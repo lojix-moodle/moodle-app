@@ -36,3 +36,35 @@
     display: inline-block;
     font-size: 14px;
 }
+
+.depo-container {
+    gap: 20px;
+    padding: 10px;
+}
+
+.depo-box, .urun-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    width: 180px;
+    text-align: center;
+    background-color: #f9f9f9;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.depo-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #0073e6;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #0073e6;
+}
+
