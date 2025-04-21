@@ -1,0 +1,38 @@
+/* block_depo_yonetimi - Stil Dosyası */
+
+/* Depo kutucukları için stil */
+.depo-box {
+    flex: 0 0 200px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+}
+
+/* Ürün kutuları için stil */
+.urun-box {
+    flex: 0 0 200px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+}
+
+/* Depo bağlantı butonu */
+.depo-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 5px 10px;
+    background: #00A29A;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Geri dönüş butonu */
+.back-link {
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 14px;
+}
