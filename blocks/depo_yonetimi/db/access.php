@@ -17,14 +17,14 @@ $capabilities = [
         ]
     ],
     'block/depo_yonetimi:viewall' => [ // Admin izni
-        'captype' => 'read',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => [
             'manager' => CAP_ALLOW
         ]
     ],
     'block/depo_yonetimi:viewown' => [ // Depo yetkilisi izni
-        'captype' => 'read',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => [
             'manager' => CAP_ALLOW
