@@ -19,16 +19,10 @@ $capabilities = [
     'block/depo_yonetimi:viewall' => [ // Admin izni
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'manager' => CAP_ALLOW
-        ]
     ],
     'block/depo_yonetimi:viewown' => [ // Depo yetkilisi izni
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'depoyetkilisi' => CAP_ALLOW
-        ]
     ]
 ];
 
