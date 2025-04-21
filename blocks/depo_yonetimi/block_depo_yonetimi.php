@@ -49,9 +49,11 @@ class block_depo_yonetimi extends block_base {
         ];
 
         // 3. Yetki kontrolü
-        if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
+        $context = context_block::instance($this->instance->id);
+
+        if (has_capability('block/depo_yonetimi:viewall', $context)) {
             $yetki = 'admin';
-        } elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
+        } elseif (has_capability('block/depo_yonetimi:viewown', $context)) {
             $yetki = 'depoyetkilisi';
         } else {
             return '<p>Yetkiniz yok.</p>';
