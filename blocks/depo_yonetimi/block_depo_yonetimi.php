@@ -115,12 +115,24 @@ class block_depo_yonetimi extends block_base {
         } else {
             // Admin tüm depoları görür
             if ($depoid) {
+//                foreach ($urunler[$depoid] as $urun) {
+//                    $html .= '<div class="urun-box">';
+//                    $html .= "<strong>{$urun['name']}</strong><br>";
+//                    $html .= "<span>Adet: {$urun['adet']}</span>";
+//                    $html .= '</div>';
+//                }
+                $html .= '<table class="generaltable">';
+                $html .= '<thead><tr><th>Ürün Adı</th><th>Adet</th></tr></thead>';
+                $html .= '<tbody>';
+
                 foreach ($urunler[$depoid] as $urun) {
-                    $html .= '<div class="urun-box">';
-                    $html .= "<strong>{$urun['name']}</strong><br>";
-                    $html .= "<span>Adet: {$urun['adet']}</span>";
-                    $html .= '</div>';
+                    $html .= '<tr>';
+                    $html .= "<td>{$urun['name']}</td>";
+                    $html .= "<td>{$urun['adet']}</td>";
+                    $html .= '</tr>';
                 }
+
+                $html .= '</tbody></table>';
                 $html .= '<br><a href="' . $PAGE->url->out(false) . '" class="back-link">← Depolara dön</a>';
             } else {
                 foreach ($depolar as $depo) {
