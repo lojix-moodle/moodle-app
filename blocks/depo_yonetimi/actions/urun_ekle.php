@@ -13,6 +13,7 @@ $PAGE->set_title('Ürün Ekle');
 $PAGE->set_heading('Ürün Ekle');
 
 $mform = new urun_form($url->out(false));
+$mform->set_data(['depoid' => $depoid]);
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/my', ['depo' => $depoid]));
