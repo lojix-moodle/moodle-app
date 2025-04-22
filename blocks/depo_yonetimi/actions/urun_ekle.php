@@ -6,6 +6,12 @@ require_once($CFG->dirroot.'/blocks/depo_yonetimi/classes/form/urun_form.php');
 $depoid = required_param('depoid', PARAM_INT);
 $url = new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]);
 
+// 💥 EKSİK OLAN KISIM: PAGE AYARLARI
+$PAGE->set_url($url);
+$PAGE->set_context(context_system::instance()); // veya uygun context
+$PAGE->set_title('Ürün Ekle');
+$PAGE->set_heading('Ürün Ekle');
+
 $mform = new urun_form($url->out(false));
 
 if ($mform->is_cancelled()) {
