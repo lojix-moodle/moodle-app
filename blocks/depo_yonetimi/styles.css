@@ -68,3 +68,11 @@
     color: #0073e6;
 }
 
+form.mform {
+    max-width: 500px;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+}
