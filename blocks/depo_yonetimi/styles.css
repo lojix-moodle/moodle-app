@@ -24,7 +24,7 @@
     display: inline-block;
     margin-top: 5px;
     padding: 5px 10px;
-    background: #00A29A;
+    background: #ff3800;
     color: white;
     border: none;
     border-radius: 5px;
@@ -57,7 +57,7 @@
     display: inline-block;
     margin-top: 10px;
     padding: 6px 12px;
-    background-color: #0073e6;
+    background-color: #e60000;
     color: white;
     border-radius: 5px;
     text-decoration: none;
@@ -66,5 +66,15 @@
 .back-link {
     display: inline-block;
     margin-top: 20px;
-    color: #0073e6;
+    color: #d700e6;
+}
+
+
+form.mform {
+    max-width: 500px;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
 }

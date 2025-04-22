@@ -6,3 +6,6 @@ $string['depo_paneli:myaddinstance'] = 'Kendi sayfana depo paneli bloğu ekle';
 $string['depo_yonetimi:viewall'] = 'Tüm depoları görme izni';
 $string['depo_yonetimi:viewown'] = 'Sadece atanmış depoyu görme izni';
 
+
+$string['productname'] = 'Product Name';
+$string['quantity'] = 'Quantity';
