@@ -30,7 +30,7 @@ class block_depo_yonetimi extends block_base {
     }
 
     private function generate_boxes_html() {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $OUTPUT;
 
         // 1. Depo listesi
         $depolar = [
@@ -42,10 +42,10 @@ class block_depo_yonetimi extends block_base {
             ['id' => 6, 'name' => 'Diyarbakır'],
         ];
 
-        // 2. Kullanıcı-depo eşleşmeleri (ileride veritabanı bağlantısı yapılabilir)
+        // 2. Kullanıcı-depo eşleşmeleri
         $kullanici_depo_eslesme = [
-            2 => 3, // Kullanıcı ID 2 => Bartın
-            5 => 1, // Kullanıcı ID 5 => Ankara
+            2 => 3,
+            5 => 1,
         ];
 
         // 3. Yetki kontrolü
@@ -60,10 +60,7 @@ class block_depo_yonetimi extends block_base {
         // 4. URL'den depo ID al
         $depoid = optional_param('depo', null, PARAM_INT);
 
-        // 5. HTML başlat
-        $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
-
-        // 6. Ürün listesi
+        // 5. Ürün listesi
         $urunler = [
             1 => [ ['name' => 'Laptop', 'adet' => 5], ['name' => 'Mouse', 'adet' => 10] ],
             2 => [ ['name' => 'Keyboard', 'adet' => 7], ['name' => 'Monitor', 'adet' => 3] ],
@@ -73,68 +70,40 @@ class block_depo_yonetimi extends block_base {
             6 => [ ['name' => 'Router', 'adet' => 3], ['name' => 'Ethernet Cable', 'adet' => 12] ],
         ];
 
-        // 7. Depo yetkilisi ise sadece kendi deposunu görür
-        if ($yetki == 'depoyetkilisi') {
-            $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
+        // 6. Admin veya yetkili ise depo seçilmişse tabloyu çiz
+        if ($depoid) {
+            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
+                $templatecontext = [
+                    'urunler' => [],
+                    'ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]),
+                    'back_url' => $PAGE->url->out(false),
+                ];
 
-            if ($depoid) {
-                if ($depoid == $kendi_depoid) {
-//                    foreach ($urunler[$depoid] as $urun) {
-//                        $html .= '<div class="urun-box">';
-//                        $html .= "<strong>{$urun['name']}</strong><br>";
-//                        $html .= "<span>Adet: {$urun['adet']}</span>";
-//                        $html .= '</div>';
-//                    }
-                    $html .= '<table class="generaltable">';
-                    $html .= '<thead><tr><th>Ürün Adı</th><th>Adet</th></tr></thead>';
-                    $html .= '<tbody>';
-
-                    foreach ($urunler[$depoid] as $urun) {
-                        $html .= '<tr>';
-                        $html .= "<td>{$urun['name']}</td>";
-                        $html .= "<td>{$urun['adet']}</td>";
-                        $html .= '</tr>';
-                    }
-
-                    $html .= '</tbody></table>';
-                    $html .= '<br><a href="' . $PAGE->url->out(false) . '" class="back-link">← Depolara dön</a>';
-                } else {
-                    $html .= '<p>Bu depoya erişim izniniz yok.</p>';
+                foreach ($urunler[$depoid] as $index => $urun) {
+                    $templatecontext['urunler'][] = [
+                        'name' => $urun['name'],
+                        'adet' => $urun['adet'],
+                        'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
+                            'depoid' => $depoid,
+                            'index' => $index
+                        ]))->out(false),
+                        'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
+                            'depoid' => $depoid,
+                            'index' => $index
+                        ]))->out(false),
+                    ];
                 }
-            } elseif ($kendi_depoid) {
-                $depo = $depolar[$kendi_depoid - 1];
-                $url = new moodle_url($PAGE->url, ['depo' => $depo['id']]);
-                $html .= '<div class="depo-box">';
-                $html .= "<strong>{$depo['name']}</strong><br>";
-                $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
-                $html .= '</div>';
+
+                return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
             } else {
-                $html .= '<p>Size atanmış bir depo yok.</p>';
+                return '<p>Bu depoya erişim izniniz yok.</p>';
             }
 
         } else {
-            // Admin tüm depoları görür
-            if ($depoid) {
-//                foreach ($urunler[$depoid] as $urun) {
-//                    $html .= '<div class="urun-box">';
-//                    $html .= "<strong>{$urun['name']}</strong><br>";
-//                    $html .= "<span>Adet: {$urun['adet']}</span>";
-//                    $html .= '</div>';
-//                }
-                $html .= '<table class="generaltable">';
-                $html .= '<thead><tr><th>Ürün Adı</th><th>Adet</th></tr></thead>';
-                $html .= '<tbody>';
+            // Yetkisine göre depo kutularını göster
+            $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
 
-                foreach ($urunler[$depoid] as $urun) {
-                    $html .= '<tr>';
-                    $html .= "<td>{$urun['name']}</td>";
-                    $html .= "<td>{$urun['adet']}</td>";
-                    $html .= '</tr>';
-                }
-
-                $html .= '</tbody></table>';
-                $html .= '<br><a href="' . $PAGE->url->out(false) . '" class="back-link">← Depolara dön</a>';
-            } else {
+            if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo['id']]);
                     $html .= '<div class="depo-box">';
@@ -142,10 +111,23 @@ class block_depo_yonetimi extends block_base {
                     $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
                     $html .= '</div>';
                 }
-            }
-        }
+            } else {
+                $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
 
-        $html .= '</div>'; // .depo-container kapanışı
-        return $html;
+                if ($kendi_depoid) {
+                    $depo = $depolar[$kendi_depoid - 1];
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo['id']]);
+                    $html .= '<div class="depo-box">';
+                    $html .= "<strong>{$depo['name']}</strong><br>";
+                    $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
+                    $html .= '</div>';
+                } else {
+                    $html .= '<p>Size atanmış bir depo yok.</p>';
+                }
+            }
+
+            $html .= '</div>';
+            return $html;
+        }
     }
 }

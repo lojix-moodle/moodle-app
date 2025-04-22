@@ -78,3 +78,24 @@ form.mform {
     border-radius: 10px;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
 }
+
+.urun-tablosu {
+    width: 100%;
+    border-collapse: collapse;
+}
+.urun-tablosu th, .urun-tablosu td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+.btn-duzenle, .btn-sil, .btn-ekle {
+    margin-right: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: #2e8b57;
+    color: white;
+    text-decoration: none;
+}
+.btn-sil {
+    background-color: #b22222;
+}
+
