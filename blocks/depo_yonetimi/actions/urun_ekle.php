@@ -1,35 +1,27 @@
 <?php
 require('../../config.php');
 
+require_login();
+
 $depoid = required_param('depoid', PARAM_INT);
 $actionurl = new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]);
 
-// Sahte veri deposu (örnek amaçlı)
-$urunler_json = $CFG->dataroot . '/urunler.json';
-if (!file_exists($urunler_json)) {
-    file_put_contents($urunler_json, json_encode([]));
-}
-$urunler = json_decode(file_get_contents($urunler_json), true);
-
-// Form gönderildi mi?
+// Form gönderildiyse
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $adet = required_param('adet', PARAM_INT);
 
-    if (!isset($urunler[$depoid])) {
-        $urunler[$depoid] = [];
-    }
+    // Kayıt ekle
+    $urun = new stdClass();
+    $urun->depoid = $depoid;
+    $urun->name = $name;
+    $urun->adet = $adet;
 
-    $urunler[$depoid][] = [
-        'name' => $name,
-        'adet' => $adet,
-    ];
+    $DB->insert_record('block_depo_yonetimi_urunler', $urun);
 
-    file_put_contents($urunler_json, json_encode($urunler));
-    redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün eklendi');
+    redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla eklendi.');
 }
 
-// Sayfa çıktısı
 echo $OUTPUT->header();
 echo html_writer::tag('h2', 'Ürün Ekle');
 

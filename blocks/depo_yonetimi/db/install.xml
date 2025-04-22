@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/depo_yonetimi/db" VERSION="2025042200" COMMENT="Veritabanı tabloları" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd">
+    <TABLES>
+
+        <TABLE NAME="block_depo_yonetimi_depolar" COMMENT="Depo listesi">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="block_depo_yonetimi_urunler" COMMENT="Depo ürünleri">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" />
+                <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" />
+                <FIELD NAME="adet" TYPE="int" LENGTH="10" NOTNULL="true" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+    </TABLES>
+</XMLDB>
