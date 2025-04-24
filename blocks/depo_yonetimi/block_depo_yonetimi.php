@@ -22,11 +22,15 @@ class block_depo_yonetimi extends block_base {
         $this->page_add_styles();
 
         return $this->content;
+
     }
+
 
     private function page_add_styles() {
         global $PAGE;
         $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css'));
+        $PAGE->requires->js_call_amd('core/bootstrap', 'init');
+
     }
 
     private function generate_boxes_html() {
