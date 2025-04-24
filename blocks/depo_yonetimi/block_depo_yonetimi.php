@@ -35,6 +35,7 @@ class block_depo_yonetimi extends block_base {
         // 1. Depo listesi (veritabanından dinamik olarak çekiliyor)
         $depolar = $DB->get_records('block_depo_yonetimi_depolar');
 
+
         // 2. Kullanıcı-depo eşleşmeleri (sabit kalabilir ya da dinamik yapılabilir)
         $kullanici_depo_eslesme = [
             2 => 3,
@@ -95,6 +96,7 @@ class block_depo_yonetimi extends block_base {
             $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
 
             if ($yetki === 'admin') {
+                echo '<a href="'.moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php').'" class="btn btn-primary">+ Depo Ekle</a>';
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
                     $html .= '<div class="depo-box">';
