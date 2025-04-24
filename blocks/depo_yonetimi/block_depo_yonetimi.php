@@ -30,19 +30,12 @@ class block_depo_yonetimi extends block_base {
     }
 
     private function generate_boxes_html() {
-        global $PAGE, $USER, $OUTPUT;
+        global $PAGE, $USER, $OUTPUT, $DB;
 
-        // 1. Depo listesi
-        $depolar = [
-            ['id' => 1, 'name' => 'Ankara'],
-            ['id' => 2, 'name' => 'Bursa'],
-            ['id' => 3, 'name' => 'Bartın'],
-            ['id' => 4, 'name' => 'İstanbul'],
-            ['id' => 5, 'name' => 'İzmir'],
-            ['id' => 6, 'name' => 'Diyarbakır'],
-        ];
+        // 1. Depo listesi (veritabanından dinamik olarak çekiliyor)
+        $depolar = $DB->get_records('block_depo_yonetimi_depolar');
 
-        // 2. Kullanıcı-depo eşleşmeleri
+        // 2. Kullanıcı-depo eşleşmeleri (sabit kalabilir ya da dinamik yapılabilir)
         $kullanici_depo_eslesme = [
             2 => 3,
             5 => 1,
@@ -60,7 +53,7 @@ class block_depo_yonetimi extends block_base {
         // 4. URL'den depo ID al
         $depoid = optional_param('depo', null, PARAM_INT);
 
-        // 5. Ürün listesi
+        // 5. Ürün listesi (şimdilik sabit, istersen bunu da veritabanından çekebiliriz)
         $urunler = [
             1 => [ ['name' => 'Laptop', 'adet' => 5], ['name' => 'Mouse', 'adet' => 10] ],
             2 => [ ['name' => 'Keyboard', 'adet' => 7], ['name' => 'Monitor', 'adet' => 3] ],
@@ -70,7 +63,6 @@ class block_depo_yonetimi extends block_base {
             6 => [ ['name' => 'Router', 'adet' => 3], ['name' => 'Ethernet Cable', 'adet' => 12] ],
         ];
 
-        // 6. Admin veya yetkili ise depo seçilmişse tabloyu çiz
         if ($depoid) {
             if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
                 $templatecontext = [
@@ -100,25 +92,24 @@ class block_depo_yonetimi extends block_base {
             }
 
         } else {
-            // Yetkisine göre depo kutularını göster
             $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
 
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
-                    $url = new moodle_url($PAGE->url, ['depo' => $depo['id']]);
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
                     $html .= '<div class="depo-box">';
-                    $html .= "<strong>{$depo['name']}</strong><br>";
+                    $html .= "<strong>{$depo->name}</strong><br>";
                     $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
                     $html .= '</div>';
                 }
             } else {
                 $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
 
-                if ($kendi_depoid) {
-                    $depo = $depolar[$kendi_depoid - 1];
-                    $url = new moodle_url($PAGE->url, ['depo' => $depo['id']]);
+                if ($kendi_depoid && isset($depolar[$kendi_depoid])) {
+                    $depo = $depolar[$kendi_depoid];
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
                     $html .= '<div class="depo-box">';
-                    $html .= "<strong>{$depo['name']}</strong><br>";
+                    $html .= "<strong>{$depo->name}</strong><br>";
                     $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
                     $html .= '</div>';
                 } else {
