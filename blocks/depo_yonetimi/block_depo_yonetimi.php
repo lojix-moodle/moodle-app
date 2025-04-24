@@ -94,9 +94,9 @@ class block_depo_yonetimi extends block_base {
 
         } else {
             $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
+            echo '<a href="'.new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php').'" class="btn btn-primary">+ Depo Ekle</a>';
 
             if ($yetki === 'admin') {
-                echo '<a href="'.new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php').'" class="btn btn-primary">+ Depo Ekle</a>';
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
                     $html .= '<div class="depo-box">';
