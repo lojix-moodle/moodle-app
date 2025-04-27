@@ -18,7 +18,8 @@
             <td>{{adet}}</td>
             <td>
                 <a href="{{duzenle_url}}">Düzenle</a> |
-                <a href="{{sil_url}}">Sil</a>
+                <a href="{{sil_url}}" class="btn btn-danger" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Ürünü Sil</a>
+
             </td>
         </tr>
     {{/urunler}}
