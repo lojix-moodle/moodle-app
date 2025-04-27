@@ -2,9 +2,11 @@
 
 require('../../../../config.php'); // config.php'ye doğru yolu ver
 require_login();
+global $DB, $PAGE, $OUTPUT;
 
 // Sayfa ayarları
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Depo Ekle');
 $PAGE->set_heading('Depo Ekle');
