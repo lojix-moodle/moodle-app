@@ -99,3 +99,30 @@ form.mform {
     background-color: #b22222;
 }
 
+/* Depo ekle butonu için */
+.depo-ekle-container {
+    margin-bottom: 20px;
+}
+
+/* Depo listesi container */
+.depo-listesi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Depo kutucukları */
+.depo-box {
+    flex: 0 0 200px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Bootstrap btn-sm override */
+.btn-sm {
+    padding: 4px 8px !important;
+    font-size: 14px !important;
+}

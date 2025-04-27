@@ -91,35 +91,12 @@ class block_depo_yonetimi extends block_base {
             } else {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
-        } else {
-            $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary">+ Depo Ekle</a>';
+        }  else {
+            $html = '<div class="depo-ekle-container">';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
+            $html .= '</div>'; // depo-ekle-container kapatma
 
-            // Depo Ekle Modal
-            $html .= '
-<div class="modal fade" id="depoEkleModal" tabindex="-1" role="dialog" aria-labelledby="depoEkleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <form action="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" method="POST">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="depoEkleModalLabel">Yeni Depo Ekle</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <label>Depo Adı:</label>
-          <input type="text" name="name" class="form-control" required>
-          <input type="hidden" name="sesskey" value="' . sesskey() . '">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-          <button type="submit" class="btn btn-success">Ekle</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>';
+            $html .= '<div class="depo-listesi">'; // Yeni depo listesi container başlangıç
 
             // Depoları Listeleme
             if ($yetki === 'admin') {
