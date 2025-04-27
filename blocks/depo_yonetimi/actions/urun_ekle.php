@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 require_once(__DIR__ . '/../../../config.php');
 
 require_login();
+global $DB, $PAGE, $OUTPUT;
 
 $depoid = required_param('depoid', PARAM_INT);
 $actionurl = new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]);
