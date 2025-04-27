@@ -40,7 +40,8 @@ if (optional_param('submitbutton', null, PARAM_RAW)) {
     $DB->update_record('block_depo_yonetimi_urunler', $urun);
 
     // Başarıyla güncellendi, geri dön
-    redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', 2);
+    redirect(new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', 2);
+
 }
 
 // Formu gösterelim
