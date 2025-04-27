@@ -98,7 +98,9 @@ class block_depo_yonetimi extends block_base {
 
         } else {
             $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
-            $html .= '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#depoEkleModal">+ Depo Ekle</button>';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary">+ Depo Ekle</a>';
+
+
 
             $html .= '
 <div class="modal fade" id="depoEkleModal" tabindex="-1" role="dialog" aria-labelledby="depoEkleModalLabel" aria-hidden="true">
