@@ -10,7 +10,13 @@ require_login();
 global $DB, $PAGE, $OUTPUT;
 
 $depoid = required_param('depoid', PARAM_INT);
-$actionurl = new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]);
+
+// BU İKİ SATIR ŞART!!!
+$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]));
+$PAGE->set_context(context_system::instance()); // veya doğru context (örneğin depo context'i varsa)
+
+$PAGE->set_title('Ürün Ekle');
+$PAGE->set_heading('Ürün Ekle');
 
 // Form gönderildiyse
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

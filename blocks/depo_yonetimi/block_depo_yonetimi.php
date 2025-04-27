@@ -55,14 +55,8 @@ class block_depo_yonetimi extends block_base {
         $depoid = optional_param('depo', null, PARAM_INT);
 
         // 5. Ürün listesi (şimdilik sabit, istersen bunu da veritabanından çekebiliriz)
-        $urunler = [
-            1 => [ ['name' => 'Laptop', 'adet' => 5], ['name' => 'Mouse', 'adet' => 10] ],
-            2 => [ ['name' => 'Keyboard', 'adet' => 7], ['name' => 'Monitor', 'adet' => 3] ],
-            3 => [ ['name' => 'Printer', 'adet' => 4], ['name' => 'Scanner', 'adet' => 2] ],
-            4 => [ ['name' => 'Webcam', 'adet' => 6], ['name' => 'Speakers', 'adet' => 8] ],
-            5 => [ ['name' => 'USB Cable', 'adet' => 15], ['name' => 'Hard Drive', 'adet' => 5] ],
-            6 => [ ['name' => 'Router', 'adet' => 3], ['name' => 'Ethernet Cable', 'adet' => 12] ],
-        ];
+        $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
 
         if ($depoid) {
             if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
@@ -72,20 +66,21 @@ class block_depo_yonetimi extends block_base {
                     'back_url' => $PAGE->url->out(false),
                 ];
 
-                foreach ($urunler[$depoid] as $index => $urun) {
+                foreach ($urunler as $index => $urun) {
                     $templatecontext['urunler'][] = [
-                        'name' => $urun['name'],
-                        'adet' => $urun['adet'],
+                        'name' => $urun->name,
+                        'adet' => $urun->adet,
                         'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                             'depoid' => $depoid,
-                            'index' => $index
+                            'index' => $urun->id
                         ]))->out(false),
                         'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
-                            'index' => $index
+                            'index' => $urun->id
                         ]))->out(false),
                     ];
                 }
+
 
                 return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
             } else {
