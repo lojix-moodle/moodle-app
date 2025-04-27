@@ -24,16 +24,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     redirect(new moodle_url('/my'), 'Depo başarıyla eklendi.');
 }
 
+// ... önceki kodlar ...
+
 echo $OUTPUT->header();
-echo html_writer::tag('h2', 'Yeni Depo Ekle');
+echo html_writer::start_div('container mt-4');
+echo html_writer::start_div('card border-primary');
+echo html_writer::start_div('card-header bg-primary text-white');
+echo html_writer::tag('h4', 'Yeni Depo Oluştur', ['class' => 'mb-0']);
+echo html_writer::end_div(); // card-header
 
-echo '<form method="POST">';
-echo '<label>Depo Adı:</label><br>';
-echo '<input type="text" name="name" required><br><br>';
-echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
-echo '<input type="submit" value="Ekle">';
+echo html_writer::start_div('card-body');
+echo '<form method="POST" class="needs-validation" novalidate>';
+echo html_writer::start_div('form-group');
+echo html_writer::tag('label', 'Depo Adı', ['class' => 'font-weight-bold']);
+echo html_writer::empty_tag('input', [
+    'type' => 'text',
+    'name' => 'name',
+    'class' => 'form-control form-control-lg',
+    'placeholder' => 'Örnek: Merkez Depo',
+    'required' => 'required'
+]);
+echo html_writer::end_div(); // form-group
+
+echo html_writer::start_div('d-flex justify-content-between align-items-center mt-4');
+echo html_writer::tag(
+    'button',
+    'Depo Ekle',
+    [
+        'type' => 'submit',
+        'class' => 'btn btn-primary btn-lg px-4'
+    ]
+);
+echo html_writer::link(
+    new moodle_url('/my'),
+    '<i class="fas fa-arrow-left mr-2"></i> Paneline Dön',
+    ['class' => 'btn btn-outline-secondary']
+);
+echo html_writer::end_div(); // d-flex
+
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'sesskey',
+    'value' => sesskey()
+]);
 echo '</form>';
+echo html_writer::end_div(); // card-body
+echo html_writer::end_div(); // card
+echo html_writer::end_div(); // container
 
-echo html_writer::link(new moodle_url('/my'), '← Geri Dön');
 echo $OUTPUT->footer();
-?>
