@@ -91,53 +91,35 @@ class block_depo_yonetimi extends block_base {
             } else {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
-        }
-        else {
-            $html = '<div class="depo-container">';
+        } else {
+            $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary">+ Depo Ekle</a>';
 
-            // Modern Floating Action Button
+            // Depo Ekle Modal
             $html .= '
-    <div class="depo-fab-container">
-        <a href="#" class="depo-fab btn btn-success" data-toggle="modal" data-target="#depoEkleModal">
-            <i class="fa fa-plus"></i>
-        </a>
-    </div>';
-
-            // Güncellenmiş Modal Tasarımı
-            $html .= '
-    <div class="modal fade" id="depoEkleModal" tabindex="-1" aria-labelledby="depoEkleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="depoEkleModalLabel">Yeni Depo Oluştur</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                </div>
-                <form action="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" method="POST">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="depoAdi" class="form-label">Depo Adı</label>
-                            <input type="text" 
-                                   class="form-control form-control-lg" 
-                                   id="depoAdi" 
-                                   name="name" 
-                                   placeholder="Depo adını giriniz" 
-                                   required
-                                   autofocus>
-                        </div>
-                        <input type="hidden" name="sesskey" value="' . sesskey() . '">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fa fa-times me-2"></i>İptal
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save me-2"></i>Oluştur
-                        </button>
-                    </div>
-                </form>
-            </div>
+<div class="modal fade" id="depoEkleModal" tabindex="-1" role="dialog" aria-labelledby="depoEkleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form action="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" method="POST">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="depoEkleModalLabel">Yeni Depo Ekle</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-    </div>';
+        <div class="modal-body">
+          <label>Depo Adı:</label>
+          <input type="text" name="name" class="form-control" required>
+          <input type="hidden" name="sesskey" value="' . sesskey() . '">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+          <button type="submit" class="btn btn-success">Ekle</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>';
 
             // Depoları Listeleme
             if ($yetki === 'admin') {
