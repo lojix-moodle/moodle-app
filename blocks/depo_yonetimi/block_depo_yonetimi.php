@@ -91,7 +91,8 @@ class block_depo_yonetimi extends block_base {
             } else {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
-        } else {
+        }
+        else {
             $html = '<div class="depo-container">';
 
             // Modern Floating Action Button
@@ -137,6 +138,7 @@ class block_depo_yonetimi extends block_base {
             </div>
         </div>
     </div>';
+
             // Depoları Listeleme
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
