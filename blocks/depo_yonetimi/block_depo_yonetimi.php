@@ -22,15 +22,12 @@ class block_depo_yonetimi extends block_base {
         $this->page_add_styles();
 
         return $this->content;
-
     }
-
 
     private function page_add_styles() {
         global $PAGE;
         $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css'));
         $PAGE->requires->js_call_amd('core/bootstrap', 'init');
-
     }
 
     private function generate_boxes_html() {
@@ -38,7 +35,6 @@ class block_depo_yonetimi extends block_base {
 
         // 1. Depo listesi (veritabanından dinamik olarak çekiliyor)
         $depolar = $DB->get_records('block_depo_yonetimi_depolar');
-
 
         // 2. Kullanıcı-depo eşleşmeleri (sabit kalabilir ya da dinamik yapılabilir)
         $kullanici_depo_eslesme = [
@@ -95,13 +91,11 @@ class block_depo_yonetimi extends block_base {
             } else {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
-
         } else {
             $html = '<div class="depo-container" style="display: flex; flex-wrap: wrap;">';
             $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary">+ Depo Ekle</a>';
 
-
-
+            // Depo Ekle Modal
             $html .= '
 <div class="modal fade" id="depoEkleModal" tabindex="-1" role="dialog" aria-labelledby="depoEkleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -127,14 +121,16 @@ class block_depo_yonetimi extends block_base {
   </div>
 </div>';
 
-
-
+            // Depoları Listeleme
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
+                    $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
+
                     $html .= '<div class="depo-box">';
                     $html .= "<strong>{$depo->name}</strong><br>";
-                    $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
+                    $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a><br><br>";
+                    $html .= "<a href='{$silurl}' class='btn btn-danger' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'>Depoyu Sil</a>";
                     $html .= '</div>';
                 }
             } else {
