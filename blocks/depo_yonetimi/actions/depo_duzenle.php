@@ -5,10 +5,11 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../../../config.php');
-require_login();
-global $DB, $PAGE, $OUTPUT, $USER;
 
-// Parametre al
+require_login();
+global $DB, $PAGE, $OUTPUT;
+
+// Parametreleri al
 $depoid = required_param('depoid', PARAM_INT);
 
 // Sayfa ayarları
@@ -21,10 +22,7 @@ $PAGE->set_heading('Depo Düzenle');
 require_capability('block/depo_yonetimi:viewall', context_system::instance());
 
 // Depo var mı kontrol et
-$depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
-if (!$depo) {
-    print_error('Depo bulunamadı.');
-}
+$depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
 
 // Form gönderildiyse
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
@@ -36,52 +34,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     redirect(new moodle_url('/my'), 'Depo başarıyla güncellendi.', 2);
 }
 
-// Formu gösterelim
 echo $OUTPUT->header();
-echo html_writer::start_div('container mt-4');
-echo html_writer::start_div('card border-info');
-echo html_writer::start_div('card-header bg-info text-white');
-echo html_writer::tag('h4', 'Depo Bilgilerini Düzenle', ['class' => 'mb-0']);
-echo html_writer::end_div(); // card-header
+?>
 
-echo html_writer::start_div('card-body');
-echo '<form method="POST" class="needs-validation" novalidate>';
-echo html_writer::start_div('form-group');
-echo html_writer::tag('label', 'Depo Adı', ['for' => 'name', 'class' => 'font-weight-bold']);
-echo html_writer::empty_tag('input', [
-    'type' => 'text',
-    'name' => 'name',
-    'id' => 'name',
-    'class' => 'form-control form-control-lg',
-    'value' => s($depo->name),
-    'required' => 'required'
-]);
-echo html_writer::end_div(); // form-group
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Depo Bilgilerini Düzenle</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
-echo html_writer::start_div('d-flex justify-content-between align-items-center mt-4');
-echo html_writer::tag(
-    'button',
-    'Kaydet',
-    [
-        'type' => 'submit',
-        'class' => 'btn btn-success btn-lg px-4'
-    ]
-);
-echo html_writer::link(
-    new moodle_url('/my'),
-    '<i class="fas fa-arrow-left mr-2"></i> Paneline Dön',
-    ['class' => 'btn btn-outline-secondary']
-);
-echo html_writer::end_div(); // d-flex
+                <div class="form-group mb-3">
+                    <label for="name" class="form-label">Depo Adı:</label>
+                    <input type="text" id="name" name="name" value="<?php echo s($depo->name); ?>" class="form-control form-control-lg" required>
+                </div>
 
-echo html_writer::empty_tag('input', [
-    'type' => 'hidden',
-    'name' => 'sesskey',
-    'value' => sesskey()
-]);
-echo '</form>';
-echo html_writer::end_div(); // card-body
-echo html_writer::end_div(); // card
-echo html_writer::end_div(); // container
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success btn-lg">Kaydet</button>
+                    <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-secondary btn-lg">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+<?php
 echo $OUTPUT->footer();
+?>

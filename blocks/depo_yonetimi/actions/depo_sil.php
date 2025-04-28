@@ -24,35 +24,42 @@ if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
 
 // 4. Onay ekranı göster
 if (!$confirm) {
-    // Onay URL'lerini oluştur
+    $depo_adi = $DB->get_field('block_depo_yonetimi_depolar', 'name', ['id' => $depoid]);
+
     $yesurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', [
         'depoid' => $depoid,
         'confirm' => 1,
-        'sesskey' => sesskey() // CSRF koruması
+        'sesskey' => sesskey()
     ]);
-    $nourl = new moodle_url('/my'); // Geri dönüş URL'si
+    $nourl = new moodle_url('/my');
+    $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', [
+        'depoid' => $depoid
+    ]);
 
-    // Sayfayı render et
     echo $OUTPUT->header();
-    echo $OUTPUT->confirm(
-        "'" . $DB->get_field('block_depo_yonetimi_depolar', 'name', ['id' => $depoid]) . "' deposunu silmek istediğinize emin misiniz?",
-        $yesurl,
-        $nourl
-    );
+
+    echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
+
+    echo html_writer::start_div('d-flex flex-column gap-2');
+
+    // Silme onayı butonları
+    echo html_writer::link($yesurl, 'Evet, Sil', ['class' => 'btn btn-danger mb-2']);
+    echo html_writer::link($nourl, 'Hayır, Vazgeç', ['class' => 'btn btn-secondary mb-2']);
+
+    // ✅ Depo düzenleme butonu
+    echo html_writer::link($duzenleurl, 'Depo Bilgilerini Düzenle', ['class' => 'btn btn-info']);
+
+    echo html_writer::end_div();
+
     echo $OUTPUT->footer();
     exit;
 }
 
-// 5. Onaylandıysa silme işlemi
-require_sesskey(); // Güvenlik anahtarı kontrolü
+// 5. Silme onayı alındıysa depo sil
+require_sesskey();
 
-// Önce bu depoya ait tüm ürünleri sil
-$DB->delete_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
-
-// Sonra depoyu sil
 $DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
 
-// Başarı mesajıyla yönlendir
 redirect(
     new moodle_url('/my'),
     'Depo başarıyla silindi.',
