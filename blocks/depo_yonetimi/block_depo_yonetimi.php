@@ -72,15 +72,15 @@ class block_depo_yonetimi extends block_base {
                         'adet' => $urun->adet,
                         'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                             'depoid' => $depoid,
-                            'index' => $urun->id
+                            'urunid' => $urun->id
                         ]))->out(false),
-
                         'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
-                            'index' => $urun->id
+                            'urunid' => $urun->id
                         ]))->out(false),
                     ];
                 }
+
 
 
                 return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
