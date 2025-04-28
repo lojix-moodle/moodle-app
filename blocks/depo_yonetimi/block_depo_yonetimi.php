@@ -78,6 +78,7 @@ class block_depo_yonetimi extends block_base {
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]))->out(false),
+
                     ];
                 }
 
