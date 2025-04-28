@@ -46,7 +46,10 @@ if (!$confirm) {
 // 5. Onaylandıysa silme işlemi
 require_sesskey(); // Güvenlik anahtarı kontrolü
 
-// Depoyu sil
+// Önce bu depoya ait tüm ürünleri sil
+$DB->delete_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
+// Sonra depoyu sil
 $DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
 
 // Başarı mesajıyla yönlendir
