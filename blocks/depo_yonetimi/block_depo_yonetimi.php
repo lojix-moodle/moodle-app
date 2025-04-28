@@ -79,6 +79,7 @@ class block_depo_yonetimi extends block_base {
                             'urunid' => $urun->id
                         ]))->out(false),
 
+
                     ];
                 }
 

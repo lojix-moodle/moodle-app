@@ -10,10 +10,10 @@ global $DB, $PAGE, $OUTPUT;
 
 // Gelen parametreleri al
 $depoid = required_param('depoid', PARAM_INT);
-$urunid = required_param('index', PARAM_INT); // index olarak geliyor, aslında ürün id'si
+$urunid = required_param('urunid', PARAM_INT); // BURASI DÜZELDİ! index DEĞİL urunid
 
 // Sayfa ayarları
-$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'index' => $urunid]));
+$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'urunid' => $urunid]));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Ürün Sil');
 $PAGE->set_heading('Ürün Sil');
@@ -34,5 +34,4 @@ $DB->delete_records('block_depo_yonetimi_urunler', ['id' => $urunid]);
 
 // Başarıyla silindi, geri dön
 redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla silindi.', 2);
-
 ?>
