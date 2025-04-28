@@ -74,6 +74,7 @@ class block_depo_yonetimi extends block_base {
                             'depoid' => $depoid,
                             'index' => $urun->id
                         ]))->out(false),
+
                         'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
                             'index' => $urun->id
