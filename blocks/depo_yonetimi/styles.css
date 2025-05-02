@@ -1,13 +1,15 @@
+/* Sayfanın altındaki genel kutu - %75 geniş */
 .depo-panel-wrapper {
-    width: 100%;
+    width: 75%;
+    margin: 20px auto;
     padding: 30px;
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     box-sizing: border-box;
-    margin-top: 20px;
 }
 
+/* Başlık */
 .panel-title {
     font-size: 26px;
     font-weight: bold;
@@ -15,52 +17,146 @@
     color: #333;
 }
 
+/* Depo ekle butonu sola yaslı ve küçük */
 .depo-ekle-container {
     margin-bottom: 20px;
     text-align: left;
 }
 
 .btn-primary {
-    padding: 6px 12px;
+    display: inline-block;
+    padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
+    border: none;
     border-radius: 6px;
-    font-size: 14px;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .btn-primary:hover {
     background-color: #45a049;
 }
 
+/* Depo kartlarını tutan alan */
 .depo-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
+    justify-content: flex-start;
 }
 
+/* Her satırda 4 kutu */
 .depo-card {
+    flex: 0 0 calc(25% - 20px);
+    max-width: calc(25% - 20px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 20px;
-    min-height: 120px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex-direction: column;
+    justify-content: space-between;
 }
 
+/* Kart başlığı */
+.depo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+}
+
+.depo-name {
+    font-weight: bold;
+    font-size: 16px;
+    flex-grow: 1;
+}
+
+.depo-edit-btn {
+    width: 28px;
+    height: 28px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 28px;
+    color: #333;
+    text-decoration: none;
+}
+
+.depo-edit-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* Butonlar */
+.depo-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    gap: 10px;
+}
+
+.depo-view-btn {
+    flex: 1;
+    padding: 8px 10px;
+    background-color: #e60000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.depo-view-btn:hover {
+    background-color: #c50000;
+}
+
+.depo-delete-btn {
+    width: 36px;
+    height: 36px;
+    background-color: #fff;
+    border: 1px solid #f44336;
+    border-radius: 6px;
+    color: #f44336;
+    text-decoration: none;
+    font-size: 18px;
+    text-align: center;
+    line-height: 36px;
+    flex-shrink: 0;
+}
+
+.depo-delete-btn:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Responsive düzenleme */
 @media (max-width: 1200px) {
-    .depo-container {
-        grid-template-columns: repeat(2, 1fr);
+    .depo-card {
+        flex: 0 0 calc(33.333% - 20px);
+        max-width: calc(33.333% - 20px);
+    }
+}
+
+@media (max-width: 900px) {
+    .depo-card {
+        flex: 0 0 calc(50% - 20px);
+        max-width: calc(50% - 20px);
     }
 }
 
 @media (max-width: 600px) {
-    .depo-container {
-        grid-template-columns: 1fr;
+    .depo-card {
+        flex: 0 0 100%;
+        max-width: 100%;
     }
 }
