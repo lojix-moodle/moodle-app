@@ -1,6 +1,6 @@
 /* Sayfanın altındaki genel kutu - %75 geniş */
 .depo-panel-wrapper {
-    width: 500px; /* viewport genişliği */
+    width: 75%; /* viewport genişliği */
     margin: 0 auto;
     padding: 30px;
     background-color: #fff;
@@ -46,8 +46,6 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: flex-start;
-    width: 10000px;
-    height: 50px;
 }
 
 /* Her satırda 4 kutu */
