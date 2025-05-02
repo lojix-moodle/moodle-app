@@ -46,6 +46,8 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: flex-start;
+    width: 100px;
+    height: 50px;
 }
 
 /* Her satırda 4 kutu */
