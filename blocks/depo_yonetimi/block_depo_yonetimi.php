@@ -30,6 +30,7 @@ class block_depo_yonetimi extends block_base {
         global $PAGE, $USER, $OUTPUT, $DB;
 
         $depolar = $DB->get_records('block_depo_yonetimi_depolar');
+
         $kullanici_depo_eslesme = [
             2 => 3,
             5 => 1,
@@ -45,14 +46,14 @@ class block_depo_yonetimi extends block_base {
 
         $depoid = optional_param('depo', null, PARAM_INT);
 
-        if ($depoid) {
-            $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+        $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
 
+        if ($depoid) {
             if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
                 $templatecontext = [
                     'urunler' => [],
-                    'ekle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]))->out(false),
-                    'back_url' => (new moodle_url('/blocks/depo_yonetimi/index.php'))->out(false),
+                    'ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]),
+                    'back_url' => $PAGE->url->out(false),
                 ];
 
                 foreach ($urunler as $urun) {
@@ -65,8 +66,7 @@ class block_depo_yonetimi extends block_base {
                         ]))->out(false),
                         'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
-                            'urunid' => $urun->id,
-                            'sesskey' => sesskey(),
+                            'urunid' => $urun->id
                         ]))->out(false),
                     ];
                 }
@@ -76,54 +76,45 @@ class block_depo_yonetimi extends block_base {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
         } else {
-            $html = '';
+            $html = '<div class="depo-ekle-container">';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
+            $html .= '</div>';
 
-            if ($yetki === 'admin') {
-                $html .= '<div class="depo-ekle-container">';
-                $html .= '<a href="' . (new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'))->out(false) . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
-                $html .= '</div>';
-            }
-
-            // 4'lü grid sistemi burada
-            $html .= '<div class="depo-grid">';
+            $html .= '<div class="depo-grid">'; // Değiştirildi: depo-listesi -> depo-grid
 
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
-                    $html .= $this->render_depo_box($depo, true);
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
+                    $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
+
+                    $html .= '<div class="depo-box">';
+                    $html .= "<h3>{$depo->name}</h3>";
+                    $html .= '<div class="depo-buttons">';
+                    $html .= "<a href='{$url}' class='btn btn-danger mb-2'>Ürünleri Gör</a><br>";
+                    $html .= "<a href='{$silurl}' class='btn btn-danger' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'>Depoyu Sil</a>";
+                    $html .= '</div>';
+                    $html .= '</div>';
                 }
             } else {
                 $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
 
                 if ($kendi_depoid && isset($depolar[$kendi_depoid])) {
-                    $html .= $this->render_depo_box($depolar[$kendi_depoid], false);
+                    $depo = $depolar[$kendi_depoid];
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
+
+                    $html .= '<div class="depo-box">';
+                    $html .= "<h3>{$depo->name}</h3>";
+                    $html .= '<div class="depo-buttons">';
+                    $html .= "<a href='{$url}' class='btn btn-danger'>Ürünleri Gör</a>";
+                    $html .= '</div>';
+                    $html .= '</div>';
                 } else {
-                    $html .= '<p>Size atanmış bir depo bulunamadı.</p>';
+                    $html .= '<p>Size atanmış bir depo yok.</p>';
                 }
             }
 
             $html .= '</div>'; // depo-grid kapatma
             return $html;
         }
-    }
-
-    private function render_depo_box($depo, $isadmin = false) {
-        $depo_url = new moodle_url('/blocks/depo_yonetimi/index.php', ['depo' => $depo->id]);
-        $duzenle_url = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]);
-        $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id, 'sesskey' => sesskey()]);
-
-        $html = '<div class="depo-box">';
-        $html .= '<h3>' . format_string($depo->name) . '</h3>';
-
-        if ($isadmin) {
-            $html .= '<div class="depo-icons">';
-            $html .= '<a href="' . $duzenle_url . '" title="Düzenle" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit"></i></a> ';
-            $html .= '<a href="' . $sil_url . '" title="Sil" class="btn btn-outline-danger btn-sm" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');"><i class="fas fa-trash"></i></a>';
-            $html .= '</div>';
-        }
-
-        $html .= '<a href="' . $depo_url . '" class="btn btn-primary btn-block mt-2">Ürünleri Gör</a>';
-        $html .= '</div>';
-
-        return $html;
     }
 }
