@@ -23,7 +23,7 @@
     display: inline-block;
     margin-top: 5px;
     padding: 5px 10px;
-    background: #48ff00;
+    background: #ff3800;
     color: white;
     border: none;
     border-radius: 5px;
@@ -48,7 +48,7 @@
     border-radius: 10px;
     width: 180px;
     text-align: center;
-    background-color: #ca48f3;
+    background-color: #f9f9f9;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -56,7 +56,7 @@
     display: inline-block;
     margin-top: 10px;
     padding: 6px 12px;
-    background-color: #48ff00;
+    background-color: #e60000;
     color: white;
     border-radius: 5px;
     text-decoration: none;
@@ -95,7 +95,7 @@ form.mform {
     text-decoration: none;
 }
 .btn-sil {
-    background-color: #48ff00;
+    background-color: #b22222;
 }
 
 /* Depo ekle butonu için */
@@ -116,7 +116,7 @@ form.mform {
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 10px;
-    background-color: #ca48f3;
+    background-color: #f9f9f9;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
 }
 
