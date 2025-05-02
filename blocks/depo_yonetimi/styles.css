@@ -1,25 +1,33 @@
-/* block_depo_yonetimi - Stil Dosyası */
+/* Ana konteyner - Arka beyaz kutu */
+.block.block_depo_yonetimi .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 
 /* Depo konteyner - Depo kutuları için flex container */
 .depo-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
-    padding: 10px;
+    gap: 30px; /* Aradaki boşluk artırıldı */
+    padding: 20px;
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center; /* Ortalanmış şekilde hizalama */
 }
 
 /* Depo kartları - Her bir depo için kart */
 .depo-card {
-    flex: 0 0 calc(24% - 15px); /* 4 kart yanyana */
-    max-width: calc(24% - 15px); /* Maksimum genişlik sınırlaması */
+    flex: 0 0 calc(23% - 30px);
+    max-width: calc(23% - 30px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 /* Depo başlık alanı */
@@ -85,89 +93,61 @@
 
 .depo-view-btn {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 10px 20px;
     background-color: #e60000;
     color: white;
     border: none;
     border-radius: 6px;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .depo-view-btn:hover {
     background-color: #c50000;
 }
 
-/* Depo ekle butonu için */
+/* Depo ekle butonu */
 .depo-ekle-container {
     margin-bottom: 20px;
     padding: 10px;
+    text-align: center;
 }
 
 .btn-primary {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 12px 24px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 6px;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .btn-primary:hover {
     background-color: #45a049;
 }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 12px;
-}
-
-/* Ürün tablosu stilleri */
-.urun-tablosu {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.urun-tablosu th, .urun-tablosu td {
-    border: 1px solid #ccc;
-    padding: 8px;
-}
-
-.btn-duzenle, .btn-sil, .btn-ekle {
-    margin-right: 10px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background-color: #2e8b57;
-    color: white;
-    text-decoration: none;
-}
-
-.btn-sil {
-    background-color: #b22222;
-}
-
 /* Responsive ayarlar */
 @media (max-width: 1200px) {
     .depo-card {
-        flex: 0 0 calc(32% - 15px); /* 3 kart yanyana */
-        max-width: calc(32% - 15px);
+        flex: 0 0 calc(30% - 30px);
+        max-width: calc(30% - 30px);
     }
 }
 
 @media (max-width: 900px) {
     .depo-card {
-        flex: 0 0 calc(49% - 15px); /* 2 kart yanyana */
-        max-width: calc(49% - 15px);
+        flex: 0 0 calc(45% - 30px);
+        max-width: calc(45% - 30px);
     }
 }
 
 @media (max-width: 600px) {
     .depo-card {
-        flex: 0 0 calc(100% - 15px); /* 1 kart yanyana */
-        max-width: calc(100% - 15px);
+        flex: 0 0 100%;
+        max-width: 100%;
     }
 }
