@@ -84,7 +84,8 @@ class block_depo_yonetimi extends block_base {
                 $html .= '</div>';
             }
 
-            $html .= '<div class="depo-listesi">';
+            // 4'lü grid sistemi burada
+            $html .= '<div class="depo-grid">';
 
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
@@ -100,7 +101,7 @@ class block_depo_yonetimi extends block_base {
                 }
             }
 
-            $html .= '</div>';
+            $html .= '</div>'; // depo-grid kapatma
             return $html;
         }
     }
@@ -111,16 +112,16 @@ class block_depo_yonetimi extends block_base {
         $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id, 'sesskey' => sesskey()]);
 
         $html = '<div class="depo-box">';
-        $html .= '<div class="depo-header">';
-        $html .= '<span class="depo-name">' . format_string($depo->name) . '</span>';
+        $html .= '<h3>' . format_string($depo->name) . '</h3>';
+
         if ($isadmin) {
-            $html .= '<div class="depo-actions">';
-            $html .= '<a href="' . $duzenle_url . '" class="depo-icon" title="Depoyu Düzenle"><i class="fas fa-pencil-alt"></i></a>';
-            $html .= '<a href="' . $sil_url . '" class="depo-icon" title="Depoyu Sil" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');"><i class="fas fa-trash"></i></a>';
+            $html .= '<div class="depo-icons">';
+            $html .= '<a href="' . $duzenle_url . '" title="Düzenle" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit"></i></a> ';
+            $html .= '<a href="' . $sil_url . '" title="Sil" class="btn btn-outline-danger btn-sm" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');"><i class="fas fa-trash"></i></a>';
             $html .= '</div>';
         }
-        $html .= '</div>';
-        $html .= '<a href="' . $depo_url . '" class="depo-btn">Ürünleri Gör</a>';
+
+        $html .= '<a href="' . $depo_url . '" class="btn btn-primary btn-block mt-2">Ürünleri Gör</a>';
         $html .= '</div>';
 
         return $html;

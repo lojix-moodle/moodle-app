@@ -1,113 +1,88 @@
-/* Genel kutu düzeni */
-.depo-listesi {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+/* Depo kutularını grid yap */
+.depo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Her satırda 4 kutu */
+    gap: 20px; /* Kutular arası boşluk */
     margin-top: 20px;
 }
 
-/* Her bir depo kutusu */
+/* Depo kutusu görünümü */
 .depo-box {
-    flex: 0 0 calc(25% - 20px);
+    background: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    box-sizing: border-box;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
 }
 
+/* Hover animasyonu */
 .depo-box:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Depo başlığı */
-.depo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 /* Depo adı */
-.depo-name {
-    font-weight: bold;
-    font-size: 18px;
+.depo-box h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
     color: #333;
 }
 
-/* Düzenle ve sil ikonları */
-.depo-actions {
-    display: flex;
-    gap: 10px;
+/* İkon butonlar */
+.depo-icons {
+    margin-bottom: 10px;
 }
 
-.depo-icon {
+.depo-icons a {
+    margin: 0 5px;
+    display: inline-block;
     color: #555;
     font-size: 18px;
-    text-decoration: none;
 }
 
-.depo-icon:hover {
-    color: #007bff;
+.depo-icons a:hover {
+    color: #000;
 }
 
 /* Ürünleri gör butonu */
-.depo-btn {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #28a745;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
+.btn-block, .depo-btn {
     display: inline-block;
-}
-
-.depo-btn:hover {
-    background-color: #218838;
-}
-
-/* Yeni depo ekle butonu */
-.yeni-depo-btn-container {
-    text-align: right;
-    margin-bottom: 20px;
-}
-
-.yeni-depo-btn {
-    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 0;
     background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
+    color: #fff !important;
+    border: none;
+    border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
-    border-radius: 5px;
 }
 
-.yeni-depo-btn:hover {
+.btn-block:hover, .depo-btn:hover {
     background-color: #0056b3;
 }
 
-/* Responsive */
+/* Depo ekle butonu */
+.depo-ekle-container {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.depo-ekle-container .btn {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+/* Responsive ayar: Mobilde 1-2 kutu görünür */
 @media (max-width: 992px) {
-    .depo-box {
-        flex: 0 0 calc(33.333% - 20px);
+    .depo-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 768px) {
-    .depo-box {
-        flex: 0 0 calc(50% - 20px);
-    }
-}
-
-@media (max-width: 480px) {
-    .depo-box {
-        flex: 0 0 100%;
+@media (max-width: 576px) {
+    .depo-grid {
+        grid-template-columns: 1fr;
     }
 }
