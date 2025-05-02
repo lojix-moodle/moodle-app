@@ -1,6 +1,6 @@
 /* Sayfanın altındaki genel kutu - %75 geniş */
 .depo-panel-wrapper {
-    width: 75%;
+    width: 100%;
     margin: 20px auto;
     padding: 30px;
     background-color: #fff;
