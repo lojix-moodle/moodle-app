@@ -90,7 +90,7 @@ class block_depo_yonetimi extends block_base {
             $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
             $html .= '</div>'; // depo-ekle-container kapatma
 
-            $html .= '<div class="depo-listesi">'; // Depo listesi container başlangıç
+            $html .= '<div class="depo-container">'; // Depo listesi container başlangıç
 
             // Depoları Listeleme
             if ($yetki === 'admin') {
@@ -99,24 +99,18 @@ class block_depo_yonetimi extends block_base {
                     $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]);
                     $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
 
-                    $html .= '<div class="depo-box">';
+                    $html .= '<div class="depo-card">';
                     $html .= '<div class="depo-header">';
-                    $html .= "<div class='depo-title'>{$depo->name}</div>";
-                    $html .= "<div class='depo-actions'>";
-                    $html .= "<a href='{$duzenleurl}' class='depo-action-btn edit-btn' title='Depoyu Düzenle'><i class='fa fa-pencil'></i></a>";
-                    $html .= "</div>";
+                    $html .= "<div class='depo-name'>{$depo->name}</div>";
+                    $html .= "<a href='{$duzenleurl}' class='depo-edit-btn' title='Depoyu Düzenle'>✎</a>";
                     $html .= '</div>'; // depo-header sonu
 
-                    $html .= '<div class="depo-content">';
-                    $html .= "<div class='depo-delete'>";
-                    $html .= "<a href='{$silurl}' class='btn btn-danger btn-sm' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'><i class='fa fa-trash'></i></a>";
-                    $html .= "</div>";
-                    $html .= "<div class='depo-view-products'>";
-                    $html .= "<a href='{$url}' class='btn btn-primary btn-sm'>Ürünleri Gör</a>";
-                    $html .= "</div>";
-                    $html .= '</div>'; // depo-content sonu
+                    $html .= '<div class="depo-buttons">';
+                    $html .= "<a href='{$silurl}' class='depo-delete-btn' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'>🗑️</a>";
+                    $html .= "<a href='{$url}' class='depo-view-btn'>Ürünleri Gör</a>";
+                    $html .= '</div>'; // depo-buttons sonu
 
-                    $html .= '</div>'; // depo-box sonu
+                    $html .= '</div>'; // depo-card sonu
                 }
             } else {
                 $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
@@ -125,24 +119,22 @@ class block_depo_yonetimi extends block_base {
                     $depo = $depolar[$kendi_depoid];
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
 
-                    $html .= '<div class="depo-box">';
+                    $html .= '<div class="depo-card">';
                     $html .= '<div class="depo-header">';
-                    $html .= "<div class='depo-title'>{$depo->name}</div>";
+                    $html .= "<div class='depo-name'>{$depo->name}</div>";
                     $html .= '</div>'; // depo-header sonu
 
-                    $html .= '<div class="depo-content">';
-                    $html .= "<div class='depo-view-products'>";
-                    $html .= "<a href='{$url}' class='btn btn-primary btn-sm'>Ürünleri Gör</a>";
-                    $html .= "</div>";
-                    $html .= '</div>'; // depo-content sonu
+                    $html .= '<div class="depo-buttons">';
+                    $html .= "<a href='{$url}' class='depo-view-btn'>Ürünleri Gör</a>";
+                    $html .= '</div>'; // depo-buttons sonu
 
-                    $html .= '</div>'; // depo-box sonu
+                    $html .= '</div>'; // depo-card sonu
                 } else {
                     $html .= '<p>Size atanmış bir depo yok.</p>';
                 }
             }
 
-            $html .= '</div>'; // depo-listesi sonu
+            $html .= '</div>'; // depo-container sonu
             return $html;
         }
     }
