@@ -1,41 +1,22 @@
 /* Lojix Depo Paneli Styles */
 
-/* Sayfanın genel kutu - %100 geniş */
+/* Sayfanın altındaki genel kutu - %85 geniş */
 .depo-panel-wrapper {
-    width: 100%;
+    width: 85%;
     margin: 0 auto;
-    padding: 20px 30px 30px;
+    padding: 30px;
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     box-sizing: border-box;
 }
 
-/* Dashboard içeriğini düzenlemeler */
-#page-content {
-    margin-top: -30px;
-}
-
-#region-main {
-    padding: 0 !important;
-}
-
-#region-main > .card {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-#region-main > .card > .card-body {
-    padding: 0 !important;
-}
-
 /* Başlık */
 .panel-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     color: #333;
-    text-align: center;
 }
 
 /* Depo ekle butonu sola yaslı ve küçük */
@@ -167,22 +148,17 @@
     color: white;
 }
 
-/* Dashboard başlığını tamamen gizle */
-.page-context-header .page-header-headings h1:contains("Dashboard"),
-h2:contains("Dashboard") {
-    display: none;
+/* Dashboard başlığını değiştir (Lojix Depo Paneli yapmak için) */
+.page-context-header .page-header-headings h1:contains("Dashboard") {
+    visibility: hidden;
+    position: relative;
 }
 
-/* Çift katmanlı görünümü düzeltme */
-#region-main > .card {
-    border: none;
-    background: transparent;
-    box-shadow: none;
-}
-
-/* Üstteki Lojix Depo Paneli başlığını kaldır */
-#region-main .card-body > [role="main"] > div > div:first-child {
-    display: none;
+.page-context-header .page-header-headings h1:contains("Dashboard"):after {
+    content: 'Lojix Depo Paneli';
+    visibility: visible;
+    position: absolute;
+    left: 0;
 }
 
 /* Responsive düzenleme */
