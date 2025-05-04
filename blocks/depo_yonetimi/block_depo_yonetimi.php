@@ -28,6 +28,7 @@ class block_depo_yonetimi extends block_base {
         global $PAGE;
         $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css', ['v' => time()]));
         $PAGE->requires->js_call_amd('core/bootstrap', 'init');
+        $PAGE->requires->js(new moodle_url('/blocks/depo_yonetimi/custom.js', ['v' => time()]));
     }
 
     private function generate_boxes_html() {
@@ -87,7 +88,7 @@ class block_depo_yonetimi extends block_base {
             }
         } else {
             $html = '<div class="depo-panel-wrapper">';
-            $html .= '<h2 class="panel-title">Lojix Depo Paneli</h2>';
+            $html .= '<h1 class="panel-title">Lojix Depo Paneli</h1>';
 
             $html .= '<div class="depo-ekle-container">';
             $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
