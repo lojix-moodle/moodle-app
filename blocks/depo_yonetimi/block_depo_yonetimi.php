@@ -86,7 +86,10 @@ class block_depo_yonetimi extends block_base {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
         } else {
-            $html = '<div class="depo-ekle-container">';
+            $html = '<div class="depo-panel-wrapper">';
+            $html .= '<h2 class="panel-title">Lojix Depo Paneli</h2>';
+
+            $html .= '<div class="depo-ekle-container">';
             $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
             $html .= '</div>'; // depo-ekle-container kapatma
 
@@ -135,6 +138,7 @@ class block_depo_yonetimi extends block_base {
             }
 
             $html .= '</div>'; // depo-container sonu
+            $html .= '</div>'; // depo-panel-wrapper sonu
             return $html;
         }
     }

@@ -1,6 +1,8 @@
-/* Sayfanın altındaki genel kutu - %75 geniş */
+/* Lojix Depo Paneli Styles */
+
+/* Sayfanın altındaki genel kutu - %85 geniş */
 .depo-panel-wrapper {
-    width: 75%; /* viewport genişliği */
+    width: 85%;
     margin: 0 auto;
     padding: 30px;
     background-color: #fff;
@@ -8,7 +10,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     box-sizing: border-box;
 }
-
 
 /* Başlık */
 .panel-title {
@@ -40,7 +41,7 @@
     background-color: #45a049;
 }
 
-/* Depo kartlarını tutan alan */
+/* Depo kartlarını tutan alan - Flexbox ile her satırda 3 kart */
 .depo-container {
     display: flex;
     flex-wrap: wrap;
@@ -48,10 +49,10 @@
     justify-content: flex-start;
 }
 
-/* Her satırda 4 kutu */
+/* Her satırda 3 kutu */
 .depo-card {
-    flex: 0 0 calc(25% - 20px);
-    max-width: calc(25% - 20px);
+    flex: 0 0 calc(33.333% - 14px);
+    max-width: calc(33.333% - 14px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -60,6 +61,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-bottom: 15px;
 }
 
 /* Kart başlığı */
@@ -76,6 +78,9 @@
     font-weight: bold;
     font-size: 16px;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .depo-edit-btn {
@@ -89,13 +94,15 @@
     line-height: 28px;
     color: #333;
     text-decoration: none;
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 
 .depo-edit-btn:hover {
     background-color: #e0e0e0;
 }
 
-/* Butonlar */
+/* Butonlar - Ürünleri Gör butonu satır aşağı inmeyecek */
 .depo-buttons {
     display: flex;
     justify-content: space-between;
@@ -115,6 +122,7 @@
     font-size: 14px;
     font-weight: 600;
     text-align: center;
+    white-space: nowrap;
 }
 
 .depo-view-btn:hover {
@@ -140,22 +148,28 @@
     color: white;
 }
 
+/* Dashboard başlığını değiştir (Lojix Depo Paneli yapmak için) */
+.page-context-header .page-header-headings h1:contains("Dashboard") {
+    visibility: hidden;
+    position: relative;
+}
+
+.page-context-header .page-header-headings h1:contains("Dashboard"):after {
+    content: 'Lojix Depo Paneli';
+    visibility: visible;
+    position: absolute;
+    left: 0;
+}
+
 /* Responsive düzenleme */
 @media (max-width: 1200px) {
     .depo-card {
-        flex: 0 0 calc(33.333% - 20px);
-        max-width: calc(33.333% - 20px);
+        flex: 0 0 calc(50% - 10px);
+        max-width: calc(50% - 10px);
     }
 }
 
-@media (max-width: 900px) {
-    .depo-card {
-        flex: 0 0 calc(50% - 20px);
-        max-width: calc(50% - 20px);
-    }
-}
-
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .depo-card {
         flex: 0 0 100%;
         max-width: 100%;

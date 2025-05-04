@@ -1,27 +1,86 @@
-<div style="display: flex; justify-content: space-between">
-    <a href="{{ekle_url}}" class="btn btn-primary">+ Ürün Ekle</a>
-    <a href="{{back_url}}" class="back-link">← Depolara dön</a>
-</div>
-<br>
-<table class="generaltable">
-    <thead>
-    <tr>
-        <th>Ürün Adı</th>
-        <th>Adet</th>
-        <th>İşlemler</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{#urunler}}
-        <tr>
-            <td>{{name}}</td>
-            <td>{{adet}}</td>
-            <td>
-                <a href="{{duzenle_url}}" class="btn btn-primary btn-sm" onclick="return confirm('Bu ürünü düzenlemek istediğinize emin misiniz?');">Düzenle</a>
-                <a href="{{sil_url}}" class="btn btn-danger" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Ürünü Sil</a>
+<div class="depo-panel-wrapper">
+    <h2 class="panel-title">Ürün Listesi</h2>
 
-            </td>
-        </tr>
-    {{/urunler}}
-    </tbody>
-</table>
+    <div class="urun-ekle-container">
+        <a href="{{ekle_url}}" class="btn btn-primary btn-sm">+ Ürün Ekle</a>
+        <a href="{{back_url}}" class="btn btn-secondary btn-sm">← Depolara Dön</a>
+    </div>
+
+    <div class="urun-table-container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Ürün Adı</th>
+                    <th>Adet</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#urunler}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{adet}}</td>
+                    <td class="urun-actions">
+                        <a href="{{duzenle_url}}" class="btn btn-sm btn-warning">Düzenle</a>
+                        <a href="{{sil_url}}" class="btn btn-sm btn-danger" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Sil</a>
+                    </td>
+                </tr>
+                {{/urunler}}
+                {{^urunler}}
+                <tr>
+                    <td colspan="3" class="text-center">Bu depoda henüz ürün bulunmamaktadır.</td>
+                </tr>
+                {{/urunler}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.urun-ekle-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.urun-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.urun-table-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+</style>
