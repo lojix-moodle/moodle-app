@@ -1,70 +1,34 @@
-/* Genel container */
-.container {
-    width: 90%;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* Satırları hizalamak için */
-.row {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px; /* Kutular arasındaki boşluk */
-}
-
-/* Her bir kutu için stil */
-.col {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
 .box {
-    padding: 20px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    background-color: #f2f2f2;
+    border: 2px solid #ccc;
+    border-radius: 12px;
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
 }
 
-.depo {
-    background-color: #4CAF50;
-    color: white;
+.box:hover {
+    background-color: #e6e6e6;
+    transform: scale(1.02);
 }
 
-.urun {
-    background-color: #2196F3;
-    color: white;
+.box-depo { background-color: #007bff; color: white; }
+.box-urun { background-color: #28a745; color: white; }
+.box-satis { background-color: #ffc107; color: white; }
+.box-stok { background-color: #17a2b8; color: white; }
+.box-talep { background-color: #dc3545; color: white; }
+
+.container {
+    margin-top: 30px;
 }
 
-.satis {
-    background-color: #FF5722;
-    color: white;
-}
-
-.stok {
-    background-color: #FFC107;
-    color: white;
-}
-
-.talep {
-    background-color: #9C27B0;
-    color: white;
-}
-
-/* Mobil uyumlu düzen */
-@media (max-width: 768px) {
-    .row {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .col {
-        flex: none;
-        width: 100%;
-    }
+.mt-4 {
+    margin-top: 2rem;
 }
