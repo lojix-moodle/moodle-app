@@ -22,6 +22,7 @@
 .depo-ekle-container {
     margin: 20px 10px 20px 0;
     text-align: left;
+    left: 10px;
 }
 
 .btn-primary {
@@ -50,8 +51,9 @@
 
 /* Her satırda 3 kutu */
 .depo-card {
-    flex: 0 0 calc(33.333% - 10px);
-    max-width: calc(33.333% - 10px);
+    flex: 0 0 calc(33.333% - 20px);
+    max-width: calc(13.333% - 20px);
+    left: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
