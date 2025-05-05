@@ -46,8 +46,7 @@ class block_depo_yonetimi extends block_base {
             </div>
         </div>';
 
-        // Footer (alt bilgi) ekleyebiliriz, şu an boş bırakıyoruz
-        $this->content->footer = '';
+        // Footer kısmı kaldırıldı
 
         // İçeriği döndür
         return $this->content;
