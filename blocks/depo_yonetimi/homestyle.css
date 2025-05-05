@@ -1,0 +1,70 @@
+/* Genel container */
+.container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Satırları hizalamak için */
+.row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Kutular arasındaki boşluk */
+}
+
+/* Her bir kutu için stil */
+.col {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.box {
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.depo {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.urun {
+    background-color: #2196F3;
+    color: white;
+}
+
+.satis {
+    background-color: #FF5722;
+    color: white;
+}
+
+.stok {
+    background-color: #FFC107;
+    color: white;
+}
+
+.talep {
+    background-color: #9C27B0;
+    color: white;
+}
+
+/* Mobil uyumlu düzen */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .col {
+        flex: none;
+        width: 100%;
+    }
+}

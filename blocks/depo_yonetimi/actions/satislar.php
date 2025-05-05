@@ -1,39 +1,28 @@
 <?php
-// Veritabanı bağlantısı
-$host = 'localhost';  // Veritabanı sunucusu
-$dbname = 'depo_db';  // Veritabanı adı
-$username = 'root';   // Veritabanı kullanıcı adı
-$password = '';       // Veritabanı şifresi
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo 'Connection failed: ' . $e->getMessage();
-}
+// Satış verileri statik olarak tanımlanacak
+$sales = [
+    ['product' => 'Ürün A', 'quantity' => 5, 'date' => '2025-05-05', 'total' => 50, 'branch' => 'Şube 1'],
+    ['product' => 'Ürün B', 'quantity' => 2, 'date' => '2025-05-04', 'total' => 20, 'branch' => 'Şube 2'],
+    ['product' => 'Ürün C', 'quantity' => 10, 'date' => '2025-05-03', 'total' => 100, 'branch' => 'Şube 1']
+];
 
 // Satış ekleme işlemi
 if (isset($_POST['add_sale'])) {
+    // Kullanıcının girdiği veriler alınıyor
     $product = $_POST['product'];
     $quantity = $_POST['quantity'];
     $date = $_POST['date'];
     $branch = $_POST['branch'];
 
     // Satış tutarını hesapla
-    // Örneğin, ürün fiyatını sabit kabul edebiliriz, ama genelde ürün fiyatı veritabanından çekilir
-    $product_price = 10; // Örnek fiyat, veritabanından ürün fiyatı çekilebilir
+    // Örneğin, ürün fiyatını sabit kabul ediyoruz
+    $product_price = 10; // Örnek fiyat, gerçek sistemde ürün fiyatı veritabanından alınır
     $total = $product_price * $quantity;
 
-    // Veritabanına ekleme
-    $sql = "INSERT INTO sales (product, quantity, date, total, branch) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$product, $quantity, $date, $total, $branch]);
+    // Yeni satış verisini ekle
+    $new_sale = ['product' => $product, 'quantity' => $quantity, 'date' => $date, 'total' => $total, 'branch' => $branch];
+    $sales[] = $new_sale;
 }
-
-// Satışları al
-$sql = "SELECT * FROM sales ORDER BY date DESC";
-$stmt = $pdo->query($sql);
-$sales = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
