@@ -1,10 +1,10 @@
 <?php
 
-class block_depo_yonetimi extends block_base {
+class block_home extends block_base {
 
     public function init() {
         // Plugin başlığı
-        $this->title = get_string('pluginname', 'block_depo_yonetimi');
+        $this->title = get_string('pluginname', 'block_home');
     }
 
     public function get_content() {
@@ -26,116 +26,38 @@ class block_depo_yonetimi extends block_base {
 
     private function page_add_styles() {
         global $PAGE;
-        $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css', ['v' => time()]));
+        $PAGE->requires->css(new moodle_url('/blocks/home/homestyle.css', ['v' => time()]));
         $PAGE->requires->js_call_amd('core/bootstrap', 'init');
     }
 
     private function generate_boxes_html() {
-        global $PAGE, $USER, $OUTPUT, $DB;
+        // 5 kutunun HTML'ini oluşturuyoruz
+        $html = '
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="box depo">Depolar</div>
+                </div>
+                <div class="col">
+                    <div class="box urun">Ürünler</div>
+                </div>
+                <div class="col">
+                    <div class="box satis">Satışlar</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="box stok">Stok</div>
+                </div>
+                <div class="col">
+                    <div class="box talep">Talep</div>
+                </div>
+                <div class="col">
+                    <!-- Boş kutu, 3. satırda yer alması için -->
+                </div>
+            </div>
+        </div>';
 
-        // 1. Depo listesi (veritabanından dinamik olarak çekiliyor)
-        $depolar = $DB->get_records('block_depo_yonetimi_depolar');
-
-        // 2. Kullanıcı-depo eşleşmeleri (sabit kalabilir ya da dinamik yapılabilir)
-        $kullanici_depo_eslesme = [
-            2 => 3,
-            5 => 1,
-        ];
-
-        // 3. Yetki kontrolü
-        if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
-            $yetki = 'admin';
-        } elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
-            $yetki = 'depoyetkilisi';
-        } else {
-            return '<p>Yetkiniz yok.</p>';
-        }
-
-        // 4. URL'den depo ID al
-        $depoid = optional_param('depo', null, PARAM_INT);
-
-        // 5. Ürün listesi (şimdilik sabit, istersen bunu da veritabanından çekebiliriz)
-        $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
-
-
-        if ($depoid) {
-            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
-                $templatecontext = [
-                    'urunler' => [],
-                    'ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]),
-                    'back_url' => $PAGE->url->out(false),
-                ];
-
-                foreach ($urunler as $index => $urun) {
-                    $templatecontext['urunler'][] = [
-                        'name' => $urun->name,
-                        'adet' => $urun->adet,
-                        'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
-                            'depoid' => $depoid,
-                            'urunid' => $urun->id
-                        ]))->out(false),
-                        'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
-                            'depoid' => $depoid,
-                            'urunid' => $urun->id
-                        ]))->out(false),
-                    ];
-                }
-
-                return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
-            } else {
-                return '<p>Bu depoya erişim izniniz yok.</p>';
-            }
-        } else {
-            $html = '<div class="depo-ekle-container">';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
-            $html .= '</div>'; // depo-ekle-container kapatma
-
-            $html .= '<div class="depo-container">'; // Depo listesi container başlangıç
-
-            // Depoları Listeleme
-            if ($yetki === 'admin') {
-                foreach ($depolar as $depo) {
-                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-                    $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]);
-                    $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
-
-                    $html .= '<div class="depo-card">';
-                    $html .= '<div class="depo-header">';
-                    $html .= "<div class='depo-name'>{$depo->name}</div>";
-                    $html .= "<a href='{$duzenleurl}' class='depo-edit-btn' title='Depoyu Düzenle'>✎</a>";
-                    $html .= '</div>'; // depo-header sonu
-
-                    $html .= '<div class="depo-buttons">';
-                    $html .= "<a href='{$silurl}' class='depo-delete-btn' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'>🗑</a>";
-                    $html .= "<a href='{$url}' class='depo-view-btn'>Ürünleri Gör</a>";
-                    $html .= '</div>'; // depo-buttons sonu
-
-                    $html .= '</div>'; // depo-card sonu
-                }
-            } else {
-                $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
-
-                if ($kendi_depoid && isset($depolar[$kendi_depoid])) {
-                    $depo = $depolar[$kendi_depoid];
-                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-
-                    $html .= '<div class="depo-card">';
-                    $html .= '<div class="depo-header">';
-                    $html .= "<div class='depo-name'>{$depo->name}</div>";
-                    $html .= '</div>'; // depo-header sonu
-
-                    $html .= '<div class="depo-buttons">';
-                    $html .= "<a href='{$url}' class='depo-view-btn'>Ürünleri Gör</a>";
-                    $html .= '</div>'; // depo-buttons sonu
-
-                    $html .= '</div>'; // depo-card sonu
-                } else {
-                    $html .= '<p>Size atanmış bir depo yok.</p>';
-                }
-            }
-
-            $html .= '</div>'; // depo-container sonu
-            return $html;
-        }
+        return $html;
     }
 }
