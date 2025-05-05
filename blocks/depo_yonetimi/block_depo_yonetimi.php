@@ -1,6 +1,6 @@
 <?php
 
-class block_home extends block_base {
+class block_depo_yonetimi extends block_base {
 
     public function init() {
         // Plugin başlığı
