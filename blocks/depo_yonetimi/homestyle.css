@@ -1,34 +1,79 @@
+/* Genel kutu stili */
 .box {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 120px;
+    height: 100px; /* Yüksekliği biraz küçülttük */
     background-color: #f2f2f2;
     border: 2px solid #ccc;
     border-radius: 12px;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px; /* Font boyutunu biraz küçülttük */
     font-weight: bold;
     color: #333;
     text-decoration: none;
     transition: all 0.2s ease-in-out;
 }
 
+/* Kutunun üzerine gelindiğinde rengi koyulaşsın */
 .box:hover {
-    background-color: #e6e6e6;
+    background-color: #d6d6d6; /* Koyu renk */
     transform: scale(1.02);
 }
 
-.box-depo { background-color: #007bff; color: white; }
-.box-urun { background-color: #28a745; color: white; }
-.box-satis { background-color: #ffc107; color: white; }
-.box-stok { background-color: #17a2b8; color: white; }
-.box-talep { background-color: #dc3545; color: white; }
+/* Her kutuya özel renkler */
+.box-depo {
+    background-color: #007bff;
+    color: white;
+}
 
+.box-urun {
+    background-color: #28a745;
+    color: white;
+}
+
+.box-satis {
+    background-color: #ffc107;
+    color: white;
+}
+
+.box-stok {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.box-talep {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Kutuların üzerine gelindiğinde renklerin koyulaşması */
+.box-depo:hover {
+    background-color: #0056b3; /* Depo kutusunun koyulaşmış rengi */
+}
+
+.box-urun:hover {
+    background-color: #218838; /* Ürün kutusunun koyulaşmış rengi */
+}
+
+.box-satis:hover {
+    background-color: #e0a800; /* Satış kutusunun koyulaşmış rengi */
+}
+
+.box-stok:hover {
+    background-color: #138496; /* Stok kutusunun koyulaşmış rengi */
+}
+
+.box-talep:hover {
+    background-color: #c82333; /* Talep kutusunun koyulaşmış rengi */
+}
+
+/* Konteynerin üst kısmına boşluk ekleyin */
 .container {
     margin-top: 30px;
 }
 
+/* Row'lar arasına boşluk ekleyin */
 .mt-4 {
     margin-top: 2rem;
 }
