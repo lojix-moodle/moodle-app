@@ -1,253 +1,83 @@
-/* Sayfanın altındaki genel kutu */
-.depo-panel-wrapper {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    box-sizing: border-box;
-}
-
-/* Başlık */
-.panel-title {
-    font-size: 26px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Depo ekle butonu sola yaslı ama boşluklu */
-.depo-ekle-container {
-    margin: 20px 0 20px 0;
-    text-align: left;
-    padding-left: 15px; /* Sol boşluk eklendi */
-}
-
-.btn-primary {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.btn-primary:hover {
-    background-color: #45a049;
-}
-
-/* Depo kartlarını tutan alan - iki yana yaslı düzen için */
-.depo-container {
+/* Genel kutu stili */
+.box {
     display: flex;
-    flex-wrap: wrap;
-    gap: 60px; /* Kutular arası mesafeyi daha da artırdım */
-    justify-content: flex-start; /* Soldan başlayan düzen */
-    width: 100%;
-    padding: 0 15px; /* Sayfa kenarlarından boşluk */
-}
-
-/* Her satırda 3 kutu, daha küçük boyutlar */
-.depo-card {
-    flex: 0 0 calc(18% - 40px); /* Kutu genişliğini daha da azalttım */
-    max-width: calc(28% - 40px);
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-bottom: 20px; /* Kartlar arası dikey boşluk */
-}
-
-/* Kart başlığı */
-.depo-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    background-color: #f0f0f0;
-    border-bottom: 1px solid #ddd;
-}
-
-.depo-name {
-    font-weight: bold;
-    font-size: 14px;
-    flex-grow: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 85%;
-}
-
-.depo-edit-btn {
-    width: 28px;
-    height: 28px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 28px;
-    color: #333;
-    text-decoration: none;
-}
-
-.depo-edit-btn:hover {
-    background-color: #e0e0e0;
-}
-
-/* Butonlar */
-.depo-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    gap: 10px;
-}
-
-.depo-view-btn {
-    flex-grow: 1;
-    padding: 8px 10px;
-    background-color: #e60000;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.depo-view-btn:hover {
-    background-color: #c50000;
-}
-
-.depo-delete-btn {
-    width: 36px;
-    height: 36px;
-    background-color: #fff;
-    border: 1px solid #f44336;
-    border-radius: 6px;
-    color: #f44336;
-    text-decoration: none;
-    font-size: 18px;
-    text-align: center;
-    line-height: 36px;
-    flex-shrink: 0;
-}
-
-.depo-delete-btn:hover {
-    background-color: #f44336;
-    color: white;
-}
-
-/* Responsive düzenleme */
-@media (max-width: 1200px) {
-    .depo-card {
-        flex: 0 0 calc(45% - 20px);
-        max-width: calc(45% - 20px);
-    }
-}
-
-@media (max-width: 768px) {
-    .depo-card {
-        flex: 0 0 calc(90% - 20px);
-        max-width: calc(90% - 20px);
-        margin: 0 auto 20px auto; /* Ortalanmış tek sütun için */
-    }
-}
-
-/* Genel stiller */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1, h2 {
-    text-align: center;
-    color: #333;
-}
-
-form {
-    margin-bottom: 30px;
-}
-
-label {
-    display: block;
-    margin: 10px 0 5px;
-}
-
-input[type="text"], input[type="number"], input[type="date"] {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    display: block;
-    width: 100%;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-}
-
-th {
+    justify-content: center;
+    height: 100px; /* Yüksekliği biraz küçülttük */
     background-color: #f2f2f2;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 18px; /* Font boyutunu biraz küçülttük */
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
 }
 
-tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+/* Kutunun üzerine gelindiğinde rengi koyulaşsın */
+.box:hover {
+    background-color: #d6d6d6; /* Koyu renk */
+    transform: scale(1.02);
 }
 
-tbody tr:hover {
-    background-color: #f1f1f1;
+/* Her kutuya özel renkler */
+.box-depo {
+    background-color: #007bff;
+    color: white;
 }
 
-/* Moodle footer'ı gizle */
+.box-urun {
+    background-color: #28a745;
+    color: white;
+}
+
+.box-satis {
+    background-color: #ffc107;
+    color: white;
+}
+
+.box-stok {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.box-talep {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Kutuların üzerine gelindiğinde renklerin koyulaşması */
+.box-depo:hover {
+    background-color: #0056b3; /* Depo kutusunun koyulaşmış rengi */
+}
+
+.box-urun:hover {
+    background-color: #218838; /* Ürün kutusunun koyulaşmış rengi */
+}
+
+.box-satis:hover {
+    background-color: #e0a800; /* Satış kutusunun koyulaşmış rengi */
+}
+
+.box-stok:hover {
+    background-color: #138496; /* Stok kutusunun koyulaşmış rengi */
+}
+
+.box-talep:hover {
+    background-color: #c82333; /* Talep kutusunun koyulaşmış rengi */
+}
+
+/* Konteynerin üst kısmına boşluk ekleyin */
+.container {
+    margin-top: 30px;
+}
+
+/* Row'lar arasına boşluk ekleyin */
+.mt-4 {
+    margin-top: 2rem;
+}
 #page-footer {
     display: none !important;
 }
+
