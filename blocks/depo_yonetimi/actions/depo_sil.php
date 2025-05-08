@@ -46,15 +46,9 @@ if (!$confirm) {
             "Bu depoda {$urun_sayisi} ürün bulunuyor. Depoyu silmek için önce ürünleri başka bir depoya taşımalı veya silmelisiniz.",
             'warning'
         );
-
-        // Ürünleri yönetme sayfasına link ekle
-        $urunler_url = new moodle_url('/blocks/depo_yonetimi/urunler.php', ['depoid' => $depoid]);
-        echo html_writer::link($urunler_url, 'Depodaki Ürünleri Yönet', ['class' => 'btn btn-warning mb-3']);
-
-        echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
-    } else {
-        echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
     }
+
+    echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
 
     echo html_writer::start_div('d-flex flex-column gap-2');
 
