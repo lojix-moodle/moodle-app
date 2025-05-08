@@ -74,9 +74,6 @@ if (!$confirm) {
 
     echo html_writer::link($nourl, 'Hayır, Vazgeç', ['class' => 'btn btn-secondary mb-2']);
 
-    // ✅ Depo düzenleme butonu
-    echo html_writer::link($duzenleurl, 'Depo Bilgilerini Düzenle', ['class' => 'btn btn-info']);
-
     echo html_writer::end_div();
 
     echo $OUTPUT->footer();
