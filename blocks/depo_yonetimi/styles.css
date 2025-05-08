@@ -18,11 +18,11 @@
     color: #333;
 }
 
-/* Depo ekle butonu sola yaslı ve biraz aşağıda */
+/* Depo ekle butonu sola yaslı ama boşluklu */
 .depo-ekle-container {
     margin: 20px 0 20px 0;
     text-align: left;
-    left: 30px;
+    padding-left: 15px; /* Sol boşluk eklendi */
 }
 
 .btn-primary {
@@ -41,19 +41,20 @@
     background-color: #45a049;
 }
 
-/* Depo kartlarını tutan alan */
+/* Depo kartlarını tutan alan - iki yana yaslı düzen için */
 .depo-container {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: flex-start;
+    justify-content: space-between; /* İki yana yaslı olması için */
+    width: 100%;
+    padding: 0 15px; /* Sayfa kenarlarından boşluk */
 }
 
-/* Her satırda 3 kutu */
+/* Her satırda 3 kutu eşit aralıklarla */
 .depo-card {
-    flex: 0 0 calc(33.333% - 20px);
-    max-width: calc(20.333% - 20px);
-    left: 10px;
+    flex: 0 0 calc(33.333% - 14px); /* 3 kart ve aralarında boşluk */
+    max-width: calc(33.333% - 14px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -61,20 +62,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-
-
-
-
-
-
-
-
-
-
-
-
-
     justify-content: space-between;
+    margin-bottom: 20px; /* Kartlar arası dikey boşluk */
 }
 
 /* Kart başlığı */
@@ -165,8 +154,8 @@
 /* Responsive düzenleme */
 @media (max-width: 1200px) {
     .depo-card {
-        flex: 0 0 calc(50% - 20px);
-        max-width: calc(50% - 20px);
+        flex: 0 0 calc(50% - 10px);
+        max-width: calc(50% - 10px);
     }
 }
 
