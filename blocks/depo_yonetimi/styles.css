@@ -45,7 +45,7 @@
 .depo-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px; /* Kutular arası mesafeyi daha da artırdım */
+    gap: 80px; /* Kutular arası mesafeyi daha da artırdım */
     justify-content: flex-start; /* Soldan başlayan düzen */
     width: 100%;
     padding: 0 15px; /* Sayfa kenarlarından boşluk */
