@@ -45,7 +45,7 @@
 .depo-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px; /* Kutular arası mesafeyi daha da artırdım */
+    gap: 60px; /* Kutular arası mesafeyi daha da artırdım */
     justify-content: flex-start; /* Soldan başlayan düzen */
     width: 100%;
     padding: 0 15px; /* Sayfa kenarlarından boşluk */
@@ -53,7 +53,7 @@
 
 /* Her satırda 3 kutu, daha küçük boyutlar */
 .depo-card {
-    flex: 0 0 calc(28% - 40px); /* Kutu genişliğini daha da azalttım */
+    flex: 0 0 calc(18% - 40px); /* Kutu genişliğini daha da azalttım */
     max-width: calc(28% - 40px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
