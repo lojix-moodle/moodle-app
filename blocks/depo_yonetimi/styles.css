@@ -45,16 +45,16 @@
 .depo-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-between; /* İki yana yaslı olması için */
+    gap: 30px; /* Kutular arası mesafeyi artırdım */
+    justify-content: flex-start; /* Baştan itibaren yerleşim */
     width: 100%;
     padding: 0 15px; /* Sayfa kenarlarından boşluk */
 }
 
-/* Her satırda 3 kutu eşit aralıklarla */
+/* Her satırda 3 kutu eşit aralıklarla, boyutları küçültüldü */
 .depo-card {
-    flex: 0 0 calc(33.333% - 14px); /* 3 kart ve aralarında boşluk */
-    max-width: calc(33.333% - 14px);
+    flex: 0 0 calc(30% - 30px); /* Kutu genişliğini azalttım */
+    max-width: calc(30% - 30px);
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -154,15 +154,16 @@
 /* Responsive düzenleme */
 @media (max-width: 1200px) {
     .depo-card {
-        flex: 0 0 calc(50% - 10px);
-        max-width: calc(50% - 10px);
+        flex: 0 0 calc(45% - 20px);
+        max-width: calc(45% - 20px);
     }
 }
 
 @media (max-width: 768px) {
     .depo-card {
-        flex: 0 0 100%;
-        max-width: 100%;
+        flex: 0 0 calc(90% - 20px);
+        max-width: calc(90% - 20px);
+        margin: 0 auto 20px auto; /* Ortalanmış tek sütun için */
     }
 }
 
