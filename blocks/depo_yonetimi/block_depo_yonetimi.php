@@ -19,6 +19,25 @@ class block_depo_yonetimi extends block_base {
         $this->page->requires->css(new moodle_url('/blocks/depo_yonetimi/homestyle.css', ['v' => time()]));
         $this->page->requires->js_call_amd('core/bootstrap', 'init');
 
+        // Kullanıcı yetkisini kontrol et
+        global $USER;
+        $kullanici_depo_eslesme = [2 => 3, 5 => 1]; // Bu dizi, kullanıcıların yetkili olduğu depoları tanımlar
+
+        // Yetki kontrolü için kullanıcının hangi şubede olduğu bilgisini ekleyin
+        $sube_id = 0; // Varsayılan şube ID'si
+
+        if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
+            $yetki = 'admin';
+        } elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
+            $yetki = 'depoyetkilisi';
+            // Kullanıcı depo yetkilisi ise, hangi şubede olduğunu belirle
+            if (isset($kullanici_depo_eslesme[$USER->id])) {
+                $sube_id = $kullanici_depo_eslesme[$USER->id];
+            }
+        } else {
+            $yetki = 'normal';
+        }
+
         // Blok içeriğini HTML olarak oluştur
         $this->content->text = '
         <div class="container">
@@ -27,7 +46,7 @@ class block_depo_yonetimi extends block_base {
                     <a href="/blocks/depo_yonetimi/actions/depolar.php" class="box box-depo">Depolar</a>
                 </div>
                 <div class="col-md-4">
-                    <a href="/blocks/depo_yonetimi/actions/urunler.php" class="box box-urun">Ürünler</a>
+                    <a href="/blocks/depo_yonetimi/actions/urunler.php?sube_id=' . $sube_id . '" class="box box-urun">Ürünler</a>
                 </div>
                 <div class="col-md-4">
                     <a href="/blocks/depo_yonetimi/actions/satislar.php" class="box box-satis">Satışlar</a>
@@ -45,8 +64,6 @@ class block_depo_yonetimi extends block_base {
                 </div>
             </div>
         </div>';
-
-        // Footer kısmı kaldırıldı
 
         // İçeriği döndür
         return $this->content;
