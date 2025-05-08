@@ -32,9 +32,6 @@ if (!$confirm) {
         'sesskey' => sesskey()
     ]);
     $nourl = new moodle_url('/my');
-    $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', [
-        'depoid' => $depoid
-    ]);
 
     echo $OUTPUT->header();
 
@@ -46,8 +43,7 @@ if (!$confirm) {
     echo html_writer::link($yesurl, 'Evet, Sil', ['class' => 'btn btn-danger mb-2']);
     echo html_writer::link($nourl, 'Hayır, Vazgeç', ['class' => 'btn btn-secondary mb-2']);
 
-    // ✅ Depo düzenleme butonu
-    echo html_writer::link($duzenleurl, 'Depo Bilgilerini Düzenle', ['class' => 'btn btn-info']);
+    // Depo düzenleme butonu kaldırıldı
 
     echo html_writer::end_div();
 
