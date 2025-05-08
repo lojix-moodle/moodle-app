@@ -38,12 +38,40 @@ if (!$confirm) {
 
     echo $OUTPUT->header();
 
-    echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
+    // İlişkili ürünleri kontrol et
+    $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
+    if ($urun_sayisi > 0) {
+        echo $OUTPUT->notification(
+            "Bu depoda {$urun_sayisi} ürün bulunuyor. Depoyu silmek için önce ürünleri başka bir depoya taşımalı veya silmelisiniz.",
+            'warning'
+        );
+
+        // Ürünleri yönetme sayfasına link ekle
+        $urunler_url = new moodle_url('/blocks/depo_yonetimi/urunler.php', ['depoid' => $depoid]);
+        echo html_writer::link($urunler_url, 'Depodaki Ürünleri Yönet', ['class' => 'btn btn-warning mb-3']);
+
+        echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
+    } else {
+        echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
+    }
 
     echo html_writer::start_div('d-flex flex-column gap-2');
 
     // Silme onayı butonları
-    echo html_writer::link($yesurl, 'Evet, Sil', ['class' => 'btn btn-danger mb-2']);
+    if ($urun_sayisi == 0) {
+        echo html_writer::link($yesurl, 'Evet, Sil', ['class' => 'btn btn-danger mb-2']);
+    } else {
+        // Ürünleri silme seçeneği de ekle
+        $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', [
+            'depoid' => $depoid,
+            'confirm' => 1,
+            'force_delete' => 1,
+            'sesskey' => sesskey()
+        ]);
+        echo html_writer::link($sil_url, 'Evet, Depo ve İçindeki Tüm Ürünleri Sil', ['class' => 'btn btn-danger mb-2']);
+    }
+
     echo html_writer::link($nourl, 'Hayır, Vazgeç', ['class' => 'btn btn-secondary mb-2']);
 
     // ✅ Depo düzenleme butonu
@@ -58,11 +86,44 @@ if (!$confirm) {
 // 5. Silme onayı alındıysa depo sil
 require_sesskey();
 
-$DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
+try {
+    // Transaction başlat
+    $transaction = $DB->start_delegated_transaction();
 
-redirect(
-    new moodle_url('/my'),
-    'Depo başarıyla silindi.',
-    null,
-    \core\output\notification::NOTIFY_SUCCESS
-);
+    // Force delete seçeneği varsa önce ilişkili ürünleri sil
+    $force_delete = optional_param('force_delete', 0, PARAM_BOOL);
+    if ($force_delete) {
+        // İlişkili ürünleri sil
+        $DB->delete_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
+        // Başka ilişkili tablolar varsa onları da temizle
+        // Örnek: $DB->delete_records('block_depo_yonetimi_stok_hareketleri', ['depoid' => $depoid]);
+    }
+
+    // Depoyu sil
+    $DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
+
+    // İşlemi onayla
+    $transaction->allow_commit();
+
+    redirect(
+        new moodle_url('/my'),
+        'Depo başarıyla silindi.',
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
+
+} catch (Exception $e) {
+    // Hata durumunda transaction'ı geri al
+    if (isset($transaction)) {
+        $transaction->rollback($e);
+    }
+
+    // Kullanıcıya anlaşılır hata mesajı göster
+    redirect(
+        new moodle_url('/my'),
+        'Depo silinemedi: Bu depoya bağlı ürünler veya başka kayıtlar var. Önce onları silmelisiniz.',
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
+}
