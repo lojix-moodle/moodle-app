@@ -1,16 +1,4 @@
 <?php
-
-$string['pluginname'] = 'Lojix Depo Paneli';
-$string['depo_paneli:addinstance'] = 'Yeni depo paneli bloğu ekle';
-$string['depo_paneli:myaddinstance'] = 'Kendi sayfana depo paneli bloğu ekle';
-$string['depo_yonetimi:viewall'] = 'Tüm depoları görme izni';
-$string['depo_yonetimi:viewown'] = 'Sadece atanmış depoyu görme izni';
-
-
-$string['productname'] = 'Product Name';
-$string['quantity'] = 'Quantity';
-
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,7 +15,7 @@ $string['quantity'] = 'Quantity';
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block için dil dosyası
+ * Language strings for Depo Yonetimi
  *
  * @package    block_depo_yonetimi
  * @copyright  2025 Your Name
@@ -36,38 +24,21 @@ $string['quantity'] = 'Quantity';
 
 $string['pluginname'] = 'Depo Yönetimi';
 $string['depo_yonetimi:addinstance'] = 'Yeni bir Depo Yönetimi bloğu ekle';
-$string['depo_yonetimi:view'] = 'Depo Yönetimi bloğunu görüntüle';
-$string['depo_yonetimi:managestock'] = 'Stok yönet';
-
-// Dashboard
+$string['depo_yonetimi:myaddinstance'] = 'Dashboard\'a yeni bir Depo Yönetimi bloğu ekle';
+$string['depo_yonetimi:view'] = 'Depo Yönetimi\'ni görüntüle';
+$string['depo_yonetimi:manage'] = 'Depo Yönetimi\'ni yönet';
+$string['viewdashboard'] = 'Dashboard\'a Git';
 $string['dashboard'] = 'Depo Yönetimi Dashboard';
 $string['daily_summary'] = 'Günlük Özet';
 $string['weekly_summary'] = 'Haftalık Özet';
 $string['monthly_summary'] = 'Aylık Özet';
+$string['entries'] = 'Giriş';
+$string['exits'] = 'Çıkış';
+$string['orders'] = 'Sipariş';
+$string['net_change'] = 'Net Değişim';
 $string['stock_levels'] = 'Stok Seviyeleri';
 $string['pending_orders'] = 'Bekleyen Siparişler';
 $string['critical_stock_alerts'] = 'Kritik Stok Uyarıları';
 $string['recent_activities'] = 'Son Hareketler';
-$string['kpi_data'] = 'Performans Göstergeleri';
-
-// KPI'lar
-$string['total_stock_value'] = 'Toplam Stok Değeri';
-$string['monthly_exit_value'] = 'Aylık Çıkış Değeri';
-$string['stock_turnover'] = 'Stok Devir Hızı';
-$string['order_completion_rate'] = 'Sipariş Tamamlanma Oranı';
-
-// Stok Hareketleri
-$string['stock_in'] = 'Stok Girişi';
-$string['stock_out'] = 'Stok Çıkışı';
-$string['product'] = 'Ürün';
-$string['quantity'] = 'Miktar';
-$string['date'] = 'Tarih';
-$string['user'] = 'Kullanıcı';
 $string['no_data'] = 'Veri bulunamadı';
-$string['no_pending_orders'] = 'Bekleyen sipariş bulunmamaktadır';
 $string['no_alerts'] = 'Kritik stok uyarısı bulunmamaktadır';
-$string['no_activities'] = 'Son işlem bulunmamaktadır';
-
-// Diğer
-$string['current_stock'] = 'Mevcut Stok';
-$string['critical_level'] = 'Kritik Seviye';

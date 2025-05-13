@@ -23,8 +23,8 @@
  */
 
 require_once('../../config.php');
-require_once('lib.php');
-require_once('dashboard_lib.php');
+require_once($CFG->dirroot . '/blocks/depo_yonetimi/lib.php');
+require_once($CFG->dirroot . '/blocks/depo_yonetimi/dashboard_lib.php');
 
 // Sayfa ayarları
 $PAGE->set_url('/blocks/depo_yonetimi/dashboard.php');
@@ -34,7 +34,7 @@ $PAGE->set_heading(get_string('dashboard', 'block_depo_yonetimi'));
 $PAGE->set_pagelayout('standard');
 
 // CSS ve JavaScript dosyalarını ekle
-$PAGE->requires->css('/blocks/depo_yonetimi/templates/styles.css');
+$PAGE->requires->css('/blocks/depo_yonetimi/templates/dashboard.css');
 $PAGE->requires->js_call_amd('block_depo_yonetimi/dashboard_charts', 'init');
 
 // Yetkiyi kontrol et
@@ -51,6 +51,9 @@ $pending_orders = get_pending_orders();
 $critical_stock_alerts = get_critical_stock_alerts();
 $kpi_data = get_kpi_data();
 $recent_activities = get_recent_activities();
+
+// Debug bilgisi (geliştirme sırasında yardımcı olur)
+// debugging('Stock levels: ' . print_r($stock_levels, true), DEBUG_DEVELOPER);
 
 // Şablona verileri gönder
 $templatecontext = [
