@@ -1,8 +1,8 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<div style="display: flex; justify-content: space-between">
     <a href="{{ekle_url}}" class="btn btn-primary">+ Ürün Ekle</a>
-    <a href="{{back_url}}" class="btn btn-secondary">← Depolara Dön</a>
+    <a href="{{back_url}}" class="back-link">← Depolara dön</a>
 </div>
-
+<br>
 <table class="generaltable">
     <thead>
     <tr>
@@ -18,13 +18,9 @@
             <td>{{adet}}</td>
             <td>
                 <a href="{{duzenle_url}}" class="btn btn-primary btn-sm" onclick="return confirm('Bu ürünü düzenlemek istediğinize emin misiniz?');">Düzenle</a>
-                <a href="{{sil_url}}" class="btn btn-danger btn-sm" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Sil</a>
+                <a href="{{sil_url}}" class="btn btn-danger" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Ürünü Sil</a>
+
             </td>
-        </tr>
-    {{/urunler}}
-    {{^urunler}}
-        <tr>
-            <td colspan="3">Henüz ürün eklenmemiş.</td>
         </tr>
     {{/urunler}}
     </tbody>
