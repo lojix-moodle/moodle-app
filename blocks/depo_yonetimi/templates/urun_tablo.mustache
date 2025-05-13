@@ -15,7 +15,6 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Ürün Düzenle');
 $PAGE->set_heading('Ürün Düzenle');
 
-// Yetki kontrolü
 $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
 $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
@@ -27,30 +26,24 @@ print_error('Erişim izniniz yok.');
 }
 }
 
-// Ürün verisini al
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
 if (!$urun) {
 print_error('Ürün bulunamadı.');
 }
 
-// Kategorileri veritabanından al
 $kategoriler = $DB->get_records('depo_yonetimi_kategoriler', null, 'name ASC');
 
-// Form gönderimi
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_sesskey();
 
-// Form verilerini al
 $yeni_ad = required_param('name', PARAM_TEXT);
 $yeni_adet = required_param('adet', PARAM_INT);
-$kategori_id = required_param('kategori_id', PARAM_INT);  // Kategori seçimi
+$kategori_id = required_param('kategori_id', PARAM_INT);
 
-// Ürün verilerini güncelle
 $urun->name = $yeni_ad;
 $urun->adet = $yeni_adet;
-$urun->kategori_id = $kategori_id;  // Kategori bilgisini güncelle
+$urun->kategori_id = $kategori_id;
 
-// Veritabanını güncelle
 if ($DB->update_record('block_depo_yonetimi_urunler', $urun)) {
 redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', 2);
 } else {
@@ -77,11 +70,11 @@ echo $OUTPUT->header();
     <div class="form-group">
         <label for="kategori_id">Kategori Seçin:</label>
         <select id="kategori_id" name="kategori_id" class="form-control" required>
-            <?php
-            foreach ($kategoriler as $kategori) {
-                echo "<option value='{$kategori->id}'" . ($kategori->id == $urun->kategori_id ? ' selected' : '') . ">{$kategori->name}</option>";
-            }
-            ?>
+            <?php foreach ($kategoriler as $kategori): ?>
+            <option value="<?php echo $kategori->id; ?>" <?php if ($kategori->id == $urun->kategori_id) echo 'selected'; ?>>
+            <?php echo format_string($kategori->name); ?>
+            </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -90,24 +83,13 @@ echo $OUTPUT->header();
     <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>" class="btn btn-secondary">Vazgeç</a>
 </form>
 
-<?php
-echo $OUTPUT->footer();
-?>
-
-<div style="display: flex; justify-content: space-between">
-    <?php
-    // Dinamik URL'leri PHP tarafında oluştur
-    $ekle_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]);
-    $back_url = new moodle_url('/blocks/depo_yonetimi/actions/depo_listesi.php');
-    $duzenle_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urunid]);
-    $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'urunid' => $urunid]);
-
-    // URL'leri Mustache şablonuna geç
-    echo "<a href='{$ekle_url}' class='btn btn-primary'>+ Ürün Ekle</a>";
-    echo "<a href='{$back_url}' class='back-link'>← Depolara dön</a>";
-    ?>
+<div style="display: flex; justify-content: space-between; margin-top: 20px;">
+    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>" class="btn btn-primary">+ Ürün Ekle</a>
+    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/depo_listesi.php'); ?>" class="btn btn-link">← Depolara dön</a>
 </div>
+
 <br>
+
 <table class="generaltable">
     <thead>
     <tr>
@@ -118,8 +100,7 @@ echo $OUTPUT->footer();
     </thead>
     <tbody>
     <?php
-    // Ürünleri listele
-    $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+        $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
     foreach ($urunler as $urun) {
     $duzenle_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]);
     $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'urunid' => $urun->id]);
@@ -128,10 +109,14 @@ echo $OUTPUT->footer();
         <td>" . s($urun->adet) . "</td>
         <td>
             <a href='{$duzenle_url}' class='btn btn-primary btn-sm' onclick='return confirm(\"Bu ürünü düzenlemek istediğinize emin misiniz?\");'>Düzenle</a>
-            <a href='{$sil_url}' class='btn btn-danger' onclick='return confirm(\"Bu ürünü silmek istediğinize emin misiniz?\");'>Ürünü Sil</a>
+            <a href='{$sil_url}' class='btn btn-danger btn-sm' onclick='return confirm(\"Bu ürünü silmek istediğinize emin misiniz?\");'>Ürünü Sil</a>
         </td>
     </tr>";
     }
     ?>
     </tbody>
 </table>
+
+<?php
+echo $OUTPUT->footer();
+?>
