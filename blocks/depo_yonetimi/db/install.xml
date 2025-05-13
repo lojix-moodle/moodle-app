@@ -25,5 +25,18 @@
             </KEYS>
         </TABLE>
 
+        <TABLE NAME="depo_yonetimi_kategoriler" COMMENT="Depo kategorileri">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="isim" TYPE="char" LENGTH="255" NOTNULL="true"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+
     </TABLES>
 </XMLDB>
+
+

@@ -1,0 +1,31 @@
+<h2>Kategori Listesi</h2>
+
+<a href="{{kategori_ekle_url}}" class="btn btn-primary">+ Yeni Kategori Ekle</a>
+
+<table class="generaltable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Kategori İsmi</th>
+        <th>İşlemler</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#kategoriler}}
+        <tr>
+            <td>{{id}}</td>
+            <td>{{isim}}</td>
+            <td>
+                <a href="{{duzenle_url}}?id={{id}}" class="btn btn-secondary">Düzenle</a>
+                <a href="{{sil_url}}?id={{id}}" class="btn btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
+            </td>
+        </tr>
+    {{/kategoriler}}
+
+    {{^kategoriler}}
+        <tr>
+            <td colspan="3">Hiç kategori bulunamadı.</td>
+        </tr>
+    {{/kategoriler}}
+    </tbody>
+</table>
