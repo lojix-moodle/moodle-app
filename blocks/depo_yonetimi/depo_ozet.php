@@ -17,30 +17,30 @@
 /**
  * Depo Yönetimi - Özet Verileri ve Grafikler
  *
- * @package    local_depo_yonetimi
+ * @package    block_depo_yonetimi
  * @copyright  2025 Your Name
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->dirroot.'/local/depo_yonetimi/db/access.php');
-require_once($CFG->dirroot.'/local/depo_yonetimi/classes/form/urun_form.php');
+require_once($CFG->dirroot.'/blocks/depo_yonetimi/db/access.php');
+require_once($CFG->dirroot.'/blocks/depo_yonetimi/classes/form/urun_form.php');
 
 // Sayfa başlığı ve başlık ayarları
-$PAGE->set_url(new moodle_url('/local/depo_yonetimi/depo_ozet.php'));
+$PAGE->set_url(new moodle_url('/block/depo_yonetimi/depo_ozet.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title(get_string('pluginname', 'local_depo_yonetimi') . ': ' . get_string('summary', 'local_depo_yonetimi'));
-$PAGE->set_heading(get_string('pluginname', 'local_depo_yonetimi') . ': ' . get_string('summary', 'local_depo_yonetimi'));
+$PAGE->set_title(get_string('pluginname', 'block_depo_yonetimi') . ': ' . get_string('summary', 'block_depo_yonetimi'));
+$PAGE->set_heading(get_string('pluginname', 'block_depo_yonetimi') . ': ' . get_string('summary', 'block_depo_yonetimi'));
 $PAGE->set_pagelayout('admin');
 
 // Yetki kontrolü
 require_login();
-require_capability('local/depo_yonetimi:view', context_system::instance());
+require_capability('block/depo_yonetimi:view', context_system::instance());
 
 // CSS ve JS dosyalarını ekleyin
-$PAGE->requires->css('/local/depo_yonetimi/styles.css');
-$PAGE->requires->js_call_amd('local/depo_yonetimi/charts', 'init');
+$PAGE->requires->css('/block/depo_yonetimi/styles.css');
+$PAGE->requires->js_call_amd('block/depo_yonetimi/charts', 'init');
 
 // Gerekli Chart.js kütüphanesini ekleyin (CDN üzerinden)
 $PAGE->requires->js(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js'));
@@ -57,7 +57,7 @@ for ($i = 6; $i >= 0; $i--) {
     $sql_date = date('Y-m-d', $date);
 
     // Son 7 günün her biri için o gün eklenen ürün sayısını al
-    $sql = "SELECT COUNT(*) FROM {local_depo_yonetimi_urunler} 
+    $sql = "SELECT COUNT(*) FROM {block_depo_yonetimi_urunler} 
             WHERE DATE(timemodified) = ?";
     $count = $DB->count_records_sql($sql, [$sql_date]);
 
@@ -72,7 +72,7 @@ for ($i = 3; $i >= 0; $i--) {
     $start_date = strtotime("-" . ($i * 7 + 6) . " days");
     $end_date = strtotime("-" . ($i * 7) . " days");
 
-    $sql = "SELECT COUNT(*) FROM {local_depo_yonetimi_urunler} 
+    $sql = "SELECT COUNT(*) FROM {block_depo_yonetimi_urunler} 
             WHERE timemodified BETWEEN ? AND ?";
     $count = $DB->count_records_sql($sql, [$start_date, $end_date]);
 
@@ -87,7 +87,7 @@ for ($i = 5; $i >= 0; $i--) {
     $start_date = strtotime("first day of -$i month");
     $end_date = strtotime("last day of -$i month 23:59:59");
 
-    $sql = "SELECT COUNT(*) FROM {local_depo_yonetimi_urunler} 
+    $sql = "SELECT COUNT(*) FROM {block_depo_yonetimi_urunler} 
             WHERE timemodified BETWEEN ? AND ?";
     $count = $DB->count_records_sql($sql, [$start_date, $end_date]);
 
@@ -97,7 +97,7 @@ for ($i = 5; $i >= 0; $i--) {
 
 // 4. Stok seviyeleri - En düşük 5 ürün
 $low_stock_sql = "SELECT name, stock_quantity 
-                  FROM {local_depo_yonetimi_urunler} 
+                  FROM {block_depo_yonetimi_urunler} 
                   ORDER BY stock_quantity ASC
                   LIMIT 5";
 $low_stock_products = $DB->get_records_sql($low_stock_sql);
@@ -111,7 +111,7 @@ foreach ($low_stock_products as $product) {
 
 // 5. Stok seviyeleri - Kategoriye göre
 $category_sql = "SELECT category, SUM(stock_quantity) as total_stock
-                FROM {local_depo_yonetimi_urunler}
+                FROM {block_depo_yonetimi_urunler}
                 GROUP BY category
                 ORDER BY total_stock DESC";
 $category_stocks = $DB->get_records_sql($category_sql);
@@ -128,8 +128,8 @@ echo $OUTPUT->header();
 
 // Sayfanın üst kısmı: başlık ve açıklama
 echo '<div class="depo-summary-container">';
-echo '<h2>' . get_string('summary_title', 'local_depo_yonetimi', 'Depo Yönetimi Özet Verileri') . '</h2>';
-echo '<p>' . get_string('summary_description', 'local_depo_yonetimi', 'Bu sayfada depo yönetimi ile ilgili günlük, haftalık ve aylık özet veriler ile stok seviyesi grafikleri yer almaktadır.') . '</p>';
+echo '<h2>' . get_string('summary_title', 'block_depo_yonetimi', 'Depo Yönetimi Özet Verileri') . '</h2>';
+echo '<p>' . get_string('summary_description', 'block_depo_yonetimi', 'Bu sayfada depo yönetimi ile ilgili günlük, haftalık ve aylık özet veriler ile stok seviyesi grafikleri yer almaktadır.') . '</p>';
 
 // Ana dashboard bölümü: Grafikleri içerir
 echo '<div class="depo-summary-dashboard">';
@@ -139,7 +139,7 @@ echo '<div class="depo-summary-row">';
 
 // Günlük veriler grafiği
 echo '<div class="depo-summary-chart">';
-echo '<h3>' . get_string('daily_summary', 'local_depo_yonetimi', 'Günlük Özet (Son 7 Gün)') . '</h3>';
+echo '<h3>' . get_string('daily_summary', 'block_depo_yonetimi', 'Günlük Özet (Son 7 Gün)') . '</h3>';
 echo '<div class="chart-container">';
 echo '<canvas id="dailyChart"></canvas>';
 echo '</div>';
@@ -147,7 +147,7 @@ echo '</div>';
 
 // Haftalık veriler grafiği
 echo '<div class="depo-summary-chart">';
-echo '<h3>' . get_string('weekly_summary', 'local_depo_yonetimi', 'Haftalık Özet (Son 4 Hafta)') . '</h3>';
+echo '<h3>' . get_string('weekly_summary', 'block_depo_yonetimi', 'Haftalık Özet (Son 4 Hafta)') . '</h3>';
 echo '<div class="chart-container">';
 echo '<canvas id="weeklyChart"></canvas>';
 echo '</div>';
@@ -160,7 +160,7 @@ echo '<div class="depo-summary-row">';
 
 // Aylık veriler grafiği
 echo '<div class="depo-summary-chart">';
-echo '<h3>' . get_string('monthly_summary', 'local_depo_yonetimi', 'Aylık Özet (Son 6 Ay)') . '</h3>';
+echo '<h3>' . get_string('monthly_summary', 'blockl_depo_yonetimi', 'Aylık Özet (Son 6 Ay)') . '</h3>';
 echo '<div class="chart-container">';
 echo '<canvas id="monthlyChart"></canvas>';
 echo '</div>';
@@ -168,7 +168,7 @@ echo '</div>';
 
 // Düşük stok seviyeleri grafiği
 echo '<div class="depo-summary-chart">';
-echo '<h3>' . get_string('low_stock', 'local_depo_yonetimi', 'En Düşük Stok Seviyeleri') . '</h3>';
+echo '<h3>' . get_string('low_stock', 'block_depo_yonetimi', 'En Düşük Stok Seviyeleri') . '</h3>';
 echo '<div class="chart-container">';
 echo '<canvas id="lowStockChart"></canvas>';
 echo '</div>';
@@ -181,7 +181,7 @@ echo '<div class="depo-summary-row">';
 
 // Kategoriye göre stok seviyeleri grafiği
 echo '<div class="depo-summary-chart full-width">';
-echo '<h3>' . get_string('category_stock', 'local_depo_yonetimi', 'Kategoriye Göre Stok Seviyeleri') . '</h3>';
+echo '<h3>' . get_string('category_stock', 'block_depo_yonetimi', 'Kategoriye Göre Stok Seviyeleri') . '</h3>';
 echo '<div class="chart-container">';
 echo '<canvas id="categoryStockChart"></canvas>';
 echo '</div>';
@@ -352,7 +352,7 @@ echo '</div>'; // .depo-summary-container son
 
 // Diğer sayfalara erişim bağlantıları
 echo '<div class="depo-nav-links">';
-echo '<a href="' . new moodle_url('/local/depo_yonetimi/index.php') . '" class="btn btn-secondary">' . get_string('back_to_main', 'local_depo_yonetimi', 'Ana Sayfaya Dön') . '</a>';
+echo '<a href="' . new moodle_url('/block/depo_yonetimi/index.php') . '" class="btn btn-secondary">' . get_string('back_to_main', 'block_depo_yonetimi', 'Ana Sayfaya Dön') . '</a>';
 echo '</div>';
 
 echo $OUTPUT->footer();
