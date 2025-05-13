@@ -1,8 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once(__DIR__ . '/../../../config.php');
 require_login();
 global $DB, $PAGE, $OUTPUT, $USER;
@@ -17,7 +13,6 @@ $PAGE->set_heading('Ürün Düzenle');
 
 $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
-$is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
 
 if (!$is_admin) {
 $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
@@ -36,13 +31,9 @@ $kategoriler = $DB->get_records('depo_yonetimi_kategoriler', null, 'name ASC');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_sesskey();
 
-$yeni_ad = required_param('name', PARAM_TEXT);
-$yeni_adet = required_param('adet', PARAM_INT);
-$kategori_id = required_param('kategori_id', PARAM_INT);
-
-$urun->name = $yeni_ad;
-$urun->adet = $yeni_adet;
-$urun->kategori_id = $kategori_id;
+$urun->name = required_param('name', PARAM_TEXT);
+$urun->adet = required_param('adet', PARAM_INT);
+$urun->kategori_id = required_param('kategori_id', PARAM_INT);
 
 if ($DB->update_record('block_depo_yonetimi_urunler', $urun)) {
 redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', 2);
@@ -54,43 +45,35 @@ print_error('Güncelleme başarısız oldu. Lütfen tekrar deneyin.');
 echo $OUTPUT->header();
 ?>
 
+<h3>Ürün Güncelle</h3>
+
 <form method="post">
     <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
-    <div class="form-group">
-        <label for="name">Ürün Adı:</label>
-        <input type="text" id="name" name="name" value="<?php echo s($urun->name); ?>" class="form-control" required>
-    </div>
+    <label for="name">Ürün Adı:</label>
+    <input type="text" id="name" name="name" value="<?php echo s($urun->name); ?>" required><br><br>
 
-    <div class="form-group">
-        <label for="adet">Adet:</label>
-        <input type="number" id="adet" name="adet" value="<?php echo s($urun->adet); ?>" class="form-control" required>
-    </div>
+    <label for="adet">Adet:</label>
+    <input type="number" id="adet" name="adet" value="<?php echo s($urun->adet); ?>" required><br><br>
 
-    <div class="form-group">
-        <label for="kategori_id">Kategori Seçin:</label>
-        <select id="kategori_id" name="kategori_id" class="form-control" required>
-            <?php foreach ($kategoriler as $kategori): ?>
-            <option value="<?php echo $kategori->id; ?>" <?php if ($kategori->id == $urun->kategori_id) echo 'selected'; ?>>
-            <?php echo format_string($kategori->name); ?>
-            </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+    <label for="kategori_id">Kategori Seçin:</label>
+    <select id="kategori_id" name="kategori_id" required>
+        <?php foreach ($kategoriler as $kategori): ?>
+        <option value="<?php echo $kategori->id; ?>" <?php if ($kategori->id == $urun->kategori_id) echo 'selected'; ?>>
+        <?php echo format_string($kategori->name); ?>
+        </option>
+        <?php endforeach; ?>
+    </select><br><br>
 
-    <br>
-    <button type="submit" name="submitbutton" class="btn btn-success">Kaydet</button>
-    <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>" class="btn btn-secondary">Vazgeç</a>
+    <button type="submit">Kaydet</button>
+    <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>">Vazgeç</a>
 </form>
 
-<div style="display: flex; justify-content: space-between; margin-top: 20px;">
-    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>" class="btn btn-primary">+ Ürün Ekle</a>
-    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/depo_listesi.php'); ?>" class="btn btn-link">← Depolara dön</a>
-</div>
+<hr>
 
-<br>
+<h4>Ürünler Listesi</h4>
 
-<table class="generaltable">
+<table border="1">
     <thead>
     <tr>
         <th>Ürün Adı</th>
@@ -101,22 +84,20 @@ echo $OUTPUT->header();
     <tbody>
     <?php
         $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
-    foreach ($urunler as $urun) {
-    $duzenle_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]);
-    $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'urunid' => $urun->id]);
-    echo "<tr>
-        <td>" . s($urun->name) . "</td>
-        <td>" . s($urun->adet) . "</td>
-        <td>
-            <a href='{$duzenle_url}' class='btn btn-primary btn-sm' onclick='return confirm(\"Bu ürünü düzenlemek istediğinize emin misiniz?\");'>Düzenle</a>
-            <a href='{$sil_url}' class='btn btn-danger btn-sm' onclick='return confirm(\"Bu ürünü silmek istediğinize emin misiniz?\");'>Ürünü Sil</a>
-        </td>
-    </tr>";
-    }
+    foreach ($urunler as $urun_item):
+    $duzenle_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun_item->id]);
+    $sil_url = new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', ['depoid' => $depoid, 'urunid' => $urun_item->id]);
     ?>
+    <tr>
+        <td><?php echo s($urun_item->name); ?></td>
+        <td><?php echo s($urun_item->adet); ?></td>
+        <td>
+            <a href="<?php echo $duzenle_url; ?>">Düzenle</a> |
+            <a href="<?php echo $sil_url; ?>" onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
     </tbody>
 </table>
 
-<?php
-echo $OUTPUT->footer();
-?>
+<?php echo $OUTPUT->footer(); ?>
