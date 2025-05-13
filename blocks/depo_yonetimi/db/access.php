@@ -38,7 +38,7 @@ $capabilities = [
             'editingteacher' => CAP_ALLOW,
             'teacher' => CAP_ALLOW
         ]
-    ]
+    ],
 
 
 ];
