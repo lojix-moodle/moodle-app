@@ -25,31 +25,57 @@ if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
 // 4. Onay ekranı göster
 if (!$confirm) {
     $depo_adi = $DB->get_field('block_depo_yonetimi_depolar', 'name', ['id' => $depoid]);
+    $ana_sayfa_url = new moodle_url('/my');
 
     $yesurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', [
         'depoid' => $depoid,
         'confirm' => 1,
         'sesskey' => sesskey()
     ]);
-    $nourl = new moodle_url('/my');
-    $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', [
-        'depoid' => $depoid
-    ]);
+
+    $nourl = $ana_sayfa_url;
 
     echo $OUTPUT->header();
 
-    echo html_writer::tag('h3', "'{$depo_adi}' deposunu silmek istediğinize emin misiniz?", ['class' => 'mb-4']);
-
-    echo html_writer::start_div('d-flex flex-column gap-2');
-
-    // Silme onayı butonları
-    echo html_writer::link($yesurl, 'Evet, Sil', ['class' => 'btn btn-danger mb-2']);
-    echo html_writer::link($nourl, 'Hayır, Vazgeç', ['class' => 'btn btn-secondary mb-2']);
-
-    // ✅ Depo düzenleme butonu
-    echo html_writer::link($duzenleurl, 'Depo Bilgilerini Düzenle', ['class' => 'btn btn-info']);
-
-    echo html_writer::end_div();
+    // Profesyonel onay kartı
+    echo '
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="m-0"><i class="fas fa-exclamation-triangle me-2"></i>Depo Silme Onayı</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="text-center mb-4">
+                            <strong>"' . htmlspecialchars($depo_adi) . '"</strong> deposunu silmek istediğinize emin misiniz?
+                        </h5>
+                        <p class="text-muted text-center mb-4">
+                            Bu işlem geri alınamaz ve depodaki tüm ürünler de silinecektir.
+                        </p>
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="' . $nourl . '" class="btn btn-lg btn-outline-secondary px-4">
+                                <i class="fas fa-times me-2"></i>Vazgeç
+                            </a>
+                            <a href="' . $yesurl . '" class="btn btn-lg btn-danger px-4">
+                                <i class="fas fa-check me-2"></i>Evet, Sil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="' . $ana_sayfa_url . '" class="text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i>Ana Sayfaya Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>';
 
     echo $OUTPUT->footer();
     exit;
