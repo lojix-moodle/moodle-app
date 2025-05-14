@@ -1,75 +1,89 @@
 <?php
+// Depo ekleme formu
+require_once('../../../../config.php');
+require_once($CFG->libdir . '/formslib.php');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-require_once(__DIR__ . '/../../../config.php');
+// Yetki kontrolü
 require_login();
-global $DB, $PAGE, $OUTPUT;
+require_capability('block/depo_yonetimi:manage', context_system::instance());
 
-$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('Depo Ekle');
-$PAGE->set_heading('Depo Ekle');
+$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
+$PAGE->set_title(get_string('depo_ekle', 'block_depo_yonetimi', 'Depo Ekle'));
+$PAGE->set_heading(get_string('depo_ekle', 'block_depo_yonetimi', 'Depo Ekle'));
+$PAGE->navbar->add(get_string('plugins', 'admin'), new moodle_url('/admin/search.php#linkblocks'));
+$PAGE->navbar->add(get_string('blocks'));
+$PAGE->navbar->add(get_string('pluginname', 'block_depo_yonetimi'), new moodle_url('/blocks/depo_yonetimi/index.php'));
+$PAGE->navbar->add(get_string('depo_ekle', 'block_depo_yonetimi', 'Depo Ekle'));
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
-    $name = required_param('name', PARAM_TEXT);
+// Form sınıfı
+class depo_ekle_form extends moodleform {
+    protected function definition() {
+        global $DB;
 
-    $depo = new stdClass();
-    $depo->name = $name;
+        $mform = $this->_form;
 
-    $DB->insert_record('block_depo_yonetimi_depolar', $depo);
+        // Depo adı
+        $mform->addElement('text', 'name', get_string('depo_adi', 'block_depo_yonetimi', 'Depo Adı'), ['size' => '48']);
+        $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', null, 'required', null, 'client');
 
-    redirect(new moodle_url('/my'), 'Depo başarıyla eklendi.');
+        // Depo sorumlusu seçimi
+        // Admin ve öğretmen rolüne sahip kullanıcıları çek
+        $admins = get_admins();
+        $admin_ids = array_map(function($admin) {
+            return $admin->id;
+        }, $admins);
+
+        $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
+        $teacher_ids = array_keys($teachers);
+
+        $user_ids = array_unique(array_merge($admin_ids, $teacher_ids));
+
+        if (!empty($user_ids)) {
+            $users = $DB->get_records_list('user', 'id', $user_ids, 'lastname, firstname');
+
+            $user_options = [0 => 'Seçiniz...'];
+            foreach ($users as $user) {
+                $user_options[$user->id] = fullname($user);
+            }
+
+            $mform->addElement('select', 'sorumluid', get_string('depo_sorumlusu', 'block_depo_yonetimi', 'Depo Sorumlusu'), $user_options);
+            $mform->setType('sorumluid', PARAM_INT);
+        }
+
+        // Form butonları
+        $this->add_action_buttons();
+    }
 }
 
-// ... önceki kodlar ...
+// Form oluşturma
+$form = new depo_ekle_form();
 
+// Form işleme
+if ($form->is_cancelled()) {
+    redirect(new moodle_url('/blocks/depo_yonetimi/index.php'));
+} else if ($data = $form->get_data()) {
+    // Yeni depo oluştur
+    $newdepo = new stdClass();
+    $newdepo->name = $data->name;
+    $newdepo->sorumluid = $data->sorumluid;
+    $newdepo->timecreated = time();
+    $newdepo->timemodified = time();
+
+    $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
+
+    // Başarı mesajı
+    \core\notification::success(get_string('depo_eklendi', 'block_depo_yonetimi', 'Depo başarıyla eklendi.'));
+    redirect(new moodle_url('/blocks/depo_yonetimi/index.php'));
+}
+
+// Çıktı
 echo $OUTPUT->header();
-echo html_writer::start_div('container mt-4');
-echo html_writer::start_div('card border-primary');
-echo html_writer::start_div('card-header bg-primary text-white');
-echo html_writer::tag('h4', 'Yeni Depo Oluştur', ['class' => 'mb-0']);
-echo html_writer::end_div(); // card-header
+echo $OUTPUT->heading(get_string('depo_ekle', 'block_depo_yonetimi', 'Depo Ekle'));
 
-echo html_writer::start_div('card-body');
-echo '<form method="POST" class="needs-validation" novalidate>';
-echo html_writer::start_div('form-group');
-echo html_writer::tag('label', 'Depo Adı', ['class' => 'font-weight-bold']);
-echo html_writer::empty_tag('input', [
-    'type' => 'text',
-    'name' => 'name',
-    'class' => 'form-control form-control-lg',
-    'placeholder' => 'Örnek: Merkez Depo',
-    'required' => 'required'
-]);
-echo html_writer::end_div(); // form-group
-
-echo html_writer::start_div('d-flex justify-content-between align-items-center mt-4');
-echo html_writer::tag(
-    'button',
-    'Depo Ekle',
-    [
-        'type' => 'submit',
-        'class' => 'btn btn-primary btn-lg px-4'
-    ]
-);
-echo html_writer::link(
-    new moodle_url('/my'),
-    '<i class="fas fa-arrow-left mr-2"></i> Paneline Dön',
-    ['class' => 'btn btn-outline-secondary']
-);
-echo html_writer::end_div(); // d-flex
-
-echo html_writer::empty_tag('input', [
-    'type' => 'hidden',
-    'name' => 'sesskey',
-    'value' => sesskey()
-]);
-echo '</form>';
-echo html_writer::end_div(); // card-body
-echo html_writer::end_div(); // card
-echo html_writer::end_div(); // container
+echo '<div class="depo-form-container">';
+$form->display();
+echo '</div>';
 
 echo $OUTPUT->footer();
