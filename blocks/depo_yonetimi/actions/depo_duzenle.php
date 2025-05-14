@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     $yeni_sorumlu = optional_param('sorumlu_id', 0, PARAM_INT);
 
     $depo->name = $yeni_ad;
-    $depo->sorumlu_id = $yeni_sorumlu;
+    $depo->sorumluid = $yeni_sorumlu;
     $DB->update_record('block_depo_yonetimi_depolar', $depo);
 
     redirect(new moodle_url('/my'), 'Depo başarıyla güncellendi.', null, \core\output\notification::NOTIFY_SUCCESS);
