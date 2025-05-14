@@ -19,7 +19,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         }
 
         // Sürüm numarasını güncelle
-        upgrade_block_savepoint(true, 2024051400, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2024051415, 'depo_yonetimi');
     }
 
 
