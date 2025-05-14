@@ -26,14 +26,15 @@ class block_depo_yonetimi extends block_base {
 
     private function page_add_assets() {
         global $PAGE;
-
-        // CSS dosyasını dahil et
+        // Stil dosyasını dahil et
         $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css'));
 
-        // JavaScript dosyalarını dahil et
+        // Font Awesome'ı dahil et (eğer tema tarafından sağlanmıyorsa)
+        $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'));
+
+        // Bootstrap ve JS dosyalarını dahil et
         $PAGE->requires->js_call_amd('core/bootstrap', 'init');
-        $PAGE->requires->js(new moodle_url('/blocks/depo_yonetimi/js/fontawesome.min.js'), true);
-        $PAGE->requires->js(new moodle_url('/blocks/depo_yonetimi/js/custom.js'));
+        $PAGE->requires->js(new moodle_url('/blocks/depo_yonetimi/js/script.js'));
     }
 
     private function generate_boxes_html() {
@@ -45,73 +46,71 @@ class block_depo_yonetimi extends block_base {
             5 => 1,
         ];
 
-        // Yetki kontrolü
         if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
             $yetki = 'admin';
         } elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
             $yetki = 'depoyetkilisi';
         } else {
-            return $this->render_access_denied();
+            return $this->render_access_denied('Yetkiniz yok.');
         }
 
         $depoid = optional_param('depo', null, PARAM_INT);
 
-        // Depo seçilmişse ürünleri göster
+        // Depo detayı görüntüleniyorsa
         if ($depoid) {
-            return $this->render_warehouse_products($depoid, $yetki, $kullanici_depo_eslesme);
-        } else {
-            return $this->render_warehouse_dashboard($depolar, $yetki, $kullanici_depo_eslesme);
+            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
+                return $this->render_depo_detay($depoid);
+            } else {
+                return $this->render_access_denied('Bu depoya erişim izniniz yok.');
+            }
+        }
+        // Ana sayfa görüntüleniyorsa
+        else {
+            return $this->render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme);
         }
     }
 
-    private function render_access_denied() {
+    /**
+     * Erişim reddedildiğinde gösterilecek mesaj
+     */
+    private function render_access_denied($message) {
         return '
         <div class="depo-access-denied">
-            <div class="card border-danger shadow-sm">
-                <div class="card-body text-center">
-                    <i class="fas fa-exclamation-circle text-danger mb-3" style="font-size: 3rem;"></i>
-                    <h4 class="text-danger">Erişim Engellendi</h4>
-                    <p class="mb-0">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+            <div class="card border-danger shadow">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
+                    <h4 class="text-danger">' . get_string('access_denied', 'block_depo_yonetimi', 'Erişim Reddedildi') . '</h4>
+                    <p class="lead">' . $message . '</p>
                 </div>
             </div>
         </div>';
     }
 
-    private function render_warehouse_products($depoid, $yetki, $kullanici_depo_eslesme) {
-        global $USER, $DB, $OUTPUT, $PAGE;
-
-        // Yetki kontrolü
-        if ($yetki !== 'admin' && (!isset($kullanici_depo_eslesme[$USER->id]) || $kullanici_depo_eslesme[$USER->id] != $depoid)) {
-            return '
-            <div class="alert alert-warning border-0 shadow-sm">
-                <div class="d-flex">
-                    <div class="mr-3">
-                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <div>
-                        <h5 class="alert-heading">Erişim Engellendi</h5>
-                        <p class="mb-0">Bu depoya erişim izniniz bulunmamaktadır.</p>
-                    </div>
-                </div>
-            </div>';
-        }
+    /**
+     * Depo detay sayfasını render et
+     */
+    private function render_depo_detay($depoid) {
+        global $DB, $OUTPUT, $PAGE;
 
         $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
+        if (!$depo) {
+            return $this->render_access_denied('Depo bulunamadı.');
+        }
+
         $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
 
-        $templatecontext = [
-            'depo_name' => $depo->name,
-            'urunler' => [],
-            'ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]),
-            'back_url' => $PAGE->url->out(false),
-            'kategori_ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php'),
-            'is_admin' => ($yetki === 'admin'),
-        ];
-
+        // Kategorilere göre ürünleri grupla
+        $kategorilere_gore_urunler = [];
         foreach ($urunler as $urun) {
             $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
-            $templatecontext['urunler'][] = [
-                'kategori_name' => $kategori->name,
+            $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
+
+            if (!isset($kategorilere_gore_urunler[$kategori_adi])) {
+                $kategorilere_gore_urunler[$kategori_adi] = [];
+            }
+
+            $kategorilere_gore_urunler[$kategori_adi][] = [
+                'id' => $urun->id,
                 'name' => $urun->name,
                 'adet' => $urun->adet,
                 'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
@@ -121,202 +120,339 @@ class block_depo_yonetimi extends block_base {
                 'sil_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                     'depoid' => $depoid,
                     'urunid' => $urun->id
-                ]))->out(false),
+                ]))->out(false)
             ];
         }
 
-        return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
-    }
+        $kategoriler = array_keys($kategorilere_gore_urunler);
 
-    private function render_warehouse_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
-        global $USER, $PAGE;
+        // Tüm kategorileri al (filtreleme için)
+        $tum_kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler', null, 'name ASC');
 
-        $html = '<div class="depo-dashboard">';
-
-        // Üst menü bölümü
-        $html .= $this->render_dashboard_header($yetki);
-
-        // Ana içerik bölümü
-        $html .= '<div class="depo-content mt-4">';
-
-        // Depo kartları
-        if ($yetki === 'admin') {
-            $html .= $this->render_admin_warehouse_cards($depolar);
-        } else {
-            $html .= $this->render_user_warehouse_cards($depolar, $kullanici_depo_eslesme);
-        }
-
-        $html .= '</div>'; // .depo-content
-        $html .= '</div>'; // .depo-dashboard
-
-        return $html;
-    }
-
-    private function render_dashboard_header($yetki) {
-        $html = '<div class="depo-header">';
-        $html .= '<div class="depo-toolbar d-flex flex-wrap gap-2 mb-4">';
-
-        // Admin için ekstra butonlar
-        if ($yetki === 'admin') {
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" 
-                class="btn btn-primary btn-sm rounded-pill px-3 py-2 d-flex align-items-center">
-                <i class="fas fa-plus-circle mr-2"></i> Depo Ekle
-            </a>';
-
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" 
-                class="btn btn-outline-primary btn-sm rounded-pill px-3 py-2 d-flex align-items-center">
-                <i class="fas fa-tags mr-2"></i> Kategoriler
-            </a>';
-
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/reports/index.php') . '" 
-                class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 d-flex align-items-center">
-                <i class="fas fa-chart-bar mr-2"></i> Raporlar
-            </a>';
-        }
-
-        $html .= '</div>'; // .depo-toolbar
-
-        // Dashboard başlık bölümü
-        $html .= '<div class="depo-dashboard-header mb-4">
-            <h3 class="mb-2"><i class="fas fa-warehouse text-primary mr-2"></i> Depo Yönetimi</h3>
-            <p class="text-muted">Depo stok takibi ve envanter yönetimi</p>
-        </div>';
-
-        $html .= '</div>'; // .depo-header
-
-        return $html;
-    }
-
-    private function render_admin_warehouse_cards($depolar) {
-        global $PAGE;
-
-        if (empty($depolar)) {
-            return '<div class="alert alert-info border-0 shadow-sm">
-                <div class="d-flex">
-                    <div class="mr-3">
-                        <i class="fas fa-info-circle text-info" style="font-size: 1.5rem;"></i>
-                    </div>
+        $html = '
+        <div class="depo-dashboard">
+            <!-- Üst Panel -->
+            <div class="depo-header mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
                     <div>
-                        <h5 class="alert-heading">Depo Bulunamadı</h5>
-                        <p class="mb-0">Henüz tanımlanmış depo bulunmamaktadır. Yeni bir depo ekleyebilirsiniz.</p>
+                        <h2 class="mb-0">
+                            <i class="fas fa-warehouse text-primary"></i>
+                            ' . htmlspecialchars($depo->name) . '
+                        </h2>
+                        <p class="text-muted">
+                            <i class="fas fa-box-open mr-1"></i> ' . count($urunler) . ' Ürün
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="' . $PAGE->url->out(false) . '" class="btn btn-outline-secondary rounded-pill">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]) . '" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-plus"></i> Yeni Ürün Ekle
+                        </a>
                     </div>
                 </div>
-            </div>';
+            </div>
+            
+            <!-- Filtreleme ve Arama -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" id="urunArama" class="form-control border-start-0" placeholder="Ürün ara...">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <select id="kategoriFiltre" class="form-select">
+                                <option value="">Tüm Kategoriler</option>';
+
+        foreach ($tum_kategoriler as $kategori) {
+            $html .= '<option value="' . htmlspecialchars($kategori->name) . '">' . htmlspecialchars($kategori->name) . '</option>';
         }
 
-        $html = '<div class="depo-cards">';
-        $html .= '<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">';
+        $html .= '
+                            </select>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php') . '" class="btn btn-outline-primary">
+                                <i class="fas fa-folder-plus"></i> Kategori Ekle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ürün Tablosu -->
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover urun-tablosu mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Ürün Adı</th>
+                                    <th>Kategori</th>
+                                    <th class="text-center">Adet</th>
+                                    <th class="text-end pe-4">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
 
-        foreach ($depolar as $depo) {
-            $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-            $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
-            $duzenleurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]);
-
-            // Depodaki toplam ürün sayısını al
-            global $DB;
-            $urun_sayisi_sql = "SELECT COUNT(*) FROM {block_depo_yonetimi_urunler} WHERE depoid = :depoid";
-            $urun_sayisi = $DB->count_records_sql($urun_sayisi_sql, ['depoid' => $depo->id]);
-
+        if (empty($urunler)) {
             $html .= '
-            <div class="col mb-4">
-                <div class="card h-100 depo-card shadow-sm border-0">
-                    <div class="position-relative">
-                        <div class="card-header bg-transparent border-0 pb-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge badge-pill badge-light text-muted">
-                                    <i class="fas fa-cubes mr-1"></i> ' . $urun_sayisi . ' ürün
-                                </span>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-icon btn-light rounded-circle" type="button" data-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="' . $duzenleurl . '">
-                                            <i class="fas fa-edit mr-2 text-primary"></i> Düzenle
-                                        </a>
-                                        <a class="dropdown-item text-danger" href="' . $silurl . '" 
-                                            onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');">
-                                            <i class="fas fa-trash mr-2"></i> Sil
-                                        </a>
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-box-open text-muted mb-3" style="font-size: 3rem;"></i>
+                                            <h4>Henüz ürün bulunmuyor</h4>
+                                            <p class="text-muted">Bu depoya ürün eklemek için "Yeni Ürün Ekle" butonunu kullanabilirsiniz.</p>
+                                        </div>
+                                    </td>
+                                </tr>';
+        } else {
+            foreach ($urunler as $urun) {
+                $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
+                $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
+
+                $html .= '
+                                <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
+                                    <td class="ps-4 align-middle">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-box text-primary me-2"></i>
+                                            <strong>' . htmlspecialchars($urun->name) . '</strong>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
+                    $urun->adet . ' adet
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4 align-middle">
+                                        <div class="btn-group">
+                                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
+                        'depoid' => $depoid,
+                        'urunid' => $urun->id
+                    ]) . '" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
+                        'depoid' => $depoid,
+                        'urunid' => $urun->id
+                    ]) . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'Bu ürünü silmek istediğinize emin misiniz?\');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>';
+            }
+        }
+
+        $html .= '
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Arama fonksiyonu
+            const searchInput = document.getElementById("urunArama");
+            const kategoriSelect = document.getElementById("kategoriFiltre");
+            const urunSatirlar = document.querySelectorAll("table.urun-tablosu tbody tr");
+            
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const kategoriFiltre = kategoriSelect.value.toLowerCase();
+                
+                urunSatirlar.forEach(satir => {
+                    const urunAdi = satir.querySelector("td:first-child strong").textContent.toLowerCase();
+                    const kategori = satir.getAttribute("data-kategori").toLowerCase();
+                    
+                    const searchMatch = urunAdi.includes(searchTerm);
+                    const kategoriMatch = kategoriFiltre === "" || kategori === kategoriFiltre;
+                    
+                    satir.style.display = (searchMatch && kategoriMatch) ? "" : "none";
+                });
+            }
+            
+            searchInput.addEventListener("input", filterTable);
+            kategoriSelect.addEventListener("change", filterTable);
+        });
+        </script>';
+
+        return $html;
+    }
+
+    /**
+     * Depo dashboard sayfasını render et
+     */
+    private function render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
+        global $PAGE, $USER;
+
+        $html = '
+        <div class="depo-dashboard">
+            <!-- Dashboard Başlık -->
+            <div class="dashboard-header mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <h2 class="mb-0 d-flex align-items-center">
+                            <i class="fas fa-warehouse text-primary me-2"></i>
+                            Depo Yönetimi
+                        </h2>
+                        <p class="text-muted">
+                            ' . ($yetki === 'admin' ? 'Tüm depoları yönetebilirsiniz.' : 'Size atanmış depoları görebilirsiniz.') . '
+                        </p>
+                    </div>';
+
+        if ($yetki === 'admin') {
+            $html .= '
+                    <div class="dashboard-actions d-flex gap-2 flex-wrap">
+                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" 
+                           class="btn btn-primary rounded-pill d-flex align-items-center">
+                            <i class="fas fa-plus me-2"></i> Depo Ekle
+                        </a>
+                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" 
+                           class="btn btn-outline-primary rounded-pill d-flex align-items-center">
+                            <i class="fas fa-tags me-2"></i> Kategoriler
+                        </a>
+                    </div>';
+        }
+
+        $html .= '
+                </div>
+            </div>
+            
+            <!-- Depo Kartları -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">';
+
+        // Admin için tüm depoları göster
+        if ($yetki === 'admin') {
+            if (empty($depolar)) {
+                $html .= '
+                <div class="col-12">
+                    <div class="card border-dashed h-100 bg-light">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center p-5">
+                            <i class="fas fa-warehouse text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h4>Henüz depo bulunmuyor</h4>
+                            <p class="text-muted">İlk deponuzu eklemek için "Depo Ekle" butonunu kullanabilirsiniz.</p>
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" 
+                               class="btn btn-primary mt-3">
+                                <i class="fas fa-plus me-2"></i> Depo Ekle
+                            </a>
+                        </div>
+                    </div>
+                </div>';
+            } else {
+                foreach ($depolar as $depo) {
+                    $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
+                    $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
+                    $depoYoneticiId = array_search($depo->id, $kullanici_depo_eslesme);
+
+                    $html .= '
+                    <div class="col">
+                        <div class="card depo-card h-100 shadow-sm border-0">
+                            <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
+                                        <i class="fas fa-warehouse text-primary"></i>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light rounded-circle" type="button" id="depoMenu' . $depo->id . '" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="depoMenu' . $depo->id . '">
+                                            <li>
+                                                <a class="dropdown-item" href="' . $url . '">
+                                                    <i class="fas fa-box-open me-2 text-primary"></i>Ürünleri Gör
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '">
+                                                    <i class="fas fa-edit me-2 text-info"></i>Düzenle
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="' . $silurl . '" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');">
+                                                    <i class="fas fa-trash me-2"></i>Sil
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <div class="text-center mb-3">
-                            <div class="depo-icon-wrapper mb-3">
-                                <i class="fas fa-warehouse depo-icon"></i>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+                                <div class="depo-info mb-3">
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="fas fa-user me-2"></i>
+                                        <span>Sorumlu: ' . ($depoYoneticiId ? fullname($DB->get_record('user', ['id' => $depoYoneticiId])) : 'Atanmamış') . '</span>
+                                    </div>
+                                </div>
+                                <a href="' . $url . '" class="btn btn-outline-primary mt-auto stretched-link">
+                                    <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
+                                </a>
                             </div>
-                            <h4 class="card-title">' . htmlspecialchars($depo->name) . '</h4>
                         </div>
-                        <div class="mt-auto">
-                            <a href="' . $url . '" class="btn btn-primary btn-block">
-                                <i class="fas fa-box-open mr-2"></i> Ürünleri Görüntüle
+                    </div>';
+                }
+            }
+        }
+        // Normal kullanıcılar için sadece kendi depolarını göster
+        else {
+            $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
+
+            if ($kendi_depoid && isset($depolar[$kendi_depoid])) {
+                $depo = $depolar[$kendi_depoid];
+                $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
+
+                $html .= '
+                <div class="col">
+                    <div class="card depo-card h-100 shadow-sm border-0">
+                        <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                            <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-warehouse text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+                            <div class="depo-info mb-3">
+                                <div class="d-flex align-items-center text-muted mb-2">
+                                    <i class="fas fa-user me-2"></i>
+                                    <span>Sorumlu: ' . fullname($USER) . '</span>
+                                </div>
+                            </div>
+                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto stretched-link">
+                                <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
                             </a>
                         </div>
                     </div>
-                </div>
-            </div>';
-        }
-
-        $html .= '</div>'; // .row
-        $html .= '</div>'; // .depo-cards
-
-        return $html;
-    }
-
-    private function render_user_warehouse_cards($depolar, $kullanici_depo_eslesme) {
-        global $USER, $PAGE;
-
-        $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
-
-        if (!$kendi_depoid || !isset($depolar[$kendi_depoid])) {
-            return '<div class="alert alert-info border-0 shadow-sm">
-                <div class="d-flex">
-                    <div class="mr-3">
-                        <i class="fas fa-info-circle text-info" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <div>
-                        <h5 class="alert-heading">Depo Atanmamış</h5>
-                        <p class="mb-0">Size atanmış bir depo bulunmamaktadır. Yönetici ile iletişime geçebilirsiniz.</p>
-                    </div>
-                </div>
-            </div>';
-        }
-
-        $depo = $depolar[$kendi_depoid];
-        $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-
-        // Depodaki toplam ürün sayısını al
-        global $DB;
-        $urun_sayisi_sql = "SELECT COUNT(*) FROM {block_depo_yonetimi_urunler} WHERE depoid = :depoid";
-        $urun_sayisi = $DB->count_records_sql($urun_sayisi_sql, ['depoid' => $depo->id]);
-
-        $html = '
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card depo-card shadow-sm border-0">
-                    <div class="card-header bg-transparent border-0 pb-0">
-                        <span class="badge badge-pill badge-light text-muted">
-                            <i class="fas fa-cubes mr-1"></i> ' . $urun_sayisi . ' ürün
-                        </span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <div class="text-center mb-3">
-                            <div class="depo-icon-wrapper mb-3">
-                                <i class="fas fa-warehouse depo-icon"></i>
-                            </div>
-                            <h4 class="card-title">' . htmlspecialchars($depo->name) . '</h4>
-                            <p class="card-text text-muted">Size atanmış depo</p>
-                        </div>
-                        <div class="mt-auto">
-                            <a href="' . $url . '" class="btn btn-primary btn-block">
-                                <i class="fas fa-box-open mr-2"></i> Ürünleri Görüntüle
-                            </a>
+                </div>';
+            } else {
+                $html .= '
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center p-5">
+                            <i class="fas fa-info-circle text-info mb-3" style="font-size: 3rem;"></i>
+                            <h4>Size atanmış bir depo yok</h4>
+                            <p class="text-muted">Sistem yöneticinizle iletişime geçerek depo sorumluluğu talep edebilirsiniz.</p>
                         </div>
                     </div>
-                </div>
+                </div>';
+            }
+        }
+
+        $html .= '
             </div>
         </div>';
 
