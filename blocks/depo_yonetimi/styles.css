@@ -156,14 +156,55 @@ form.mform {
 
 
 
+.dashboard-fullpage {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0 2vw;
+    background: #f4f6fb;
+}
+
+.depo-row-modern {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    margin: 0 auto;
+}
 
 .depo-box-modern {
-    min-height: 250px;
-    border-radius: 1.25rem;
+    min-width: 340px;
+    max-width: 420px;
+    flex: 1 1 340px;
+    min-height: 260px;
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
     transition: transform 0.2s, box-shadow 0.2s;
-    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    border: none;
 }
 .depo-box-modern:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    transform: translateY(-8px) scale(1.04);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.13);
+}
+
+.btn-dashboard {
+    background: #fff !important;
+    color: #007bff !important;
+    border: 2px solid #007bff !important;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.btn-dashboard:hover, .btn-dashboard:focus {
+    background: #007bff !important;
+    color: #fff !important;
+    box-shadow: 0 4px 16px rgba(0,123,255,0.15);
+    text-decoration: none;
 }

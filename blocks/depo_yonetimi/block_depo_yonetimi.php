@@ -81,16 +81,20 @@ class block_depo_yonetimi extends block_base {
                 return '<div class="alert alert-warning mt-4">Bu depoya erişim izniniz yok.</div>';
             }
         } else {
-            $html = '<div class="mb-4 d-flex gap-3 flex-wrap">';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-success shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
-            <i class="fa fa-plus mr-2"></i> Depo Ekle
-        </a>';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
-            <i class="fa fa-list mr-2"></i> Kategoriler
-        </a>';
+            $html = '<div class="dashboard-fullpage">';
+            $html .= '<div class="mb-4 d-flex gap-3 flex-wrap">';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-dashboard shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+    <i class="fa fa-plus mr-2"></i> Depo Ekle
+</a>';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-dashboard shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+    <i class="fa fa-list mr-2"></i> Kategoriler
+</a>';
             $html .= '</div>';
 
-            $html .= '<div class="row">';
+            $html .= '<div class="depo-row-modern">';
+            /* ... depo kutuları burada ... */
+            $html .= '</div>';
+            $html .= '</div>';
 
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
