@@ -37,41 +37,43 @@ if (!$confirm) {
 
     echo $OUTPUT->header();
 
-    // Profesyonel onay kartı
+    // Geliştirilmiş profesyonel onay kartı
     echo '
-    <div class="container py-4">
+    <div class="container py-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-danger text-white">
-                        <h4 class="m-0"><i class="fas fa-exclamation-triangle me-2"></i>Depo Silme Onayı</h4>
+            <div class="col-md-7">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="m-0 d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-3"></i>
+                            Depo Silme İşlemi
+                        </h4>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="card-body p-5">
                         <div class="text-center mb-4">
-                            <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+                            <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-flex mb-2">
+                                <i class="fas fa-trash-alt text-danger" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="fw-bold mt-3">Silme Onayı</h4>
                         </div>
-                        <h5 class="text-center mb-4">
-                            <strong>"' . htmlspecialchars($depo_adi) . '"</strong> deposunu silmek istediğinize emin misiniz?
-                        </h5>
-                        <p class="text-muted text-center mb-4">
-                            Bu işlem geri alınamaz ve depodaki tüm ürünler de silinecektir.
+                        
+                        <div class="alert alert-warning border-0 bg-warning bg-opacity-10 mb-4">
+                            <strong>"' . htmlspecialchars($depo_adi) . '"</strong> isimli depoyu silmek üzeresiniz.
+                        </div>
+                        
+                        <p class="text-muted mb-4">
+                            Bu işlem kalıcıdır ve geri alınamaz. Depo ile ilişkili tüm ürün verileri ve kayıtlar sistemden tamamen silinecektir.
                         </p>
                         
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="' . $nourl . '" class="btn btn-lg btn-outline-secondary px-4">
-                                <i class="fas fa-times me-2"></i>Vazgeç
+                        <div class="d-grid gap-3 d-sm-flex justify-content-sm-between">
+                            <a href="' . $nourl . '" class="btn btn-lg btn-outline-secondary flex-grow-1" style="min-width: 140px;">
+                                <i class="fas fa-times me-2"></i>İptal
                             </a>
-                            <a href="' . $yesurl . '" class="btn btn-lg btn-danger px-4">
-                                <i class="fas fa-check me-2"></i>Evet, Sil
+                            <a href="' . $yesurl . '" class="btn btn-lg btn-danger flex-grow-1" style="min-width: 140px;">
+                                <i class="fas fa-check me-2"></i>Sil
                             </a>
                         </div>
                     </div>
-                </div>
-                
-                <div class="text-center mt-3">
-                    <a href="' . $ana_sayfa_url . '" class="text-decoration-none">
-                        <i class="fas fa-arrow-left me-1"></i>Ana Sayfaya Dön
-                    </a>
                 </div>
             </div>
         </div>
