@@ -39,9 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $yeni_ad = required_param('name', PARAM_TEXT);
     $yeni_adet = required_param('adet', PARAM_INT);
+    $kategoriid = required_param('kategoriid', PARAM_INT);
 
     $urun->name = $yeni_ad;
     $urun->adet = $yeni_adet;
+    $urun->kategoriid = $kategoriid;
     $DB->update_record('block_depo_yonetimi_urunler', $urun);
 
     redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', 2);
