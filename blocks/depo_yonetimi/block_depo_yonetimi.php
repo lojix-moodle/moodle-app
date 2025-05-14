@@ -33,28 +33,21 @@ class block_depo_yonetimi extends block_base {
     private function generate_boxes_html() {
         global $PAGE, $USER, $OUTPUT, $DB;
 
-        // 1. Depo listesi (veritabanından dinamik olarak çekiliyor)
         $depolar = $DB->get_records('block_depo_yonetimi_depolar');
-
-        // 2. Kullanıcı-depo eşleşmeleri (sabit kalabilir ya da dinamik yapılabilir)
         $kullanici_depo_eslesme = [
             2 => 3,
             5 => 1,
         ];
 
-        // 3. Yetki kontrolü
         if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
             $yetki = 'admin';
         } elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
             $yetki = 'depoyetkilisi';
         } else {
-            return '<p>Yetkiniz yok.</p>';
+            return '<div class="alert alert-danger mt-4">Yetkiniz yok.</div>';
         }
 
-        // 4. URL'den depo ID al
         $depoid = optional_param('depo', null, PARAM_INT);
-
-        // 5. Ürün listesi (şimdilik sabit, istersen bunu da veritabanından çekebiliriz)
         $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
 
         if ($depoid) {
@@ -66,10 +59,8 @@ class block_depo_yonetimi extends block_base {
                     'kategori_ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php'),
                 ];
 
-                foreach ($urunler as $index => $urun) {
-
+                foreach ($urunler as $urun) {
                     $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
-
                     $templatecontext['urunler'][] = [
                         'kategori_name' => $kategori->name,
                         'name' => $urun->name,
@@ -82,60 +73,71 @@ class block_depo_yonetimi extends block_base {
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]))->out(false),
-
-
                     ];
                 }
 
                 return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
             } else {
-                return '<p>Bu depoya erişim izniniz yok.</p>';
+                return '<div class="alert alert-warning mt-4">Bu depoya erişim izniniz yok.</div>';
             }
-        }  else {
-            $html = '<div class="depo-ekle-container mb-4 d-flex gap-3 flex-wrap">';
-
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-outline-success shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+        } else {
+            $html = '<div class="mb-4 d-flex gap-3 flex-wrap">';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-success shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
             <i class="fa fa-plus mr-2"></i> Depo Ekle
-          </a>';
-
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-outline-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+        </a>';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
             <i class="fa fa-list mr-2"></i> Kategoriler
-          </a>';
-
+        </a>';
             $html .= '</div>';
 
+            $html .= '<div class="row">';
 
-            $html .= '<div class="depo-listesi">'; // Yeni depo listesi container başlangıç
-
-            // Depoları Listeleme
             if ($yetki === 'admin') {
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
                     $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
 
-                    $html .= '<div class="depo-box">';
-                    $html .= "<strong>{$depo->name}</strong><br>";
-                    $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a><br><br>";
-                    $html .= "<a href='{$silurl}' class='btn btn-danger' onclick='return confirm(\"Bu depoyu silmek istediğinize emin misiniz?\");'>Depoyu Sil</a>";
-                    $html .= '</div>';
+                    $html .= '
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-lg h-100 depo-box-modern">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title text-primary font-weight-bold mb-3" style="font-size:1.5rem;">' . htmlspecialchars($depo->name) . '</h5>
+                            <div class="mt-auto">
+                                <a href="' . $url . '" class="btn btn-outline-primary btn-lg w-100 mb-2">
+                                    <i class="fa fa-box"></i> Ürünleri Gör
+                                </a>
+                                <a href="' . $silurl . '" class="btn btn-danger btn-block w-100" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');">
+                                    <i class="fa fa-trash"></i> Depoyu Sil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
                 }
             } else {
                 $kendi_depoid = $kullanici_depo_eslesme[$USER->id] ?? null;
-
                 if ($kendi_depoid && isset($depolar[$kendi_depoid])) {
                     $depo = $depolar[$kendi_depoid];
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-                    $html .= '<div class="depo-box">';
-                    $html .= "<strong>{$depo->name}</strong><br>";
-                    $html .= "<a href='{$url}' class='depo-btn'>Ürünleri Gör</a>";
-                    $html .= '</div>';
+                    $html .= '
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-lg h-100 depo-box-modern">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title text-primary font-weight-bold mb-3" style="font-size:1.5rem;">' . htmlspecialchars($depo->name) . '</h5>
+                            <div class="mt-auto">
+                                <a href="' . $url . '" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="fa fa-box"></i> Ürünleri Gör
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
                 } else {
-                    $html .= '<p>Size atanmış bir depo yok.</p>';
+                    $html .= '<div class="col-12"><div class="alert alert-info">Size atanmış bir depo yok.</div></div>';
                 }
             }
 
             $html .= '</div>';
             return $html;
         }
-    }
-}
+    }}
