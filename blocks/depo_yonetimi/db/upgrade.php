@@ -5,7 +5,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025042190) {
+    if ($oldversion < 2025042191) {
 
         $table = new xmldb_table('block_depo_yonetimi_kategoriler');
 
