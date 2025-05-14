@@ -425,7 +425,7 @@ class block_depo_yonetimi extends block_base {
                             <div class="depo-info mb-3">
                                 <div class="d-flex align-items-center text-muted mb-2">
                                     <i class="fas fa-user me-2"></i>
-                                    <span>Sorumlu: ' . fullname($sorumlu_ismi) . '</span>
+                                    <span>Sorumlu: ' . $sorumlu_ismi . '</span>
                                 </div>
                             </div>
                             <a href="' . $url . '" class="btn btn-outline-primary mt-auto">

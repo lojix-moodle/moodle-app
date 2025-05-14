@@ -37,7 +37,7 @@ $sorumlu_id = $depo->sorumlu_id ?? 0;
 // Form gönderildiyse
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     $yeni_ad = required_param('name', PARAM_TEXT);
-    $yeni_sorumlu = optional_param('sorumlu_id', 0, PARAM_INT);
+    $yeni_sorumlu = required_param('sorumlu_id', PARAM_INT);
 
     $depo->name = $yeni_ad;
     $depo->sorumluid = $yeni_sorumlu;
