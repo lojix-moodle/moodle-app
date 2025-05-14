@@ -6,22 +6,18 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2025042191) {
+        $table = new xmldb_table('block_depo_yonetimi_urunler');
 
-        $table = new xmldb_table('block_depo_yonetimi_kategoriler');
+        $field = new xmldb_field('kategoriid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
 
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
-
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        upgrade_block_savepoint(true, 2025042202, 'depo_yonetimi');
+        // Güncelleme noktasını kaydet
+        upgrade_block_savepoint(true, 2025051401, 'depo_yonetimi');
     }
+
 
     return true;
 }
