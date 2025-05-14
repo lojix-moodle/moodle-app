@@ -56,6 +56,7 @@ class block_depo_yonetimi extends block_base {
 
         // 5. Ürün listesi (şimdilik sabit, istersen bunu da veritabanından çekebiliriz)
         $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+        $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
 
         if ($depoid) {
@@ -64,6 +65,7 @@ class block_depo_yonetimi extends block_base {
                     'urunler' => [],
                     'ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]),
                     'back_url' => $PAGE->url->out(false),
+                    'kategori_ekle_url' => new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php', ['depoid' => $depoid]),
                 ];
 
                 foreach ($urunler as $index => $urun) {
@@ -82,8 +84,6 @@ class block_depo_yonetimi extends block_base {
 
                     ];
                 }
-
-
 
                 return $OUTPUT->render_from_template('block_depo_yonetimi/urun_tablo', $templatecontext);
             } else {

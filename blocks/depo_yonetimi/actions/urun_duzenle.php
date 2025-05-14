@@ -28,6 +28,8 @@ if (!$is_admin) {
 }
 
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
+$kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
+
 if (!$urun) {
     print_error('Ürün bulunamadı.');
 }
@@ -50,6 +52,18 @@ echo $OUTPUT->header();
 
     <form method="post">
         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+        <div class="form-group">
+            <label for="kategoriid">Kategori :</label>
+            <select name="kategoriid" id="kategoriid">
+                <?php
+
+                foreach ($kategoriler as $kategori) {
+                    echo '<option value="' . $kategori->id . '">' . $kategori->name . '</option>';
+                }
+
+                ?>
+            </select>
+        </div>
         <div class="form-group">
             <label for="name">Ürün Adı:</label>
             <input type="text" id="name" name="name" value="<?php echo s($urun->name); ?>" class="form-control" required>

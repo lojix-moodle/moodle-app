@@ -1,0 +1,41 @@
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Kategoriler</h4>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a href="{{ekle_url}}" class="btn btn-success">+ Yeni Kategori Ekle</a>
+            <a href="{{back_url}}" class="btn btn-secondary ml-2">Geri Dön</a>
+        </div>
+
+        {{#kategoriler.0}}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Kategori Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#kategoriler}}
+                        <tr>
+                            <td>{{name}}</td>
+                            <td>
+                                <a href="{{duzenle_url}}" class="btn btn-warning btn-sm">Düzenle</a>
+                                <a href="{{sil_url}}" class="btn btn-danger btn-sm" onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">Sil</a>
+                            </td>
+                        </tr>
+                    {{/kategoriler}}
+                    </tbody>
+                </table>
+            </div>
+        {{/kategoriler.0}}
+
+        {{^kategoriler.0}}
+            <div class="alert alert-info">
+                Bu depoya ait herhangi bir kategori bulunamadı. Yeni bir kategori eklemek için yukarıdaki butonu kullanabilirsiniz.
+            </div>
+        {{/kategoriler.0}}
+    </div>
+</div>
