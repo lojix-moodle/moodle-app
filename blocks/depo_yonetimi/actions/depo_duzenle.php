@@ -160,14 +160,6 @@ echo $OUTPUT->header();
     <div class="container py-4 depo-dashboard">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb bg-light p-3 rounded">
-                        <li class="breadcrumb-item"><a href="<?php echo new moodle_url('/my'); ?>">Ana Sayfa</a></li>
-                        <li class="breadcrumb-item"><a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>">Depo Yönetimi</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Depo Düzenle</li>
-                    </ol>
-                </nav>
 
                 <div class="card border-0 shadow-sm depo-card">
                     <div class="card-header bg-primary text-white p-3 dashboard-header">
