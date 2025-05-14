@@ -94,6 +94,7 @@ class block_depo_yonetimi extends block_base {
         }  else {
             $html = '<div class="depo-ekle-container">';
             $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-primary btn-sm">Kategoriler</a>';
             $html .= '</div>'; // depo-ekle-container kapatma
 
             $html .= '<div class="depo-listesi">'; // Yeni depo listesi container başlangıç
