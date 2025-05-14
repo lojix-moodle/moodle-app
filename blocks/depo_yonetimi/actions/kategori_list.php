@@ -32,8 +32,10 @@ foreach ($kategoriler as $index => $kategori) {
     ];
 }
 
+echo $OUTPUT->header();
 
 echo $OUTPUT->render_from_template('block_depo_yonetimi/kategori_tablo', $templatecontext);
+echo $OUTPUT->footer();
 
 
 ?>
