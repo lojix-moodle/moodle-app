@@ -1,41 +1,50 @@
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">Kategoriler</h4>
-    </div>
-    <div class="card-body">
-        <div class="mb-3">
-            <a href="{{kategori_ekle_url}}" class="btn btn-success">+ Yeni Kategori Ekle</a>
-            <a href="{{back_url}}" class="btn btn-secondary ml-2">Geri Dön</a>
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm rounded">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Depo Kategori Yönetimi</h4>
+            <div>
+                <a href="{{kategori_ekle_url}}" class="btn btn-light btn-sm mr-2">
+                    <i class="fa fa-plus"></i> Kategori Ekle
+                </a>
+                <a href="{{back_url}}" class="btn btn-outline-light btn-sm">
+                    <i class="fa fa-arrow-left"></i> Geri Dön
+                </a>
+            </div>
         </div>
-
-        {{#kategoriler.0}}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th>Kategori Adı</th>
-                        <th>İşlemler</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#kategoriler}}
+        <div class="card-body">
+            {{#kategoriler.0}}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="thead-dark">
                         <tr>
-                            <td>{{name}}</td>
-                            <td>
-                                <a href="{{duzenle_url}}" class="btn btn-warning btn-sm">Düzenle</a>
-                                <a href="{{sil_url}}" class="btn btn-danger btn-sm" onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">Sil</a>
-                            </td>
+                            <th style="width: 70%;">Kategori Adı</th>
+                            <th style="width: 30%;">İşlemler</th>
                         </tr>
-                    {{/kategoriler}}
-                    </tbody>
-                </table>
-            </div>
-        {{/kategoriler.0}}
+                        </thead>
+                        <tbody>
+                        {{#kategoriler}}
+                            <tr>
+                                <td class="font-weight-bold">{{name}}</td>
+                                <td>
+                                    <a href="{{duzenle_url}}" class="btn btn-warning btn-sm">
+                                        <i class="fa fa-edit"></i> Düzenle
+                                    </a>
+                                    <a href="{{sil_url}}" class="btn btn-danger btn-sm" onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
+                                        <i class="fa fa-trash"></i> Sil
+                                    </a>
+                                </td>
+                            </tr>
+                        {{/kategoriler}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/kategoriler.0}}
 
-        {{^kategoriler.0}}
-            <div class="alert alert-info">
-                Bu depoya ait herhangi bir kategori bulunamadı. Yeni bir kategori eklemek için yukarıdaki butonu kullanabilirsiniz.
-            </div>
-        {{/kategoriler.0}}
+            {{^kategoriler.0}}
+                <div class="alert alert-info text-center">
+                    <i class="fa fa-info-circle"></i> Şu anda kayıtlı kategori bulunmamaktadır. Lütfen üstten yeni kategori ekleyin.
+                </div>
+            {{/kategoriler.0}}
+        </div>
     </div>
 </div>
