@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/depo_yonetimi/db" VERSION="2025042202" COMMENT="Veritabanı tabloları" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd">
+<XMLDB PATH="blocks/depo_yonetimi/db" VERSION="2025042203" COMMENT="Veritabanı tabloları" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../lib/xmldb/xmldb.xsd">
     <TABLES>
 
         <TABLE NAME="block_depo_yonetimi_depolar" COMMENT="Depo listesi">
