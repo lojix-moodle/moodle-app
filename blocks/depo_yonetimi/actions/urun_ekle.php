@@ -18,6 +18,8 @@ $PAGE->set_context(context_system::instance()); // veya doğru context (örneği
 $PAGE->set_title('Ürün Ekle');
 $PAGE->set_heading('Ürün Ekle');
 
+$kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
+
 // Form gönderildiyse
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
@@ -37,15 +39,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 echo $OUTPUT->header();
 echo html_writer::tag('h2', 'Ürün Ekle');
 
-echo '<form method="POST">';
-echo '<label>Ürün Adı:</label><br>';
-echo '<input type="text" name="name" required><br><br>';
+?>
 
-echo '<label>Adet:</label><br>';
-echo '<input type="number" name="adet" required><br><br>';
+<form method="post">
+    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+    <div class="form-group">
+        <label for="kategoriid">Kategori :</label>
+        <select name="kategoriid" id="kategoriid">
+            <?php
 
-echo '<input type="submit" value="Ekle">';
-echo '</form>';
+            foreach ($kategoriler as $kategori) {
+                echo '<option value="' . $kategori->id . '">' . $kategori->name . '</option>';
+            }
 
-echo html_writer::link(new moodle_url('/my', ['depo' => $depoid]), '← Geri Dön');
+            ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Ürün Adı:</label>
+        <input type="text" name="name" required>
+    </div>
+    <div class="form-group">
+        <label>Adet:</label>
+        <input type="text" name="adet" required>
+    </div>
+    <br>
+    <button type="submit" name="submitbutton" class="btn btn-success">Kaydet</button>
+    <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>" class="btn btn-secondary">Vazgeç</a>
+</form>
+<?php
 echo $OUTPUT->footer();
+?>
