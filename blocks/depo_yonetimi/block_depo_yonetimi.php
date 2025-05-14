@@ -68,7 +68,7 @@ class block_depo_yonetimi extends block_base {
 
                 foreach ($urunler as $index => $urun) {
 
-                    $kategori = $this->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun['kategoriid']]);
+                    $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun['kategoriid']]);
 
                     $templatecontext['urunler'][] = [
                         'kategori_name' => $kategori->name,
