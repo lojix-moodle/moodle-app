@@ -331,7 +331,7 @@ class block_depo_yonetimi extends block_base {
             </div>
             
             <!-- Depo Kartları -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">';
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">';
 
         // Admin için tüm depoları göster
         if ($yetki === 'admin') {
