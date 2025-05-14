@@ -24,12 +24,14 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $adet = required_param('adet', PARAM_INT);
+    $kategoriid = required_param('kategoriid', PARAM_INT);
 
     // Kayıt ekle
     $urun = new stdClass();
     $urun->depoid = $depoid;
     $urun->name = $name;
     $urun->adet = $adet;
+    $urun->kategoriid = $kategoriid;
 
     $DB->insert_record('block_depo_yonetimi_urunler', $urun);
 
