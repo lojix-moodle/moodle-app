@@ -5,7 +5,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025051416) {
+    if ($oldversion < 2025051417) {
         $table = new xmldb_table('block_depo_yonetimi_depolar');
 
         // Eğer tablo varsa işlem yap
@@ -19,7 +19,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         }
 
         // Sürüm numarasını güncelle
-        upgrade_block_savepoint(true, 2024051415, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2024051417, 'depo_yonetimi');
     }
 
 
