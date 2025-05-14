@@ -71,7 +71,7 @@ class block_depo_yonetimi extends block_base {
                     $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun['kategoriid']]);
 
                     $templatecontext['urunler'][] = [
-                        'kategori_name' => $kategori->name,
+                        'kategori_name' => $kategori['name'],
                         'name' => $urun->name,
                         'adet' => $urun->adet,
                         'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
