@@ -295,7 +295,7 @@ class block_depo_yonetimi extends block_base {
      * Depo dashboard sayfasını render et
      */
     private function render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $DB;
 
         $html = '
         <div class="depo-dashboard">
@@ -353,7 +353,8 @@ class block_depo_yonetimi extends block_base {
             } else {
                 foreach ($depolar as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
-                    $silurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
+                    $duzenleUrl = new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]);
+                    $silUrl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
                     $depoYoneticiId = array_search($depo->id, $kullanici_depo_eslesme);
 
                     $html .= '
@@ -364,30 +365,13 @@ class block_depo_yonetimi extends block_base {
                                     <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
                                         <i class="fas fa-warehouse text-primary"></i>
                                     </div>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light rounded-circle" type="button" id="depoMenu' . $depo->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="depoMenu' . $depo->id . '">
-                                            <li>
-                                                <a class="dropdown-item" href="' . $url . '">
-                                                    <i class="fas fa-box-open me-2 text-primary"></i>Ürünleri Gör
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '">
-                                                    <i class="fas fa-edit me-2 text-info"></i>Düzenle
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item text-danger" href="' . $silurl . '" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');">
-                                                    <i class="fas fa-trash me-2"></i>Sil
-                                                </a>
-                                            </li>
-                                        </ul>
+                                    <div class="d-flex">
+                                        <a href="' . $duzenleUrl . '" class="btn btn-sm btn-outline-info me-2" title="Depoyu Düzenle">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="' . $silUrl . '" class="btn btn-sm btn-outline-danger" title="Depoyu Sil" onclick="return confirm(\'Bu depoyu silmek istediğinize emin misiniz?\');">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -399,7 +383,7 @@ class block_depo_yonetimi extends block_base {
                                         <span>Sorumlu: ' . ($depoYoneticiId ? fullname($DB->get_record('user', ['id' => $depoYoneticiId])) : 'Atanmamış') . '</span>
                                     </div>
                                 </div>
-                                <a href="' . $url . '" class="btn btn-outline-primary mt-auto stretched-link">
+                                <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
                                     <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
                                 </a>
                             </div>
@@ -432,7 +416,7 @@ class block_depo_yonetimi extends block_base {
                                     <span>Sorumlu: ' . fullname($USER) . '</span>
                                 </div>
                             </div>
-                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto stretched-link">
+                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
                                 <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
                             </a>
                         </div>
