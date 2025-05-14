@@ -46,14 +46,118 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     redirect(new moodle_url('/my'), 'Depo başarıyla güncellendi.', null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
-// CSS ve JS eklemeleri
-$PAGE->requires->css_init();
-$PAGE->requires->js_init();
+// Add custom CSS from styles file
+$PAGE->requires->css('/blocks/depo_yonetimi/styles.css');
 
 echo $OUTPUT->header();
-?>
 
-    <div class="container py-4">
+// Özel CSS Stillerini Inline Olarak Ekleyelim
+?>
+    <style>
+        /* Depo Yönetimi için CSS Kodları */
+
+        /* Genel Stil Ayarları */
+        .depo-dashboard {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .depo-dashboard h2 {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .depo-dashboard .text-primary {
+            color: #1177d1 !important;
+        }
+
+        .depo-dashboard .btn-primary {
+            background-color: #1177d1;
+            border-color: #1177d1;
+        }
+
+        .depo-dashboard .btn-primary:hover {
+            background-color: #0e62b0;
+            border-color: #0e62b0;
+        }
+
+        .depo-dashboard .btn-outline-primary {
+            color: #1177d1;
+            border-color: #1177d1;
+        }
+
+        .depo-dashboard .btn-outline-primary:hover {
+            background-color: #1177d1;
+            color: white;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,.1);
+        }
+
+        /* Depo Kartları */
+        .depo-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .depo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,.1) !important;
+        }
+
+        .depo-icon-container {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #1177d1;
+            background-color: #f8f9fa;
+            margin-right: 15px;
+        }
+
+        .depo-icon-container i {
+            font-size: 1.5rem;
+        }
+
+        /* Form Stil Ayarları */
+        .form-control-lg {
+            font-size: 1.1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .needs-validation input:invalid {
+            border-color: #dc3545;
+        }
+
+        .needs-validation input:valid {
+            border-color: #28a745;
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .depo-dashboard {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+    </style>
+
+    <div class="container py-4 depo-dashboard">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <!-- Breadcrumb -->
@@ -65,11 +169,13 @@ echo $OUTPUT->header();
                     </ol>
                 </nav>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-primary text-white p-3">
+                <div class="card border-0 shadow-sm depo-card">
+                    <div class="card-header bg-primary text-white p-3 dashboard-header">
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-warehouse me-2" style="font-size: 1.25rem;"></i>
-                            <h4 class="mb-0">Depo Bilgilerini Düzenle</h4>
+                            <div class="depo-icon-container bg-white me-3">
+                                <i class="icon fa fa-edit fa-fw" aria-hidden="true"></i>
+                            </div>
+                            <h4 class="mb-0 ml-2">Depo Bilgilerini Düzenle</h4>
                         </div>
                     </div>
 
@@ -79,7 +185,7 @@ echo $OUTPUT->header();
 
                             <div class="mb-4">
                                 <label for="name" class="form-label fw-bold">
-                                    <i class="fas fa-tag me-2 text-muted"></i>Depo Adı
+                                    <i class="icon fa fa-tag fa-fw" aria-hidden="true"></i> Depo Adı
                                 </label>
                                 <input type="text" id="name" name="name" value="<?php echo s($depo->name); ?>"
                                        class="form-control form-control-lg" required>
@@ -89,7 +195,7 @@ echo $OUTPUT->header();
 
                             <div class="mb-4">
                                 <label for="sorumlu_id" class="form-label fw-bold">
-                                    <i class="fas fa-user-shield me-2 text-muted"></i>Depo Sorumlusu
+                                    <i class="icon fa fa-user fa-fw" aria-hidden="true"></i> Depo Sorumlusu
                                 </label>
                                 <select id="sorumlu_id" name="sorumlu_id" class="form-select form-select-lg">
                                     <option value="0">-- Sorumlu Seçiniz --</option>
@@ -105,12 +211,12 @@ echo $OUTPUT->header();
                             <div class="row mt-5">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                     <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-outline-secondary btn-lg w-100">
-                                        <i class="fas fa-times me-2"></i>İptal
+                                        <i class="icon fa fa-times fa-fw" aria-hidden="true"></i> İptal
                                     </a>
                                 </div>
                                 <div class="col-sm-6">
                                     <button type="submit" class="btn btn-success btn-lg w-100">
-                                        <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                        <i class="icon fa fa-save fa-fw" aria-hidden="true"></i> Değişiklikleri Kaydet
                                     </button>
                                 </div>
                             </div>
@@ -121,7 +227,7 @@ echo $OUTPUT->header();
                 <!-- Son düzenleme bilgisi -->
                 <div class="text-center text-muted mt-4">
                     <small>
-                        <i class="fas fa-info-circle me-1"></i>
+                        <i class="icon fa fa-info-circle fa-fw" aria-hidden="true"></i>
                         Son düzenleme: <?php echo userdate($depo->timemodified ?? time()); ?>
                     </small>
                 </div>
