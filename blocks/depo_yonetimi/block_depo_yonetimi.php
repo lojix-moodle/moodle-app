@@ -92,10 +92,18 @@ class block_depo_yonetimi extends block_base {
                 return '<p>Bu depoya erişim izniniz yok.</p>';
             }
         }  else {
-            $html = '<div class="depo-ekle-container">';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-primary btn-sm">+ Depo Ekle</a>';
-            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-primary btn-sm">Kategoriler</a>';
-            $html .= '</div>'; // depo-ekle-container kapatma
+            $html = '<div class="depo-ekle-container mb-4 d-flex gap-3 flex-wrap">';
+
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" class="btn btn-outline-success shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+            <i class="fa fa-plus mr-2"></i> Depo Ekle
+          </a>';
+
+            $html .= '<a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" class="btn btn-outline-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center">
+            <i class="fa fa-list mr-2"></i> Kategoriler
+          </a>';
+
+            $html .= '</div>';
+
 
             $html .= '<div class="depo-listesi">'; // Yeni depo listesi container başlangıç
 
