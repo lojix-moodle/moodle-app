@@ -4,7 +4,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Depo ekleme formu
-require_once('../../../../config.php');
+
+require_once(__DIR__ . '/../../../config.php');
 global $CFG, $PAGE, $DB, $OUTPUT;
 require_once($CFG->libdir . '/formslib.php');
 
