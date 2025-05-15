@@ -11,8 +11,3 @@ $string['productname'] = 'Product Name';
 $string['quantity'] = 'Quantity';
 
 
-$string['depo_ekle'] = 'Depo Ekle';
-$string['depo_adi'] = 'Depo Adı';
-$string['depo_sorumlusu'] = 'Depo Sorumlusu';
-$string['depo_eklendi'] = 'Depo başarıyla eklendi.';
-$string['hata_sorumlu_sec'] = 'Lütfen bir sorumlu seçin.';
