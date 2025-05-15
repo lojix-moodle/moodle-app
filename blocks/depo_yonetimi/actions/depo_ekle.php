@@ -72,7 +72,7 @@ $form = new depo_ekle_form();
 
 // Form işleme
 if ($form->is_cancelled()) {
-    redirect(new moodle_url('/blocks/depo_yonetimi/index.php'));
+    redirect(new moodle_url('/my'));
 } else if ($data = $form->get_data()) {
     // Yeni depo oluştur
     $newdepo = new stdClass();
@@ -85,7 +85,7 @@ if ($form->is_cancelled()) {
 
     // Başarı mesajı
     \core\notification::success(get_string('depo_eklendi', 'block_depo_yonetimi', 'Depo başarıyla eklendi.'));
-    redirect(new moodle_url('/blocks/depo_yonetimi/index.php'));
+    redirect(new moodle_url('/my'));
 }
 
 // Çıktı
