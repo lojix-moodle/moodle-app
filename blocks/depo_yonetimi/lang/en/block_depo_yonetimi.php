@@ -9,5 +9,3 @@ $string['depo_yonetimi:viewown'] = 'Sadece atanmış depoyu görme izni';
 
 $string['productname'] = 'Product Name';
 $string['quantity'] = 'Quantity';
-
-
