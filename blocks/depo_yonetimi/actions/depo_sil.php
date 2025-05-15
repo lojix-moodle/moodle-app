@@ -83,9 +83,25 @@ if (!$confirm) {
     exit;
 }
 
-// 5. Silme onayı alındıysa depo sil
+
+
+// 5. Silme onayı alındıysa ve ürün kontrolü
 require_sesskey();
 
+// Depo içinde ürün var mı kontrol et
+$urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
+if ($urun_sayisi > 0) {
+    // Ürünler varsa silme ve kullanıcıya bilgi ver
+    redirect(
+        new moodle_url('/my'),
+        'Bu depoda ' . $urun_sayisi . ' adet ürün bulunmaktadır. Lütfen önce bu ürünleri siliniz.',
+        null,
+        \core\output\notification::NOTIFY_WARNING
+    );
+}
+
+// Ürün yoksa depoyu sil
 $DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
 
 redirect(
