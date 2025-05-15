@@ -1,6 +1,8 @@
 <?php
 // Depo ekleme formu
 require_once('../../../../config.php');
+// Moodle global objeleri
+global $CFG, $PAGE, $DB, $OUTPUT;
 require_once($CFG->libdir . '/formslib.php');
 
 // Yetki kontrolü
