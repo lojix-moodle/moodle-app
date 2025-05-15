@@ -16,6 +16,7 @@ $capabilities = [
             'user' => CAP_ALLOW
         ]
     ],
+
     'block/depo_yonetimi:viewall' => [ // Admin izni
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -29,5 +30,6 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW
         ]
-    ]
+    ],
+
 ];
