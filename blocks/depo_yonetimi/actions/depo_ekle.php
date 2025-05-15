@@ -11,7 +11,12 @@ require_once($CFG->libdir . '/formslib.php');
 
 // Yetki kontrolü
 require_login();
-require_capability('block/depo_yonetimi:manage', context_system::instance());
+if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
+    $yetki = 'admin';
+} elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
+    $yetki = 'depoyetkilisi';
+}
+//require_capability('block/depo_yonetimi:manage', context_system::instance());
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
