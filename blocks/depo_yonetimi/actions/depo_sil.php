@@ -23,18 +23,19 @@ if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
 }
 
 // 4. Onay ekranı göster
+
+// Ana sayfa URL'i
+$return_url = new moodle_url('/blocks/depo_yonetimi/index.php');
+
 if (!$confirm) {
     $depo_adi = $DB->get_field('block_depo_yonetimi_depolar', 'name', ['id' => $depoid]);
-    $ana_sayfa_url = new moodle_url('/my');
 
     $yesurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', [
         'depoid' => $depoid,
         'confirm' => 1,
         'sesskey' => sesskey()
     ]);
-
-    $nourl = $ana_sayfa_url;
-
+    $nourl = $return_url;
     echo $OUTPUT->header();
 
     // Geliştirilmiş profesyonel onay kartı
@@ -84,16 +85,14 @@ if (!$confirm) {
 }
 
 /// 5. Silme onayı alındıysa depo sil
+
 require_sesskey();
 
-// Depo içinde ürün var mı kontrol et
-$urun_var_mi = $DB->record_exists('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
-
-if ($urun_var_mi) {
-    // Silme engelleniyor
+// Depo içinde ürün kontrolü
+if ($DB->record_exists('block_depo_yonetimi_urunler', ['depoid' => $depoid])) {
     redirect(
-        new moodle_url('/my'),
-        'Depo silinemedi. Bu depoya ait ürün(ler) mevcut.',
+        $return_url,
+        'Depo silinemedi. Bu depoda ürünler mevcut. Önce ürünleri başka bir depoya taşıyın veya silin.',
         null,
         \core\output\notification::NOTIFY_ERROR
     );
@@ -103,7 +102,7 @@ if ($urun_var_mi) {
 $DB->delete_records('block_depo_yonetimi_depolar', ['id' => $depoid]);
 
 redirect(
-    new moodle_url('/my'),
+    $return_url,
     'Depo başarıyla silindi.',
     null,
     \core\output\notification::NOTIFY_SUCCESS
