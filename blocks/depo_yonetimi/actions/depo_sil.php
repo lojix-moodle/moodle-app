@@ -1,34 +1,28 @@
 <?php
-require_once(__DIR__ . '/../../../config.php');
+require_once('../../../../config.php');
+require_login();
 
-require_login(); // Kullanıcı giriş kontrolü
 global $DB, $PAGE, $OUTPUT;
 
-// Sayfa ayarlarını EN BAŞTA yapıyoruz
+$PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php'));
-$PAGE->set_context(context_system::instance()); // Context hatasını çözer
 $PAGE->set_title('Depo Silme');
 $PAGE->set_heading('Depo Silme');
 
-// 1. Parametreleri al
+require_capability('block/depo_yonetimi:manage', context_system::instance());
+
 $depoid = required_param('depoid', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
-
-// 2. Yetki kontrolü
-require_capability('block/depo_yonetimi:viewall', context_system::instance());
-
-// 3. Depo var mı kontrol et
-if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
-    throw new moodle_exception('invaliddepoid', 'block_depo_yonetimi');
-}
-
-// 4. Onay ekranı göster
 
 // Ana sayfa URL'i
 $return_url = new moodle_url('/blocks/depo_yonetimi/index.php');
 
+if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
+    redirect($return_url, 'Geçersiz depo ID\'si.', null, \core\output\notification::NOTIFY_ERROR);
+}
+
 if (!$confirm) {
-    $depo_adi = $DB->get_field('block_depo_yonetimi_depolar', 'name', ['id' => $depoid]);
+    $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
 
     $yesurl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', [
         'depoid' => $depoid,
@@ -36,7 +30,13 @@ if (!$confirm) {
         'sesskey' => sesskey()
     ]);
     $nourl = $return_url;
+
     echo $OUTPUT->header();
+    echo $OUTPUT->confirm(
+        "\"$depo->name\" deposunu silmek istediğinizden emin misiniz?",
+        $yesurl,
+        $nourl
+    );
 
     // Geliştirilmiş profesyonel onay kartı
     echo '
@@ -57,15 +57,15 @@ if (!$confirm) {
                             </div>
                             <h4 class="fw-bold mt-3">Silme Onayı</h4>
                         </div>
-                        
+
                         <div class="alert alert-warning border-0 bg-warning bg-opacity-10 mb-4">
-                            <strong>"' . htmlspecialchars($depo_adi) . '"</strong> isimli depoyu silmek üzeresiniz.
+                            <strong>"' . htmlspecialchars($depo->name) . '"</strong> isimli depoyu silmek üzeresiniz.
                         </div>
-                        
+
                         <p class="text-muted mb-4">
                             Bu işlem kalıcıdır ve geri alınamaz. Depo ile ilişkili tüm ürün verileri ve kayıtlar sistemden tamamen silinecektir.
                         </p>
-                        
+
                         <div class="d-grid gap-3 d-sm-flex justify-content-sm-between">
                             <a href="' . $nourl . '" class="btn btn-lg btn-outline-secondary flex-grow-1" style="min-width: 140px;">
                                 <i class="fas fa-times me-2"></i>İptal
@@ -83,8 +83,6 @@ if (!$confirm) {
     echo $OUTPUT->footer();
     exit;
 }
-
-/// 5. Silme onayı alındıysa depo sil
 
 require_sesskey();
 
