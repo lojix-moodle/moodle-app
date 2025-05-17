@@ -5,7 +5,7 @@
 {{> core/local/toast/wrapper }}
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
     * {
         margin: 0;
@@ -14,8 +14,8 @@
     }
 
     body#page-login-index {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f5f5f9;
+        font-family: 'Open Sans', sans-serif;
+        background-color: #eef2f7;
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -24,292 +24,200 @@
 
     #page-wrapper {
         width: 100%;
-        max-width: 1000px;
+        max-width: 420px;
         margin: 0 auto;
+        padding: 15px;
     }
 
-    .login-wrapper {
-        display: flex;
+    .login-card {
         background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        margin: 20px;
+        position: relative;
     }
 
-    /* Left side - Branding */
-    .login-logo-section {
-        width: 40%;
-        background-color: #1e88e5;
-        color: #fff;
+    .login-header {
+        background: #1a73e8;
+        padding: 30px 20px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 40px 20px;
+        color: white;
     }
 
     .login-logo {
-        font-size: 48px;
-        font-weight: 700;
-        margin-bottom: 20px;
+        font-size: 32px;
+        font-weight: 600;
         letter-spacing: -1px;
+        margin-bottom: 8px;
     }
 
-    .login-logo-desc {
-        font-size: 16px;
-        font-weight: 300;
-        line-height: 1.6;
-        max-width: 260px;
-        margin: 0 auto;
-    }
-
-    /* Right side - Form */
     .login-form-section {
-        width: 60%;
-        padding: 40px;
+        padding: 25px 20px;
     }
 
-    .login-title {
-        font-size: 28px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 10px;
-    }
-
-    .login-subtitle {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 30px;
-    }
-
-    /* Override default form styles */
-    .login-form-section form {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .login-form-section .form-group {
-        margin-bottom: 20px;
-    }
-
-    .login-form-section .form-label {
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 8px;
-        display: block;
-        color: #333;
-    }
-
-    .login-form-section .form-control {
-        width: 100%;
-        height: 48px;
-        padding: 0 15px;
-        font-size: 16px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        background-color: #fafafa;
-        transition: all 0.2s ease;
-    }
-
-    .login-form-section .form-control:focus {
-        border-color: #1e88e5;
-        background-color: #fff;
-        box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
-        outline: none;
-    }
-
-    .login-form-section .btn-primary {
-        height: 48px;
-        background-color: #1e88e5;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        margin-top: 10px;
-    }
-
-    .login-form-section .btn-primary:hover {
-        background-color: #1976d2;
-    }
-
-    /* Password recovery link */
-    .login-form-section .forgot-link {
-        text-align: right;
-        margin: 15px 0;
-    }
-
-    .login-form-section .forgot-link a {
-        color: #1e88e5;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    .login-form-section .forgot-link a:hover {
-        text-decoration: underline;
-    }
-
-    /* First time section */
-    .new-account-section {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-    }
-
-    .new-account-title {
-        font-size: 16px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 8px;
-    }
-
-    .new-account-text {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 15px;
-    }
-
-    .new-account-button {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #f5f5f5;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        color: #333;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        text-align: center;
-        transition: all 0.2s ease;
-    }
-
-    .new-account-button:hover {
-        background-color: #e0e0e0;
-    }
-
-    /* Make it responsive */
-    @media (max-width: 768px) {
-        .login-wrapper {
-            flex-direction: column;
-        }
-
-        .login-logo-section,
-        .login-form-section {
-            width: 100%;
-        }
-
-        .login-logo-section {
-            padding: 30px 20px;
-        }
-    }
-
-    /* Fix for Moodle's form elements */
-    .login-form-section div,
-    .login-form-section form,
-    .login-form-section fieldset {
-        width: 100%;
-    }
-
+    /* Form Elements */
     .login-form-section input[type="text"],
     .login-form-section input[type="password"] {
         width: 100%;
-        height: 48px;
-        padding: 0 15px;
-        font-size: 16px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        background-color: #fafafa;
-        transition: all 0.2s ease;
+        height: 42px;
+        padding: 0 12px;
+        font-size: 14px;
+        border: 1px solid #dbe0e6;
+        border-radius: 6px;
+        background-color: #fff;
         margin-bottom: 15px;
+        transition: all 0.2s;
     }
 
     .login-form-section input[type="text"]:focus,
     .login-form-section input[type="password"]:focus {
-        border-color: #1e88e5;
-        background-color: #fff;
-        box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
         outline: none;
     }
 
-    .login-form-section label {
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 8px;
-        display: block;
-        color: #333;
-    }
-
-    .login-form-section button,
     .login-form-section input[type="submit"] {
         display: block;
         width: 100%;
-        height: 48px;
-        background-color: #1e88e5;
+        height: 42px;
+        background-color: #1a73e8;
         color: white;
         border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        font-weight: 500;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
         cursor: pointer;
         transition: background-color 0.2s;
-        margin-top: 10px;
+        margin-top: 5px;
     }
 
-    .login-form-section button:hover,
     .login-form-section input[type="submit"]:hover {
-        background-color: #1976d2;
+        background-color: #1765cc;
     }
 
-    .login-form-section a {
-        color: #1e88e5;
-        text-decoration: none;
+    /* Tab Navigation */
+    .login-tabs {
+        display: flex;
+        border-bottom: 1px solid #dbe0e6;
+        margin-bottom: 20px;
     }
 
-    .login-form-section a:hover {
-        text-decoration: underline;
+    .login-tab {
+        flex: 1;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #5f6368;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
     }
 
-    /* Hide any unnecessary Moodle elements */
+    .login-tab.active {
+        color: #1a73e8;
+    }
+
+    .login-tab.active:after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #1a73e8;
+    }
+
+    /* Register Form */
+    #register-form {
+        display: none;
+    }
+
+    /* Hide unnecessary elements */
+    .login-form-section a,
     .login-form-section .sr-only,
-    .login-form-section .visually-hidden {
-        display: none;
+    .login-form-section .alert,
+    .login-form-section .visually-hidden,
+    .login-form-section .divider,
+    #page-footer {
+        display: none !important;
     }
 
-    /* Footer adjustments */
-    #page-footer {
-        display: none;
+    /* Make sure form elements are properly displayed */
+    .login-form-section div,
+    .login-form-section form,
+    .login-form-section fieldset {
+        max-width: 100%;
+    }
+
+    .login-form-section label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: block;
+        color: #5f6368;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        #page-wrapper {
+            padding: 10px;
+        }
+
+        .login-header {
+            padding: 20px 15px;
+        }
+
+        .login-form-section {
+            padding: 20px 15px;
+        }
     }
 </style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-wrapper">
-        <!-- Left section with logo and description -->
-        <div class="login-logo-section">
+    <div class="login-card">
+        <div class="login-header">
             <div class="login-logo">Lojix</div>
-            <div class="login-logo-desc">Profesyonel depo yönetim sistemi ile işlerinizi kolaylaştırın</div>
         </div>
 
-        <!-- Right section with login form -->
         <div class="login-form-section">
-            <h1 class="login-title">Giriş Paneli</h1>
-            <p class="login-subtitle">Hesabınıza erişmek için bilgilerinizi girin</p>
+            <div class="login-tabs">
+                <div class="login-tab active" id="login-tab">Giriş</div>
+                <div class="login-tab" id="register-tab">Kayıt Ol</div>
+            </div>
 
-            <!-- This is where Moodle injects the login form -->
-            <div id="login-form-container">
+            <!-- Login Form (Default) -->
+            <div id="login-form">
                 {{{ output.main_content }}}
             </div>
 
-            <!-- New account section -->
-            <div class="new-account-section">
-                <h2 class="new-account-title">İlk kez mi buradasınız?</h2>
-                <p class="new-account-text">Sisteme tam erişim sağlamak için önce bir hesap oluşturmanız gerekir.</p>
-                <a href="#" class="new-account-button">Yeni hesap oluştur</a>
+            <!-- Register Form (Hidden initially) -->
+            <div id="register-form">
+                <form method="post" action="register.php">
+                    <div class="form-group">
+                        <label for="fullname">Ad Soyad</label>
+                        <input type="text" id="fullname" name="fullname" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-posta</label>
+                        <input type="text" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newpassword">Şifre</label>
+                        <input type="password" id="newpassword" name="newpassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmpassword">Şifre Tekrar</label>
+                        <input type="password" id="confirmpassword" name="confirmpassword" required>
+                    </div>
+
+                    <input type="submit" value="Kayıt Ol">
+                </form>
             </div>
         </div>
     </div>
@@ -323,25 +231,51 @@
     require(['theme_boost/loader'], function() {
     M.util.js_complete('theme_boost/loader');
 
-    // Additional JavaScript to fix form elements
+    // Tab switching functionality
     document.addEventListener('DOMContentLoaded', function() {
-    // Add classes to login button
-    var loginBtn = document.querySelector('input[type="submit"]');
-    if (loginBtn) {
-    loginBtn.classList.add('login-button');
-    }
-
-    // Adjust any form field labels
-    var labels = document.querySelectorAll('form label');
-    labels.forEach(function(label) {
-    label.classList.add('form-label');
-    });
-
-    // Adjust any form inputs
-    var inputs = document.querySelectorAll('form input[type="text"], form input[type="password"]');
-    inputs.forEach(function(input) {
+    // Function to enhance Moodle's login form
+    function enhanceLoginForm() {
+    // Fix login form elements
+    var loginInputs = document.querySelectorAll('#login-form input[type="text"], #login-form input[type="password"]');
+    loginInputs.forEach(function(input) {
     input.classList.add('form-input');
     });
+
+    var loginButton = document.querySelector('#login-form input[type="submit"]');
+    if (loginButton) {
+    loginButton.value = "Giriş Yap";
+    }
+
+    // Hide unnecessary elements
+    var loginLinks = document.querySelectorAll('#login-form a');
+    loginLinks.forEach(function(link) {
+    link.style.display = 'none';
+    });
+    }
+
+    // Get tab elements
+    var loginTab = document.getElementById('login-tab');
+    var registerTab = document.getElementById('register-tab');
+    var loginForm = document.getElementById('login-form');
+    var registerForm = document.getElementById('register-form');
+
+    // Add click event listeners to tabs
+    loginTab.addEventListener('click', function() {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.style.display = 'block';
+    registerForm.style.display = 'none';
+    });
+
+    registerTab.addEventListener('click', function() {
+    registerTab.classList.add('active');
+    loginTab.classList.remove('active');
+    registerForm.style.display = 'block';
+    loginForm.style.display = 'none';
+    });
+
+    // Run enhancement functions
+    enhanceLoginForm();
     });
     });
 {{/js}}
