@@ -28,15 +28,16 @@ $PAGE->requires->css(new moodle_url('/lib/jquery/themes/base/jquery.ui.all.css')
 $PAGE->requires->js_call_amd('block_depo_yonetimi/validation', 'init');
 
 echo $OUTPUT->header();
+
 echo '<style>
-/* Ana form kutusunu sayfanın ortasına al ve genişliği küçült */
+/* Ana form kutusunu ortala ve genişliği uygun yap */
 .depo-form-card {
     background: #fff;
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-width: 600px; /* daha uygun genişlik */
-    margin: 3rem auto; /* ortala */
+    max-width: 600px;
+    margin: 3rem auto;
 }
 
 /* Başlık ve ikon */
@@ -59,81 +60,62 @@ echo '<style>
 
 /* Label genişliği ve hizalama */
 .depo-label {
-    display: inline-block;
+    display: block;
     min-width: 150px;
     font-weight: 600;
-    margin-bottom: 0.3rem;
     font-size: 1rem;
+    margin-bottom: 0.3rem;
     color: #333;
-    vertical-align: top;
 }
 
-/* Inputların hizalanması ve genişliği */
-.depo-form-control {
-    width: calc(100% - 160px);
+/* Input ve select alanları hizalanması */
+.depo-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.depo-input-group label {
+    width: 150px;
+    font-weight: 600;
+}
+.depo-input-group input,
+.depo-input-group select {
+    flex: 1;
     padding: 0.5rem 0.75rem;
     font-size: 0.95rem;
     border: 1px solid #ccc;
     border-radius: 0.5rem;
-    display: inline-block;
 }
 
-/* Form gruplarını satır yap */
-.depo-form-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.2rem;
-}
-
-/* Butonlar container düzeni */
+/* Butonlar container */
 .depo-form-buttons {
     display: flex;
-    justify-content: space-between; /* sol ve sağ hizala */
+    justify-content: center; /* ortala */
+    gap: 20px; /* aralık */
     margin-top: 1.5rem;
 }
 
-/* Butonların küçültülmüş hali ve hizalanması */
+/* Buton stilleri */
 .depo-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
     border-radius: 0.5rem;
     border: none;
     cursor: pointer;
-    display: inline-flex;
+    height: 36px;
+    min-width: 120px;
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s;
-    min-width: 120px;
-    height: 36px;
 }
-
-/* Kaydet butonu sola hizala ve küçült */
 .depo-btn-primary {
     background-color: #0073e6;
-    color: white;
-    margin-right: 20px;
+    color: #fff;
 }
-
-/* Geri butonu sağa hizala ve küçült */
 .depo-btn-secondary {
-    background-color: #ccc;
-    color: #000;
-}
-
-/* Geri butonunu sağa hizala */
-.depo-btn-geri {
-    margin-left: auto;
-}
-
-/* Butonlar arasındaki boşluk */
-.depo-form-buttons > * {
-    margin: 0 10px;
-}
-
-/* Diğer stiller ... */
-.fitem .felement .error,
-.fitem .felement .required {
-    display: none !important;
+    background-color: #aaa;
+    color: #fff;
 }
 </style>';
 
@@ -144,10 +126,12 @@ class depo_ekle_form extends moodleform {
 
         $mform->addElement('html', '<div class="depo-form-card"><div class="depo-form-header">
             <div class="depo-icon-circle"><i class="fas fa-warehouse fa-2x"></i></div>
-            <h3>Yeni Depo Ekle</h3><p>Lütfen tüm gerekli alanları doldurun</p></div>');
+            <h3>Yeni Depo Ekle</h3>
+            <p>Lütfen tüm gerekli alanları doldurun</p>
+        </div>');
 
         // Depo Adı
-        $mform->addElement('html', '<div class="depo-form-group">');
+        $mform->addElement('html', '<div class="depo-input-group">');
         $mform->addElement('html', '<label class="depo-label" for="id_name">Depo Adı</label>');
         $mform->addElement('text', 'name', '', [
             'id' => 'id_name',
@@ -156,11 +140,9 @@ class depo_ekle_form extends moodleform {
         ]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', 'Depo adı zorunludur', 'required', null, 'client');
-        $mform->addElement('html', '<div class="depo-form-hint">Benzersiz bir depo adı girin</div>');
         $mform->addElement('html', '</div>');
 
-        // Sorumlu Seçimi
-        $mform->addElement('html', '<div class="depo-form-group">');
+        // Depo Sorumlusu
         $admins = get_admins();
         $admin_ids = array_map(fn($a) => $a->id, $admins);
         $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
@@ -176,6 +158,7 @@ class depo_ekle_form extends moodleform {
             }
         }
 
+        $mform->addElement('html', '<div class="depo-input-group">');
         $mform->addElement('html', '<label class="depo-label" for="id_sorumluid">Depo Sorumlusu</label>');
         $mform->addElement('select', 'sorumluid', '', $user_options, [
             'id' => 'id_sorumluid',
@@ -183,13 +166,12 @@ class depo_ekle_form extends moodleform {
         ]);
         $mform->setType('sorumluid', PARAM_INT);
         $mform->addRule('sorumluid', 'Lütfen bir depo sorumlusu seçin', 'required', null, 'client');
-        $mform->addElement('html', '<div class="depo-form-hint">Depo sorumlusu, depo ile ilgili tüm işlemleri yönetebilir</div>');
         $mform->addElement('html', '</div>');
 
         // Butonlar
         $mform->addElement('html', '<div class="depo-form-buttons">');
         $mform->addElement('html', '<button class="depo-btn depo-btn-primary" type="submit" name="submit">Depoyu Kaydet</button>');
-        $mform->addElement('html', '<a href="' . new moodle_url('/blocks/depo_yonetimi/index.php') . '" class="depo-btn depo-btn-secondary depo-btn-geri">
+        $mform->addElement('html', '<a href="' . new moodle_url('/blocks/depo_yonetimi/index.php') . '" class="depo-btn depo-btn-secondary">
             Geri
         </a>');
         $mform->addElement('html', '</div></div>');
