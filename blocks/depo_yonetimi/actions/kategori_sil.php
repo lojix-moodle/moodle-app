@@ -71,4 +71,3 @@ try {
         null,
         \core\output\notification::NOTIFY_ERROR);
 }
-?>
