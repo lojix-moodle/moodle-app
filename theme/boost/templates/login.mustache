@@ -408,11 +408,47 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get tab elements
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const tabIndicator = document.querySelector('.active-tab-indicator');
+        // Add click event listeners to tabs with animation
+        loginTab.addEventListener('click', function() {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            tabIndicator.style.transform = 'translateX(0)';
+
+            // Animate form transition
+            registerForm.style.opacity = '0';
+            registerForm.style.transform = 'translateX(20px)';
+
+            setTimeout(function() {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+
+                setTimeout(function() {
+                    loginForm.style.opacity = '1';
+                    loginForm.style.transform = 'translateX(0)';
+                }, 50);
+            }, 300);
+        });
+
+        registerTab.addEventListener('click', function() {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            tabIndicator.style.transform = 'translateX(100%)';
+
+            // Animate form transition
+            loginForm.style.opacity = '0';
+            loginForm.style.transform = 'translateX(-20px)';
+
+            setTimeout(function() {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+
+                setTimeout(function() {
+                    registerForm.style.opacity = '1';
+                    registerForm.style.transform = 'translateX(0)';
+                }, 50);
+            }, 300);
+        });
+
 
         // Process any existing Moodle login form
         function processMoodleForm() {
