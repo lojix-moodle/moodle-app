@@ -208,7 +208,7 @@ echo $OUTPUT->header();
                                                        class="btn btn-sm btn-outline-primary" title="Düzenle">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['id' => $kategori->id, 'sesskey' => sesskey()]); ?>"
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['kategoriid' => $kategori->id, 'sesskey' => sesskey()]); ?>"
                                                        class="btn btn-sm btn-outline-danger delete-btn"
                                                        title="Sil"
                                                        data-id="<?php echo $kategori->id; ?>"
