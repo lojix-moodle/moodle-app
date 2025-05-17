@@ -414,7 +414,6 @@ echo $OUTPUT->header();
                     sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
                     sortTable();
-                    updatePagination();
                 });
             });
 
@@ -429,6 +428,26 @@ echo $OUTPUT->header();
                 currentPage = 1;
                 updatePagination();
             });
+
+            // Tablo filtreleme ve görüntüleme sayısı güncelleme
+            function filterTable() {
+                var searchTerm = searchInput.value.toLowerCase();
+                var visibleCount = 0;
+
+                tableRows.forEach(function(row) {
+                    var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
+                    var isVisible = kategoriName.includes(searchTerm);
+
+                    // Filtreleme durumunu kaydet
+                    row.classList.toggle('filtered-out', !isVisible);
+                    row.dataset.visible = isVisible ? 'true' : 'false';
+
+                    if (isVisible) visibleCount++;
+                });
+
+                displayedCountEl.textContent = visibleCount;
+                updatePagination();
+            }
 
             // Tablo sıralama fonksiyonu
             function sortTable() {
@@ -451,47 +470,24 @@ echo $OUTPUT->header();
                 });
 
                 var tbody = document.querySelector('#kategoriTable tbody');
+                tbody.innerHTML = '';
                 rows.forEach(function(row) {
-                    row.style.display = 'none'; // Tüm satırları önce gizle
                     tbody.appendChild(row);
                 });
 
-                filterTable(); // Filtreleme ve sayfalama işlemini tetikle
+                filterTable();
             }
 
-            // Tablo filtreleme
-            function filterTable() {
-                var searchTerm = searchInput.value.toLowerCase();
-                var visibleCount = 0;
-
-                tableRows.forEach(function(row) {
-                    var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
-                    var isVisible = kategoriName.includes(searchTerm);
-
-                    // Filtreleme durumunu kaydet
-                    row.classList.toggle('filtered-out', !isVisible);
-                    row.dataset.visible = isVisible ? 'true' : 'false';
-
-                    if (isVisible) visibleCount++;
-                });
-
-                displayedCountEl.textContent = visibleCount;
-                updatePagination();
-            }
-
-            // Sayfalama güncelleme - Bu fonksiyon düzgün sayfalama sağlar
+            // Sayfalama güncelleme - Bu fonksiyon sayfalama ve görünürlük kontrolü yapar
             function updatePagination() {
                 var visibleRows = Array.from(tableRows).filter(function(row) {
                     return row.dataset.visible !== 'false';
                 });
 
                 var totalItems = visibleRows.length;
-                totalCountEl.textContent = tableRows.length;
-                displayedCountEl.textContent = totalItems;
-
                 var totalPages = Math.ceil(totalItems / pageSize);
 
-                // Tüm satırları gizle
+                // Önce tüm satırları gizle
                 tableRows.forEach(function(row) {
                     row.style.display = 'none';
                 });
