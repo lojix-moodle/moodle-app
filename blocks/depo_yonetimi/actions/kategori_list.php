@@ -184,12 +184,11 @@ echo $OUTPUT->header();
                                     <tbody>
                                     <?php foreach ($kategoriler as $kategori):
                                         // Her kategori için ürün sayısını sorgula
-                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategori_id' => $kategori->id]);
+                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategoriid' => $kategori->id]);
                                         ?>
                                         <tr data-id="<?php echo $kategori->id; ?>" data-name="<?php echo htmlspecialchars($kategori->name); ?>" data-date="<?php echo $kategori->timecreated ?? 0; ?>">
                                             <td class="align-middle">
                                                 <span class="category-name"><?php echo htmlspecialchars($kategori->name); ?></span>
-                                                <small class="text-muted d-block">(ID: <?php echo $kategori->id; ?>)</small>
                                             </td>
                                             <td class="align-middle text-center">
                                                 <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill"><?php echo $urun_sayisi; ?></span>
@@ -343,14 +342,8 @@ echo $OUTPUT->header();
             });
 
             // Modal ile silme onayı
-            confirmDeleteBtn.addEventListener('click', function(e) {
-                e.preventDefault(); // Tarayıcının varsayılan davranışını engelle
+            confirmDeleteBtn.addEventListener('click', function() {
                 loadingOverlay.style.display = 'flex';
-
-                // Silme işlemi için form gönderimi
-                setTimeout(function() {
-                    window.location.href = confirmDeleteBtn.getAttribute('href');
-                }, 100);
             });
 
             // Sıralama işlemi
