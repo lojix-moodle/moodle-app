@@ -340,13 +340,15 @@
 
             <!-- Login Form (Default) -->
             <div id="login-form">
-                {{{ output.main_content }}}
-
+                <form method="post" action="login.php">
+                    {{{ output.main_content }}}
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Giriş Yap</span>
+                        <div class="loader"></div>
+                    </button>
+                </form>
             </div>
-            <button type="submit" class="submit-btn">
-                <span class="btn-text">Giriş Yap</span>
-                <div class="loader"></div>
-            </button>
+
 
             <!-- Register Form (Hidden initially) -->
             <div id="register-form">
