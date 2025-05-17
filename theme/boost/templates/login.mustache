@@ -341,7 +341,12 @@
             <!-- Login Form (Default) -->
             <div id="login-form">
                 {{{ output.main_content }}}
+
             </div>
+            <button type="submit" class="submit-btn">
+                <span class="btn-text">Kayıt Ol</span>
+                <div class="loader"></div>
+            </button>
 
             <!-- Register Form (Hidden initially) -->
             <div id="register-form">
@@ -376,11 +381,6 @@
                         <label for="newpassword">Şifre</label>
 
                     </div>
-
-                    <button type="submit" class="submit-btn">
-                        <span class="btn-text">Giriş Yap</span>
-                        <div class="loader"></div>
-                    </button>
 
                     <div class="form-group">
                         <input type="password" id="confirmpassword" name="confirmpassword" class="form-input" placeholder=" " required>
