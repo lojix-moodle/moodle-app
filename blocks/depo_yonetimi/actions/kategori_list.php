@@ -345,7 +345,7 @@ echo $OUTPUT->header();
             var pageSizeSelect = document.getElementById('page-size');
             var paginationContainer = document.querySelector('.pagination');
             var currentPage = 1;
-            var pageSize = 10; // Varsayılan olarak 10 değerini atıyoruz
+            var pageSize = 10; // Başlangıçta 10 ürün gösterilecek
             var allRows = Array.from(tableRows);
             var sortField = 'name';
             var sortDirection = 'asc';
@@ -354,12 +354,14 @@ echo $OUTPUT->header();
             var deleteModalText = document.getElementById('deleteModalText');
             var sortDropdown = document.getElementById('sortDropdown');
 
-            // Sayfa boyutunu başlangıçta ayarla
+            // Sayfa boyutunu başlangıçta ayarla (varsayılan 10)
             pageSizeSelect.value = "10";
 
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
                 loadingOverlay.style.display = 'none';
+                // Sayfa başlangıçta 10 ürün göster
+                filterAndDisplay();
             });
 
             // Tablo satırlarına hover efekti
@@ -417,7 +419,7 @@ echo $OUTPUT->header();
                     // Sıralama başlığını güncelle
                     sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
-                    sortAndDisplay();
+                    filterAndDisplay();
                 });
             });
 
@@ -429,13 +431,13 @@ echo $OUTPUT->header();
                 } else {
                     pageSize = parseInt(selectedValue);
                 }
-                currentPage = 1;
+                currentPage = 1; // Sayfayı başa al
                 filterAndDisplay();
             });
 
-            // Tablo filtreleme, sıralama ve görüntüleme - Ana fonksiyon
+            // Ana fonksiyon: filtreleme, sıralama ve gösterim
             function filterAndDisplay() {
-                // Önce tüm satırları gizle
+                // Tüm satırları gizle
                 allRows.forEach(function(row) {
                     row.style.display = 'none';
                 });
@@ -473,25 +475,23 @@ echo $OUTPUT->header();
                     currentPage = totalPages;
                 }
 
-                // Geçerli sayfa için satırları göster
+                // Gösterilecek satırlar
                 var startIndex = (currentPage - 1) * pageSize;
-                var endIndex = Math.min(startIndex + pageSize, filteredRows.length);
+                var endIndex = Math.min(startIndex + pageSize, totalItems);
 
                 for (var i = startIndex; i < endIndex; i++) {
-                    if (i < filteredRows.length) {
-                        filteredRows[i].style.display = '';
-                    }
+                    filteredRows[i].style.display = '';
                 }
 
-                // 4. Sayfalama UI oluştur
+                // 4. Sayfalama
                 createPagination(totalItems);
 
-                // 5. Görüntülenen/toplam sayıları güncelle
+                // 5. Sayfa ve toplam sayıları güncelle
                 totalCountEl.textContent = allRows.length;
                 displayedCountEl.textContent = totalItems;
             }
 
-            // Sayfalama oluşturma
+            // Sayfalama oluşturma fonksiyonu
             function createPagination(totalItems) {
                 paginationContainer.innerHTML = '';
 
@@ -506,9 +506,9 @@ echo $OUTPUT->header();
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, startPage + 4);
 
-                // Önceki sayfa butonu
+                // Önceki
                 if (currentPage > 1) {
-                    addPageItem(currentPage - 1, '&laquo;', 'Önceki');
+                    addPageItem(currentPage - 1, '«', 'Önceki');
                 }
 
                 // Sayfa numaraları
@@ -516,13 +516,13 @@ echo $OUTPUT->header();
                     addPageItem(i, i, '', i === currentPage);
                 }
 
-                // Sonraki sayfa butonu
+                // Sonraki
                 if (currentPage < totalPages) {
-                    addPageItem(currentPage + 1, '&raquo;', 'Sonraki');
+                    addPageItem(currentPage + 1, '»', 'Sonraki');
                 }
             }
 
-            // Sayfalama öğesi ekleme
+            // Sayfa öğesi ekleme
             function addPageItem(pageNum, text, ariaLabel, isActive) {
                 var li = document.createElement('li');
                 li.className = 'page-item' + (isActive ? ' active' : '');
@@ -544,7 +544,7 @@ echo $OUTPUT->header();
                 paginationContainer.appendChild(li);
             }
 
-            // İlk yükleme - sayfa boyutunu uygulamak için
+            // İlk yüklemede başlangıçta 10 ürün göster
             setTimeout(function() {
                 filterAndDisplay();
             }, 100);
