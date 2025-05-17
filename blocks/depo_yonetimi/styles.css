@@ -196,16 +196,16 @@ form.mform {
 
 .btn-dashboard {
     background: #fff !important;
-    color: #007bff !important;
-    border: 2px solid #007bff !important;
+    color: #9d62bc !important;
+    border: 2px solid #833baa !important;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .btn-dashboard:hover, .btn-dashboard:focus {
-    background: #007bff !important;
+    background: #9d62bc !important;
     color: #fff !important;
-    box-shadow: 0 4px 16px rgba(0,123,255,0.15);
+    box-shadow: 0 4px 16px #36104b;
     text-decoration: none;
 }
 
@@ -223,27 +223,33 @@ form.mform {
 }
 
 .depo-dashboard .text-primary {
-    color: #1177d1 !important;
+    color: #a989e9 !important;
 }
 
 .depo-dashboard .btn-primary {
-    background-color: #1177d1;
-    border-color: #1177d1;
+    background: linear-gradient(135deg, #b090e9 0%, #9fc5ff 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    box-shadow: 0 5px 15px rgba(169, 137, 233, 0.2) !important;
+    transition: all 0.3s !important;
 }
 
 .depo-dashboard .btn-primary:hover {
-    background-color: #0e62b0;
-    border-color: #0e62b0;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(169, 137, 233, 0.3) !important;
 }
 
 .depo-dashboard .btn-outline-primary {
-    color: #1177d1;
-    border-color: #1177d1;
+    color: #a989e9 !important;
+    border-color: #a989e9 !important;
+    background: transparent !important;
+    transition: all 0.3s !important;
 }
 
 .depo-dashboard .btn-outline-primary:hover {
-    background-color: #1177d1;
-    color: white;
+    background: linear-gradient(135deg, #b090e9 0%, #9fc5ff 100%) !important;
+    color: white !important;
+    border-color: transparent !important;
 }
 
 /* Dashboard Header */
