@@ -30,15 +30,6 @@ $PAGE->requires->js_call_amd('block_depo_yonetimi/validation', 'init');
 echo $OUTPUT->header();
 
 echo '<style>
-/* Ana form kutusunu ortala ve genişliği uygun yap */
-body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f0f0f0; /* isteğe bağlı, arka plan rengi */
-}
 
 /* Form kutusu */
 .depo-form-card {
