@@ -9,18 +9,8 @@ require_once(__DIR__ . '/../../../config.php');
 require_login();
 global $DB, $USER;
 
-// Parametreleri al (hem id hem de kategoriid parametrelerini kabul et)
-$kategoriid = optional_param('kategoriid', 0, PARAM_INT);
-$id = optional_param('id', 0, PARAM_INT);
-
-// Hangisi mevcutsa onu kullan
-if ($kategoriid == 0 && $id > 0) {
-    $kategoriid = $id;
-}
-
-if ($kategoriid <= 0) {
-    print_error('invalidparameter', 'error');
-}
+// Parametreleri al
+$kategoriid = required_param('kategoriid', PARAM_INT);
 
 try {
     // Kategori var mı kontrol et
