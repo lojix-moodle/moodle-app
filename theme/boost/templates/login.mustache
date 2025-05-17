@@ -5,133 +5,116 @@
 {{> core/local/toast/wrapper }}
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
     body#page-login-index {
         margin: 0;
         padding: 0;
         min-height: 100vh;
         font-family: 'Poppins', sans-serif;
-        background: url('https://source.unsplash.com/1920x1080/?technology,education') no-repeat center center/cover;
+        background: linear-gradient(135deg, #2c3e50, #4ca1af);
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative;
+        color: #fff;
     }
 
-    .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 1;
-    }
-
-    .login-card {
-        position: relative;
-        z-index: 2;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 40px 50px;
+    .login-wrapper {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 16px;
         width: 100%;
-        max-width: 450px;
-        color: #ffffff;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-        animation: popIn 0.5s ease-out;
+        max-width: 380px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        animation: slideIn 0.4s ease;
     }
 
-    @keyframes popIn {
-        0% { opacity: 0; transform: scale(0.9); }
-        100% { opacity: 1; transform: scale(1); }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .login-card h1 {
-        font-size: 28px;
-        margin-bottom: 10px;
+    .login-wrapper h2 {
         text-align: center;
+        margin-bottom: 8px;
+        font-size: 22px;
         font-weight: 600;
     }
 
-    .login-card p {
+    .login-wrapper p.subtitle {
         text-align: center;
-        font-size: 14px;
-        margin-bottom: 25px;
-        color: #e0f7fa;
-    }
-
-    .login-card input[type="text"],
-    .login-card input[type="password"] {
-        width: 100%;
-        padding: 12px 15px;
-        margin-bottom: 18px;
-        border: none;
-        border-radius: 10px;
-        font-size: 15px;
-        color: #333;
-    }
-
-    .login-card .btn-primary {
-        width: 100%;
-        padding: 12px;
-        background: #00c6ff;
-        background: linear-gradient(90deg, #0072ff, #00c6ff);
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 16px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .login-card .btn-primary:hover {
-        transform: scale(1.03);
-        box-shadow: 0 0 10px #00c6ff88;
-    }
-
-    .login-card .links {
-        text-align: center;
-        margin-top: 15px;
         font-size: 13px;
+        color: #dcefff;
+        margin-bottom: 20px;
     }
 
-    .login-card .links a {
-        color: #a0e9ff;
+    .login-wrapper .form-input input[type="text"],
+    .login-wrapper .form-input input[type="password"] {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+        color: #000;
+    }
+
+    .login-wrapper .btn-primary {
+        width: 100%;
+        padding: 10px;
+        background: linear-gradient(90deg, #00b4db, #0083b0);
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        transition: background 0.3s ease;
+        cursor: pointer;
+    }
+
+    .login-wrapper .btn-primary:hover {
+        background: linear-gradient(90deg, #0083b0, #00b4db);
+    }
+
+    .login-wrapper .info {
+        margin-top: 18px;
+        font-size: 13px;
+        color: #eee;
+    }
+
+    .login-wrapper .info a {
+        color: #a0e7ff;
         text-decoration: none;
     }
 
-    .login-card .links a:hover {
+    .login-wrapper .info a:hover {
         text-decoration: underline;
     }
 
-    @media (max-width: 480px) {
-        .login-card {
-            padding: 30px 25px;
-        }
-
-        .login-card h1 {
-            font-size: 24px;
-        }
+    .login-wrapper .firsttime {
+        margin-top: 10px;
+        font-size: 12px;
+        opacity: 0.9;
+        color: #dbefff;
     }
-</style>
 
-<div class="overlay"></div>
+</style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-card">
-        <h1>Giriş Paneli</h1>
-        <p>Hesabınıza erişmek için bilgilerinizi girin</p>
+    <div class="login-wrapper">
+        <h2>Giriş Paneli</h2>
+        <p class="subtitle">Hesabınıza erişmek için bilgilerinizi girin</p>
+        <p style="text-align: center; font-size: 13px; color: #a5f1ff; margin-bottom: 20px;">
+            Log in to <strong>Lojix:Depo Yönetim Paneli</strong>
+        </p>
         {{{ output.main_content }}}
-        <div class="links">
-            <a href="#">Şifrenizi mi unuttunuz?</a> |
-            <a href="#">Kayıt Ol</a>
+
+        <div class="firsttime">
+            <p>İlk kez mi buradasınız?</p>
+            <p>Sisteme tam erişim sağlamak için önce bir hesap oluşturmanız gerekir.</p>
         </div>
     </div>
 
