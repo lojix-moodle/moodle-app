@@ -40,7 +40,7 @@ echo $OUTPUT->header();
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-secondary text-white">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-plus-circle me-2"></i>
                             <h5 class="mb-0">Yeni Ürün Ekle</h5>
