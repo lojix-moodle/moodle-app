@@ -374,6 +374,11 @@
                             </svg>
                         </i>
                         <label for="newpassword">Şifre</label>
+
+                        <button type="submit" class="submit-btn">
+                            <span class="btn-text">Giriş Yap</span>
+                            <div class="loader"></div>
+                        </button>
                     </div>
 
                     <div class="form-group">
@@ -403,35 +408,7 @@
         const registerTab = document.getElementById('register-tab');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
-        const indicator = document.querySelector('.active-tab-indicator');
-
-        loginTab.addEventListener('click', () => {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-            setTimeout(() => {
-                loginForm.style.opacity = 1;
-                loginForm.style.transform = 'translateX(0)';
-                registerForm.style.opacity = 0;
-                registerForm.style.transform = 'translateX(20px)';
-            }, 50);
-            indicator.style.transform = 'translateX(0%)';
-        });
-
-        registerTab.addEventListener('click', () => {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            registerForm.style.display = 'block';
-            loginForm.style.display = 'none';
-            setTimeout(() => {
-                registerForm.style.opacity = 1;
-                registerForm.style.transform = 'translateX(0)';
-                loginForm.style.opacity = 0;
-                loginForm.style.transform = 'translateX(-20px)';
-            }, 50);
-            indicator.style.transform = 'translateX(100%)';
-        });
+        const tabIndicator = document.querySelector('.active-tab-indicator');
 
         // Process any existing Moodle login form
         function processMoodleForm() {
