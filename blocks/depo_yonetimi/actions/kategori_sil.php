@@ -28,7 +28,7 @@ if (!has_capability('block/depo_yonetimi:viewall', context_system::instance()) &
 }
 
 // Bu kategoriye bağlı ürünleri kontrol et
-$bagli_urunler = $DB->count_records('block_depo_yonetimi_urunler', ['kategori_id' => $kategoriid]);
+$bagli_urunler = $DB->count_records('block_depo_yonetimi_urunler', ['kategoriid' => $kategoriid]);
 
 if ($bagli_urunler > 0) {
     // Kategoriye bağlı ürünler varsa uyarı ver
