@@ -34,6 +34,9 @@ $THEME->usefallback = true;
 $THEME->scss = function($theme) {
     return theme_boost_get_main_scss_content($theme);
 };
+$THEME->extrascsscallback = function($theme) {
+    return file_get_contents(__DIR__ . '/scss/custom.scss');
+};
 
 $THEME->layouts = [
     // Most backwards compatible layout without the blocks.

@@ -1,7 +1,7 @@
 @import "https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css";
 
 body {
-  background: linear-gradient(135deg, #1e3c72, #2a5298, #4e54c8);
+  background: linear-gradient(120deg, #ff7eb3, #ff758c, #ff6a65);
   font-family: 'Roboto', sans-serif;
   color: #fff;
   display: flex;
@@ -13,51 +13,55 @@ body {
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.05); /* Daha şeffaf */
-  border-radius: 15px;
-  backdrop-filter: blur(15px); /* Bulanıklığı artır */
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Daha belirgin kenarlık */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); /* Daha koyu gölge */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
-
 
 .login-card {
   width: 100%;
-  max-width: 450px;
-  padding: 30px;
+  max-width: 400px;
+  padding: 40px;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
 }
 
 .login-card h2 {
   color: #fff;
+  font-size: 1.8rem;
 }
 
 .login-card a {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .btn-primary {
-  background-color: #4e54c8;
+  background-color: #ff6a65;
   border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
 }
 
 .btn-primary:hover {
-  background-color: #3b44a1;
+  background-color: #ff4a45;
 }
 
 .btn-outline-light {
   color: #fff;
-  border: 1px solid #fff;
+  border: 2px solid #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
 }
 
 .btn-outline-light:hover {
   background-color: #fff;
-  color: #4e54c8;
+  color: #ff6a65;
 }
