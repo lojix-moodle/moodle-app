@@ -307,7 +307,7 @@ class block_depo_yonetimi extends block_base {
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
                     <h2 class="mb-0 d-flex align-items-center">
-                        <i class="fas fa-warehouse text-primary me-2 " style="color: #450f64;></i>
+                        <i class="fas fa-warehouse text-primary me-2"></i>
                         Depo Yönetimi
                     </h2>
                     <p class="text-muted">
