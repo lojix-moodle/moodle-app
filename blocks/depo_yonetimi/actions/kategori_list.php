@@ -366,14 +366,21 @@ echo $OUTPUT->header();
                 loadingOverlay.style.display = 'none';
             });
 
-            // Silme butonu işlemi
+            // Silme butonu işlemi - Alert ekleme
             document.querySelectorAll('.delete-btn').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     var kategoriName = this.getAttribute('data-name');
-                    deleteModalText.textContent = '"' + kategoriName + '" kategorisini silmek istediğinizden emin misiniz?';
-                    confirmDeleteBtn.href = this.href;
-                    deleteModal.show();
+                    var kategoriId = this.getAttribute('data-id');
+                    var deleteUrl = this.href;
+
+                    // Önce alert göster
+                    if (confirm('"' + kategoriName + '" kategorisini silmek istediğinizden emin misiniz?')) {
+                        // Ardından modal göster (daha detaylı onay için)
+                        deleteModalText.textContent = '"' + kategoriName + '" kategorisini silmek üzeresiniz. Bu işlem geri alınamaz!';
+                        confirmDeleteBtn.href = deleteUrl;
+                        deleteModal.show();
+                    }
                 });
             });
 
