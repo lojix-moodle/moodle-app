@@ -1,55 +1,49 @@
 <?php
+// Hataları gösterelim
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../../../config.php');
+
 require_login();
 global $DB, $USER;
 
-try {
-    // Kategori ID'sini al
-    $kategoriid = required_param('kategoriid', PARAM_INT);
+// Parametreleri al
+$kategoriid = required_param('kategoriid', PARAM_INT);
 
-    // Basit sorgu ile kategoriyi kontrol et
-    $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $kategoriid]);
-    if (!$kategori) {
-        throw new moodle_exception('Kategori bulunamadı.');
-    }
+// Kategori var mı kontrol et
+$kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $kategoriid], '*', MUST_EXIST);
+$depoid = $kategori->depoid;
 
-    // Bağlı ürünleri basit sorgu ile kontrol et
-    $bagli_urunler = $DB->count_records('block_depo_yonetimi_urunler', [
-        'kategoriid' => $kategoriid,
-        'deleted' => 0
-    ]);
+// Yetki kontrolü
+$kullanici_depo_eslesme = [
+    2 => 3,
+    5 => 1,
+];
 
-    if ($bagli_urunler > 0) {
-        redirect(
-            new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
-            'Bu kategoriye bağlı ' . $bagli_urunler . ' ürün var.',
-            null,
-            \core\output\notification::NOTIFY_ERROR
-        );
-        exit;
-    }
-
-    // Kategoriyi sil
-    if ($DB->delete_records('block_depo_yonetimi_kategoriler', ['id' => $kategoriid])) {
-        redirect(
-            new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
-            'Kategori başarıyla silindi.',
-            null,
-            \core\output\notification::NOTIFY_SUCCESS
-        );
-    } else {
-        throw new moodle_exception('Silme işlemi başarısız oldu.');
-    }
-
-} catch (moodle_exception $e) {
-    redirect(
-        new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
-        $e->getMessage(),
-        null,
-        \core\output\notification::NOTIFY_ERROR
-    );
+if (!has_capability('block/depo_yonetimi:viewall', context_system::instance()) &&
+    (!isset($kullanici_depo_eslesme[$USER->id]) || $kullanici_depo_eslesme[$USER->id] != $depoid)) {
+    print_error('Bu depoya erişim izniniz yok.');
 }
+
+// Bu kategoriye bağlı ürünleri kontrol et
+$bagli_urunler = $DB->count_records('block_depo_yonetimi_urunler', ['kategori_id' => $kategoriid]);
+
+if ($bagli_urunler > 0) {
+    // Kategoriye bağlı ürünler varsa uyarı ver
+    redirect(new moodle_url('/my', ['depo' => $depoid, 'view' => 'kategoriler']),
+        'Bu kategoriye bağlı ' . $bagli_urunler . ' ürün var. Önce bu ürünlerin kategorisini değiştirin veya silin.',
+        null,
+        \core\output\notification::NOTIFY_ERROR);
+} else {
+    // Kategoriyi sil
+    $DB->delete_records('block_depo_yonetimi_kategoriler', ['id' => $kategoriid]);
+
+    // Başarılı mesajı ile ana sayfaya yönlendir
+    redirect(new moodle_url('/my', ['depo' => $depoid, 'view' => 'kategoriler']),
+        'Kategori başarıyla silindi.',
+        null,
+        \core\output\notification::NOTIFY_SUCCESS);
+}
+?>
