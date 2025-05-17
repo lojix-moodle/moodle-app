@@ -97,15 +97,17 @@ echo $OUTPUT->header();
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-folder me-2"></i>
-                            <h5 class="mb-0">Kategoriler</h5>
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-folder me-2"></i>
+                                <h5 class="mb-0">Kategoriler</h5>
+                            </div>
+                            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php'); ?>"
+                               class="btn btn-light btn-sm">
+                                <i class="fas fa-plus-circle me-2"></i>Yeni Kategori
+                            </a>
                         </div>
-                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php'); ?>"
-                           class="btn btn-light btn-sm">
-                            <i class="fas fa-plus-circle me-2"></i>Yeni Kategori
-                        </a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (!empty($kategoriler)): ?>
