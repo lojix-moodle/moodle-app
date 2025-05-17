@@ -36,11 +36,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 echo $OUTPUT->header();
 ?>
 
+    <style>
+        .form-control, .form-select {
+            border-color: #dee2e6 !important;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #80bdff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0f6cbf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header bg-secondary text-white">
+                    <div class="card-header bg-primary text-white">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-plus-circle me-2"></i>
                             <h5 class="mb-0">Yeni Ürün Ekle</h5>
@@ -107,15 +150,22 @@ echo $OUTPUT->header();
     <script>
         (function () {
             'use strict'
+
             var forms = document.querySelectorAll('.needs-validation')
             Array.prototype.slice.call(forms).forEach(function (form) {
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()
+                    } else {
+                        document.getElementById('loadingOverlay').style.display = 'flex'
                     }
                     form.classList.add('was-validated')
                 }, false)
+            })
+
+            window.addEventListener('load', function() {
+                document.getElementById('loadingOverlay').style.display = 'none'
             })
         })()
     </script>
