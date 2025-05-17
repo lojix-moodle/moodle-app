@@ -356,6 +356,7 @@ echo $OUTPUT->header();
                     sortField = parts[0];
                     sortDirection = parts[1];
 
+                    // Sıralama başlığını güncelle
                     sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
                     sortTable();
@@ -363,7 +364,7 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Tablo sıralama fonksiyonu
+            // Tablo sıralama fonksiyonu - DÜZELTİLMİŞ
             function sortTable() {
                 var rows = Array.from(tableRows);
 
@@ -371,22 +372,32 @@ echo $OUTPUT->header();
                     var aValue, bValue;
 
                     if (sortField === 'name') {
-                        aValue = a.getAttribute('data-name').toLowerCase();
-                        bValue = b.getAttribute('data-name').toLowerCase();
+                        aValue = a.querySelector('.category-name').textContent.toLowerCase();
+                        bValue = b.querySelector('.category-name').textContent.toLowerCase();
                     } else if (sortField === 'date') {
                         aValue = parseInt(a.getAttribute('data-date')) || 0;
                         bValue = parseInt(b.getAttribute('data-date')) || 0;
                     }
 
-                    if (sortDirection === 'asc') {
-                        return aValue > bValue ? 1 : -1;
-                    } else {
-                        return aValue < bValue ? 1 : -1;
+                    // Karşılaştırma için tam bir karşılaştırma operatörü kullanıyoruz
+                    var comparison = 0;
+                    if (aValue > bValue) {
+                        comparison = 1;
+                    } else if (aValue < bValue) {
+                        comparison = -1;
                     }
+
+                    // Sıralama yönüne göre sonucu tersine çeviriyoruz
+                    return sortDirection === 'asc' ? comparison : -comparison;
                 });
 
                 // Sıralanmış satırları tabloya yerleştir
                 var tbody = document.querySelector('#kategoriTable tbody');
+                // Önce tüm satırları kaldır
+                while (tbody.firstChild) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                // Sonra sıralanmış satırları ekle
                 rows.forEach(function(row) {
                     tbody.appendChild(row);
                 });
