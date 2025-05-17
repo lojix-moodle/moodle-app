@@ -535,47 +535,32 @@
 
         // "For full access to this site..." altına giriş yap butonu ekle
         // "For full access to this site..." altına giriş yap butonu ekle
-        function addLoginButton() {
-            // Tüm paragrafları kontrol edelim (case-insensitive olarak)
-            const allParagraphs = document.querySelectorAll('p');
-            let targetParagraph = null;
+        function addLoginButtonDirectly() {
+            // Register formundaki gerekli elementi bul
+            const registerForm = document.getElementById('register-form');
 
-            allParagraphs.forEach(function(p) {
-                if (p.textContent && p.textContent.toLowerCase().includes('full access to this site')) {
-                    targetParagraph = p;
-                    console.log('Hedef paragraf bulundu:', p.textContent);
+            // Bilgi metni ve giriş yap butonunu doğrudan HTML olarak ekle
+            if (registerForm) {
+                // Form başına bilgi metni ve buton ekle
+                const infoHTML = `
+                <p style="display: block; margin-bottom: 15px; color: #666; font-size: 14px; text-align: center;">
+                    For full access to this site, you first need to create an account.
+                </p>
+                <button type="button" class="submit-btn" style="margin-bottom: 20px;" id="go-to-login-btn">
+                    Giriş Yap
+                </button>
+            `;
+
+                // HTML'i registerForm'un başına ekle
+                registerForm.insertAdjacentHTML('afterbegin', infoHTML);
+
+                // Eklenen butona olay dinleyici ekle
+                const loginBtn = document.getElementById('go-to-login-btn');
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', function() {
+                        document.getElementById('login-tab').click();
+                    });
                 }
-            });
-
-            if (targetParagraph) {
-                // Giriş yap butonunu oluştur
-                const loginButton = document.createElement('button');
-                loginButton.type = 'button';
-                loginButton.className = 'submit-btn';
-                loginButton.style.marginTop = '15px';
-                loginButton.style.marginBottom = '15px';
-                loginButton.textContent = 'Giriş Yap';
-
-                // CSS ile gizlenmiş olabilecek paragrafı görünür yap
-                targetParagraph.style.display = 'block';
-                targetParagraph.style.visibility = 'visible';
-                targetParagraph.style.marginBottom = '10px';
-                targetParagraph.style.color = '#666';
-                targetParagraph.style.fontSize = '14px';
-                targetParagraph.style.textAlign = 'center';
-
-                // Butonu paragrafın altına ekle
-                targetParagraph.parentNode.insertBefore(loginButton, targetParagraph.nextSibling);
-
-                // Butona tıklama olayı ekle
-                loginButton.addEventListener('click', function() {
-                    // Giriş sekmesine geç
-                    document.getElementById('login-tab').click();
-                });
-
-                console.log('Giriş yap butonu eklendi');
-            } else {
-                console.log('Hedef paragraf bulunamadı');
             }
         }
 
