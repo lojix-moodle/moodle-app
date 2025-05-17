@@ -29,23 +29,25 @@ $PAGE->requires->js_call_amd('block_depo_yonetimi/validation', 'init');
 
 echo $OUTPUT->header();
 echo '<style>
+    /* Formu ortala ve genişliği küçült */
     .depo-form-card {
         background: #fff;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 1rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        max-width: 700px;
-        margin: auto;
+        max-width: 500px; /* Daha küçük yapıldı */
+        margin: 2rem auto; /* Ortala ve üst-alt boşluk */
     }
+    /* Form başlık ve ikon */
     .depo-form-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     .depo-icon-circle {
         background: #0073e6;
         color: white;
-        width: 70px;
-        height: 70px;
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -53,43 +55,41 @@ echo '<style>
         margin: auto;
         margin-bottom: 1rem;
     }
-    .depo-form-group {
-        margin-bottom: 1.5rem;
-    }
+    /* Label düzenle */
     .depo-label {
         display: inline-block;
-        min-width: 160px;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
+        min-width: 140px;
+        font-weight: 600; /* Daha belirgin */
+        margin-bottom: 0.3rem;
+        font-size: 1rem;
+        color: #333;
     }
+    /* Form kontrol */
     .depo-form-control {
         width: 100%;
-        padding: 0.6rem;
-        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.95rem;
         border: 1px solid #ccc;
         border-radius: 0.5rem;
     }
-    .depo-form-hint {
-        font-size: 0.85rem;
-        color: #666;
-        margin-top: 0.3rem;
-    }
+    /* Butonları küçült ve ortala */
     .depo-form-buttons {
         display: flex;
         gap: 1rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
+        justify-content: center; /* Ortala */
+        margin-top: 1.5rem;
     }
+    /* Buton stil */
     .depo-btn {
-        padding: 0.5rem 1.2rem;
-        font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
         border: none;
         border-radius: 0.5rem;
         cursor: pointer;
-        text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        transition: background-color 0.2s;
     }
     .depo-btn-primary {
         background-color: #0073e6;
@@ -99,10 +99,12 @@ echo '<style>
         background-color: #ccc;
         color: #000;
     }
+    /* Gelişmiş küçük buton sınıfı */
     .small-btn {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
     }
+    /* Diğer stiller ... (değişmeyebilir) */
     .fitem .felement .error,
     .fitem .felement .required {
         display: none !important;
