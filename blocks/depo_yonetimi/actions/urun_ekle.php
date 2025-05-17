@@ -73,6 +73,26 @@ echo $OUTPUT->header();
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .btn {
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -81,11 +101,11 @@ echo $OUTPUT->header();
 
     <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm border-0">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-primary text-white">
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-plus-circle me-2"></i>
+                            <i class="fas fa-box-open me-2"></i>
                             <h5 class="mb-0">Yeni Ürün Ekle</h5>
                         </div>
                     </div>
@@ -104,40 +124,54 @@ echo $OUTPUT->header();
                                 <label for="kategoriid" class="form-label">
                                     <i class="fas fa-tags me-2"></i>Kategori
                                 </label>
-                                <select name="kategoriid" id="kategoriid" class="form-select" required>
-                                    <option value="">Kategori Seçiniz</option>
-                                    <?php foreach ($kategoriler as $kategori): ?>
-                                        <option value="<?php echo $kategori->id; ?>">
-                                            <?php echo htmlspecialchars($kategori->name); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                                    <select name="kategoriid" id="kategoriid" class="form-select" required>
+                                        <option value="">Kategori Seçiniz</option>
+                                        <?php foreach ($kategoriler as $kategori): ?>
+                                            <option value="<?php echo $kategori->id; ?>">
+                                                <?php echo htmlspecialchars($kategori->name); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                                 <div class="invalid-feedback">Lütfen bir kategori seçin.</div>
+                                <small class="form-text text-muted">Ürünün ait olduğu kategoriyi seçin</small>
                             </div>
 
                             <div class="mb-4">
                                 <label for="name" class="form-label">
                                     <i class="fas fa-box me-2"></i>Ürün Adı
                                 </label>
-                                <input type="text" class="form-control" id="name" name="name" required>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           placeholder="Ürün adını girin" required>
+                                </div>
                                 <div class="invalid-feedback">Lütfen ürün adını girin.</div>
+                                <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün adını girin</small>
                             </div>
 
                             <div class="mb-4">
                                 <label for="adet" class="form-label">
                                     <i class="fas fa-hashtag me-2"></i>Adet
                                 </label>
-                                <input type="number" class="form-control" id="adet" name="adet" min="0" required>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+                                    <input type="number" class="form-control" id="adet" name="adet"
+                                           min="0" placeholder="Ürün adedini girin" required>
+                                </div>
                                 <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
+                                <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
                             </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Kaydet
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-save me-2"></i>Ürünü Kaydet
                                 </button>
                                 <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>"
-                                   class="btn btn-outline-secondary">
-                                    <i class="fas fa-times me-2"></i>Vazgeç
+                                   class="btn btn-outline-secondary ms-auto">
+                                    <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
                             </div>
                         </form>
@@ -151,21 +185,52 @@ echo $OUTPUT->header();
         (function () {
             'use strict'
 
+            // Form doğrulama
             var forms = document.querySelectorAll('.needs-validation')
+            var loadingOverlay = document.getElementById('loadingOverlay')
+            var submitBtn = document.getElementById('submitBtn')
+
+            // Sayfa yüklendiğinde loading overlay'i gizle
+            window.addEventListener('load', function() {
+                loadingOverlay.style.display = 'none'
+            })
+
             Array.prototype.slice.call(forms).forEach(function (form) {
+                // Dinamik doğrulama - alan değiştiğinde
+                var inputs = form.querySelectorAll('input, select')
+                Array.prototype.slice.call(inputs).forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        // Geçerlilik kontrolü
+                        if (input.checkValidity()) {
+                            input.classList.remove('is-invalid')
+                            input.classList.add('is-valid')
+                        } else {
+                            input.classList.remove('is-valid')
+                            input.classList.add('is-invalid')
+                        }
+                    })
+                })
+
+                // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()
+
+                        // Geçersiz alanları işaretle
+                        Array.prototype.slice.call(inputs).forEach(function(input) {
+                            if (!input.checkValidity()) {
+                                input.classList.add('is-invalid')
+                            }
+                        })
                     } else {
-                        document.getElementById('loadingOverlay').style.display = 'flex'
+                        // Form geçerli ise yükleme animasyonunu göster
+                        loadingOverlay.style.display = 'flex'
+                        submitBtn.disabled = true
                     }
+
                     form.classList.add('was-validated')
                 }, false)
-            })
-
-            window.addEventListener('load', function() {
-                document.getElementById('loadingOverlay').style.display = 'none'
             })
         })()
     </script>
