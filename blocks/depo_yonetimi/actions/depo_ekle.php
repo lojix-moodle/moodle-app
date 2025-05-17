@@ -56,7 +56,7 @@ class depo_ekle_form extends moodleform {
 
         // Butonlar
         $mform->addElement('submit', 'submitbutton', 'Depoyu Kaydet', [
-            'class' => 'btn btn-primary btn-lg'
+            'class' => 'btn btn-primary btn-md'
         ]);
     }
 }
