@@ -5,116 +5,231 @@
 {{> core/local/toast/wrapper }}
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --text-color: #1f2937;
+        --text-muted: #6b7280;
+        --bg-color: #f9fafb;
+        --card-bg: #ffffff;
+        --border-color: #e5e7eb;
+        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
 
     body#page-login-index {
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #2c3e50, #4ca1af);
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #fff;
+        color: var(--text-color);
     }
 
-    .login-wrapper {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 30px;
-        border-radius: 16px;
-        width: 100%;
-        max-width: 380px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        animation: slideIn 0.4s ease;
+    .login-container {
+        display: flex;
+        width: 900px;
+        height: 540px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
     }
 
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .login-branding {
+        flex: 1;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        padding: 40px;
+        position: relative;
     }
 
-    .login-wrapper h2 {
+    .login-branding::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .brand-logo {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-tagline {
+        font-size: 16px;
+        opacity: 0.9;
         text-align: center;
-        margin-bottom: 8px;
-        font-size: 22px;
+        max-width: 240px;
+        line-height: 1.6;
+    }
+
+    .login-form {
+        flex: 1;
+        background-color: var(--card-bg);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-form h2 {
+        font-size: 24px;
         font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-color);
     }
 
-    .login-wrapper p.subtitle {
-        text-align: center;
-        font-size: 13px;
-        color: #dcefff;
+    .login-form .subtitle {
+        font-size: 15px;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+    }
+
+    .login-form .form-group {
         margin-bottom: 20px;
     }
 
-    .login-wrapper .form-input input[type="text"],
-    .login-wrapper .form-input input[type="password"] {
-        width: 100%;
-        padding: 10px 12px;
-        margin-bottom: 14px;
-        border-radius: 8px;
-        border: none;
+    .login-form label {
+        display: block;
         font-size: 14px;
-        color: #000;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text-color);
     }
 
-    .login-wrapper .btn-primary {
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
         width: 100%;
-        padding: 10px;
-        background: linear-gradient(90deg, #00b4db, #0083b0);
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 15px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        color: var(--text-color);
+    }
+
+    .login-form input[type="text"]:focus,
+    .login-form input[type="password"]:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        outline: none;
+    }
+
+    .login-form .btn-primary {
+        background-color: var(--primary-color);
         color: white;
-        font-weight: 600;
         border: none;
-        border-radius: 8px;
-        transition: background 0.3s ease;
+        border-radius: 6px;
+        padding: 12px 16px;
+        font-size: 15px;
+        font-weight: 500;
         cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+        margin-top: 8px;
     }
 
-    .login-wrapper .btn-primary:hover {
-        background: linear-gradient(90deg, #0083b0, #00b4db);
+    .login-form .btn-primary:hover {
+        background-color: var(--primary-hover);
     }
 
-    .login-wrapper .info {
-        margin-top: 18px;
-        font-size: 13px;
-        color: #eee;
+    .login-form .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
     }
 
-    .login-wrapper .info a {
-        color: #a0e7ff;
+    .login-form .remember-me input[type="checkbox"] {
+        margin-right: 8px;
+    }
+
+    .login-form .help-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        font-size: 14px;
+    }
+
+    .login-form .help-links a {
+        color: var(--primary-color);
         text-decoration: none;
     }
 
-    .login-wrapper .info a:hover {
+    .login-form .help-links a:hover {
         text-decoration: underline;
     }
 
-    .login-wrapper .firsttime {
-        margin-top: 10px;
-        font-size: 12px;
-        opacity: 0.9;
-        color: #dbefff;
+    .login-form .firsttime {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+        font-size: 14px;
+        color: var(--text-muted);
     }
 
+    .login-form .firsttime p {
+        margin: 4px 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 940px) {
+        .login-container {
+            width: 90%;
+            flex-direction: column;
+            height: auto;
+        }
+
+        .login-branding {
+            padding: 30px 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-form {
+            padding: 30px 20px;
+        }
+
+        .help-links {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
 </style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-wrapper">
-        <h2>Giriş Paneli</h2>
-        <p class="subtitle">Hesabınıza erişmek için bilgilerinizi girin</p>
-        <p style="text-align: center; font-size: 13px; color: #a5f1ff; margin-bottom: 20px;">
-            Log in to <strong>Lojix:Depo Yönetim Paneli</strong>
-        </p>
-        {{{ output.main_content }}}
+    <div class="login-container">
+        <div class="login-branding">
+            <div class="brand-logo">Lojix</div>
+            <div class="brand-tagline">Profesyonel depo yönetim sistemi ile işlerinizi kolaylaştırın</div>
+        </div>
+        <div class="login-form">
+            <h2>Giriş Paneli</h2>
+            <p class="subtitle">Hesabınıza erişmek için bilgilerinizi girin</p>
 
-        <div class="firsttime">
-            <p>İlk kez mi buradasınız?</p>
-            <p>Sisteme tam erişim sağlamak için önce bir hesap oluşturmanız gerekir.</p>
+            <div class="login-form-inner">
+                {{{ output.main_content }}}
+            </div>
+
+            <div class="firsttime">
+                <p><strong>İlk kez mi buradasınız?</strong></p>
+                <p>Sisteme tam erişim sağlamak için önce bir hesap oluşturmanız gerekir.</p>
+            </div>
         </div>
     </div>
 
