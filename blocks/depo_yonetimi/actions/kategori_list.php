@@ -14,21 +14,6 @@ $PAGE->set_heading('Kategori Listesi');
 
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler', null, 'name ASC');
 
-// Ürün sayılarını hesapla
-$urun_sayilari = [];
-$kategori_ids = array_keys($kategoriler);
-if (!empty($kategori_ids)) {
-    list($sql_in, $params) = $DB->get_in_or_equal($kategori_ids);
-    $sql = "SELECT kategori_id, COUNT(*) as sayi FROM {block_depo_yonetimi_urunler} 
-            WHERE kategori_id $sql_in 
-            GROUP BY kategori_id";
-    $counts = $DB->get_records_sql($sql, $params);
-
-    foreach ($counts as $count) {
-        $urun_sayilari[$count->kategori_id] = $count->sayi;
-    }
-}
-
 echo $OUTPUT->header();
 ?>
 
@@ -141,10 +126,6 @@ echo $OUTPUT->header();
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        .dropdown-item {
-            cursor: pointer;
-        }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -172,19 +153,16 @@ echo $OUTPUT->header();
                             <div class="p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div class="input-group search-box">
-                                    <span class="input-group-text" id="search-addon">
-                                        <i class="fas fa-search"></i>
-                                    </span>
-                                        <input type="text" class="form-control" id="searchInput" placeholder="Kategori ara..." aria-label="Ara" aria-describedby="search-addon">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" id="searchInput" class="form-control" placeholder="Kategori ara...">
                                     </div>
                                     <div class="dropdown">
-                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-sort me-1"></i>İsim (A-Z)
+                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-sort me-1"></i>Sırala
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="name-asc">İsim (A-Z)</a></li>
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="name-desc">İsim (Z-A)</a></li>
-                                            <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="date-asc">Oluşturma (Eski-Yeni)</a></li>
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="date-desc">Oluşturma (Yeni-Eski)</a></li>
                                         </ul>
@@ -195,40 +173,47 @@ echo $OUTPUT->header();
                                 <table class="table table-hover mb-0" id="kategoriTable">
                                     <thead>
                                     <tr>
-                                        <th scope="col">Kategori Adı</th>
-                                        <th scope="col">Ürün Sayısı</th>
-                                        <th scope="col">Oluşturulma Tarihi</th>
-                                        <th scope="col" class="text-end">İşlemler</th>
+                                        <th scope="col" class="border-0">
+                                            <i class="fas fa-tag me-2"></i>Kategori Adı
+                                        </th>
+                                        <th scope="col" class="border-0 text-center">Ürün Sayısı</th>
+                                        <th scope="col" class="border-0 text-center">Oluşturulma Tarihi</th>
+                                        <th scope="col" class="border-0 text-end">İşlemler</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <?php foreach ($kategoriler as $kategori):
-                                        $urun_sayisi = isset($urun_sayilari[$kategori->id]) ? $urun_sayilari[$kategori->id] : 0;
-                                        $date_timestamp = isset($kategori->timecreated) ? $kategori->timecreated : 0;
-                                        $date_formatted = $date_timestamp ? userdate($date_timestamp, get_string('strftimedatetimeshort', 'core_langconfig')) : '';
+                                        // Her kategori için ürün sayısını sorgula
+                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategoriid' => $kategori->id]);
                                         ?>
-                                        <tr data-date="<?php echo $date_timestamp; ?>">
-                                            <td>
-                                                <span class="category-name"><?php echo format_text($kategori->name, FORMAT_HTML); ?></span>
+                                        <tr data-id="<?php echo $kategori->id; ?>" data-name="<?php echo htmlspecialchars($kategori->name); ?>" data-date="<?php echo $kategori->timecreated ?? 0; ?>">
+                                            <td class="align-middle">
+                                                <span class="category-name"><?php echo htmlspecialchars($kategori->name); ?></span>
                                             </td>
-                                            <td>
-                                        <span class="category-badge badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'light text-dark'; ?>">
-                                            <i class="fas fa-box-open me-1"></i>
-                                            <span class="badge-counter"><?php echo $urun_sayisi; ?></span>
-                                            Ürün
-                                        </span>
+                                            <td class="align-middle text-center">
+                                                <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill"><?php echo $urun_sayisi; ?></span>
                                             </td>
-                                            <td><?php echo $date_formatted; ?></td>
+                                            <td class="align-middle text-center">
+                                                <?php
+                                                if (!empty($kategori->timecreated)) {
+                                                    echo date('d.m.Y H:i', $kategori->timecreated);
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
+                                                ?>
+                                            </td>
                                             <td class="text-end">
                                                 <div class="btn-group">
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_duzenle.php', ['kategoriid' => $kategori->id]); ?>" class="btn btn-sm btn-outline-primary">
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_duzenle.php', ['id' => $kategori->id]); ?>"
+                                                       class="btn btn-sm btn-outline-primary" title="Düzenle">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['kategoriid' => $kategori->id]); ?>"
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['id' => $kategori->id, 'sesskey' => sesskey()]); ?>"
                                                        class="btn btn-sm btn-outline-danger delete-btn"
+                                                       title="Sil"
                                                        data-id="<?php echo $kategori->id; ?>"
-                                                       data-name="<?php echo format_text($kategori->name, FORMAT_HTML); ?>">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                       data-name="<?php echo htmlspecialchars($kategori->name); ?>">
+                                                        <i class="fas fa-trash"></i>
                                                     </a>
                                                 </div>
                                             </td>
@@ -240,11 +225,11 @@ echo $OUTPUT->header();
                             <div class="d-flex justify-content-between align-items-center p-3" id="pagination-container">
                                 <div>
                                     <select id="page-size" class="form-select form-select-sm" style="width: auto;">
-                                        <option value="10" selected>10 öğe</option>
-                                        <option value="25">25 öğe</option>
-                                        <option value="50">50 öğe</option>
-                                        <option value="100">100 öğe</option>
-                                        <option value="all">Tümü</option>
+                                        <option value="10">10 / sayfa</option>
+                                        <option value="25">25 / sayfa</option>
+                                        <option value="50">50 / sayfa</option>
+                                        <option value="100">100 / sayfa</option>
+                                        <option value="all">Tümünü Göster</option>
                                     </select>
                                 </div>
                                 <nav aria-label="Sayfalama">
@@ -387,8 +372,8 @@ echo $OUTPUT->header();
                     var aValue, bValue;
 
                     if (sortField === 'name') {
-                        aValue = a.querySelector('.category-name').textContent.toLowerCase().trim();
-                        bValue = b.querySelector('.category-name').textContent.toLowerCase().trim();
+                        aValue = a.querySelector('.category-name').textContent.toLowerCase();
+                        bValue = b.querySelector('.category-name').textContent.toLowerCase();
                     } else if (sortField === 'date') {
                         aValue = parseInt(a.getAttribute('data-date')) || 0;
                         bValue = parseInt(b.getAttribute('data-date')) || 0;
