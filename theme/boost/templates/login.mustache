@@ -339,29 +339,9 @@
             </div>
 
             <!-- Login Form (Default) -->
-            <form method="post" action="login/index.php" id="login-form-element">
-                <div class="form-group">
-                    <input type="text" id="username" name="username" class="form-input" placeholder=" " required>
-                    <i class="input-icon">
-                        <!-- kullanıcı ikonu SVG -->
-                    </i>
-                    <label for="username">Kullanıcı Adı</label>
-                </div>
-
-                <div class="form-group">
-                    <input type="password" id="password" name="password" class="form-input" placeholder=" " required>
-                    <i class="input-icon">
-                        <!-- şifre ikonu SVG -->
-                    </i>
-                    <label for="password">Şifre</label>
-                </div>
-
-                <button type="submit" class="submit-btn">
-                    <span class="btn-text">Giriş Yap</span>
-                    <div class="loader"></div>
-                </button>
-            </form>
-
+            <div id="login-form">
+                {{{ output.main_content }}}
+            </div>
 
             <!-- Register Form (Hidden initially) -->
             <div id="register-form">
@@ -452,6 +432,7 @@
             }, 50);
             tabIndicator.style.transform = 'translateX(100%)';
         });
+
         // Process any existing Moodle login form
         function processMoodleForm() {
             // Find and process Moodle's form elements
@@ -552,6 +533,45 @@
             });
         }
 
+        // "For full access to this site..." altına giriş yap butonu ekle
+        function addLoginButton() {
+            // Hedef metni içeren paragrafı bul
+            const paragraphs = document.querySelectorAll('#login-form p');
+            let targetParagraph = null;
+
+            paragraphs.forEach(function(p) {
+                if (p.textContent.includes('For full access to this site, you first need to create an account.')) {
+                    targetParagraph = p;
+                }
+            });
+
+            if (targetParagraph) {
+                // Giriş yap butonunu oluştur
+                const loginButton = document.createElement('button');
+                loginButton.type = 'button';
+                loginButton.className = 'submit-btn';
+                loginButton.style.marginTop = '15px';
+                loginButton.style.marginBottom = '15px';
+                loginButton.textContent = 'Giriş Yap';
+
+                // Butonu paragrafın altına ekle
+                targetParagraph.parentNode.insertBefore(loginButton, targetParagraph.nextSibling);
+
+                // Butona tıklama olayı ekle
+                loginButton.addEventListener('click', function() {
+                    // Giriş sekmesine geç
+                    document.getElementById('login-tab').click();
+                });
+
+                // Paragraph'ı görünür yap, çünkü CSS tüm paragrafları gizliyor
+                targetParagraph.style.display = 'block';
+                targetParagraph.style.marginBottom = '10px';
+                targetParagraph.style.color = '#666';
+                targetParagraph.style.fontSize = '14px';
+                targetParagraph.style.textAlign = 'center';
+            }
+        }
+
         // Add click event listeners to tabs with animation
         loginTab.addEventListener('click', function() {
             loginTab.classList.add('active');
@@ -611,6 +631,9 @@
 
         // Process any existing Moodle form
         processMoodleForm();
+
+        // Giriş yap butonunu ekle
+        addLoginButton();
 
         // Add floating animation to inputs
         const inputs = document.querySelectorAll('.form-input');
