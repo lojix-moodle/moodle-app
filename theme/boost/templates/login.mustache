@@ -1,7 +1,5 @@
-{{!
-    @template theme_boost/login
-    Modern login sayfası tasarımı – Cam efektli, gradient arka planlı
-}}
+{{! @template theme_boost/login }}
+
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}} id="page-login-index">
@@ -24,124 +22,94 @@
         color: #fff;
     }
 
-    .login-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        max-width: 1200px;
-        padding: 20px;
-    }
-
-    .login-wrapper {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.25);
+    .login-box {
+        background: rgba(255, 255, 255, 0.06);
         border-radius: 20px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        padding: 40px;
-        max-width: 420px;
-        width: 100%;
         animation: fadeInDown 0.8s ease;
-        text-align: center;
     }
 
-    .login-wrapper .logo {
+    .login-box .logo {
+        text-align: center;
         margin-bottom: 20px;
     }
 
-    .login-wrapper .logo img {
-        max-width: 100px;
+    .login-box .logo img {
+        max-width: 80px;
     }
 
-    .login-wrapper h2 {
+    .login-box h2 {
+        text-align: center;
+        font-size: 26px;
         font-weight: 600;
-        font-size: 28px;
         margin-bottom: 10px;
         color: #fff;
     }
 
-    .login-wrapper p {
-        font-size: 14px;
+    .login-box p {
+        text-align: center;
         color: #ddd;
+        font-size: 14px;
         margin-bottom: 30px;
     }
 
-    .login-wrapper .form-content {
-        margin-bottom: 20px;
-    }
-
-    .login-wrapper .btn-group {
+    .login-box form {
         display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 20px;
+        flex-direction: column;
     }
 
-    .login-wrapper .btn-primary {
+    .login-box input[type="text"],
+    .login-box input[type="password"] {
+        padding: 12px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .login-box .btn-primary {
         background-color: #4e54c8;
         border: none;
-        padding: 10px 24px;
-        font-weight: 600;
+        padding: 12px;
         border-radius: 8px;
+        font-weight: bold;
+        margin-bottom: 10px;
         transition: background 0.3s;
-        color: #fff;
     }
 
-    .login-wrapper .btn-primary:hover {
+    .login-box .btn-primary:hover {
         background-color: #3b44a1;
     }
 
-    .login-wrapper .btn-outline-light {
-        background: transparent;
-        border: 1px solid #fff;
+    .login-box .additional-links {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    .login-box .additional-links a {
         color: #fff;
-        padding: 10px 24px;
-        font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.3s;
+        text-decoration: underline;
     }
 
-    .login-wrapper .btn-outline-light:hover {
-        background-color: #fff;
-        color: #4e54c8;
-    }
-
-    @media (max-width: 768px) {
-        .login-wrapper {
-            padding: 20px;
-        }
-
-        .login-wrapper h2 {
-            font-size: 24px;
-        }
-
-        .login-wrapper p {
-            font-size: 12px;
-        }
-    }
 </style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-container">
-        <div class="login-wrapper animate__animated animate__fadeInDown">
-            <div class="logo">
-                <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo">
-            </div>
-            <h2>Hoş Geldiniz</h2>
-            <p>Lütfen giriş yaparak devam edin</p>
+    <div class="login-box animate__animated animate__fadeInDown">
+        <div class="logo">
+            <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo">
+        </div>
+        <h2>Hoş Geldiniz</h2>
+        <p>Lütfen giriş bilgilerinizi girin</p>
 
-            <div class="form-content">
-                {{{ output.main_content }}}
-            </div>
-
-            <div class="btn-group">
-                <a href="/login/index.php" class="btn btn-primary">Giriş Yap</a>
-                <a href="/login/signup.php" class="btn btn-outline-light">Kayıt Ol</a>
-            </div>
+        <div>
+            {{{ output.main_content }}}
         </div>
     </div>
 
