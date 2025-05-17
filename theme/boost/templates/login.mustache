@@ -1,64 +1,38 @@
 {{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-}}
-{{!
     @template theme_boost/login
-
-    Login page template
-
-    Example context (json):
-    {
-        "output": {
-            "doctype": "<!DOCTYPE html>",
-            "page_title": "Login page",
-            "favicon": "favicon.ico",
-            "main_content": "<h1>Headers keep HTML validators happy</h1>"
-        }
-    }
+    Modern ve profesyonel login sayfası tasarımı
 }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
 {{> core/local/toast/wrapper}}
 
-<div id="page-wrapper">
+<div id="page-wrapper" class="d-flex align-items-center justify-content-center vh-100 bg-gradient">
 
     {{{ output.standard_top_of_body_html }}}
 
-    <div id="page" class="container-fluid pt-5 mt-0">
-        <div id="page-content" class="row">
-            <div id="region-main-box" class="col-12">
-                <div id="region-main" class="col-12 h-100">
-                <div class="login-wrapper">
-                    <div class="login-container">
-                    {{{ output.main_content }}}
-                    </div>
-                </div>
-                </div>
-            </div>
+    <div class="login-card shadow-lg p-5 rounded bg-white">
+        <div class="text-center mb-4">
+            <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo" class="mb-3" style="max-width: 100px;">
+            <h2 class="fw-bold text-primary">Hoş Geldiniz</h2>
+            <p class="text-muted">Hesabınıza giriş yaparak devam edin</p>
+        </div>
+        <div>
+            {{{ output.main_content }}}
+        </div>
+        <div class="text-center mt-4">
+            <p class="text-muted">Hesabınız yok mu? <a href="/login/signup.php" class="text-decoration-none text-primary fw-bold">Kayıt Ol</a></p>
         </div>
     </div>
+
     {{> theme_boost/footer }}
 </div>
 
 </body>
 </html>
 {{#js}}
-M.util.js_pending('theme_boost/loader');
-require(['theme_boost/loader'], function() {
-  M.util.js_complete('theme_boost/loader');
-});
+    M.util.js_pending('theme_boost/loader');
+    require(['theme_boost/loader'], function() {
+    M.util.js_complete('theme_boost/loader');
+    });
 {{/js}}
