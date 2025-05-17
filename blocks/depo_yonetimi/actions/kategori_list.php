@@ -18,50 +18,118 @@ echo $OUTPUT->header();
 ?>
 
     <style>
-        /* Genel stil ve sayfa ortalama için */
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0; /* isteğe bağlı arka plan */
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-        }
-
-        /* diğer stil ayarları burada kaldı... (kendi kodunuzdaki stil) */
         .form-control, .form-select {
             border-color: #dee2e6 !important;
             transition: all 0.3s ease;
         }
+
         .form-control:focus, .form-select:focus {
             border-color: #80bdff !important;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
+
         .loading-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.8);
             z-index: 9999;
-            justify-content: center; align-items: center;
+            justify-content: center;
+            align-items: center;
         }
+
         .spinner {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #0f6cbf;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        /* diğer stiller... (kendi kodunuzdaki stil) */
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .btn {
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .table th {
+            font-weight: 600;
+            background-color: #f8f9fa;
+        }
+
+        .search-box {
+            max-width: 300px;
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+        }
+
+        .badge-counter {
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 1rem;
+            margin-left: 0.25rem;
+        }
+
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .page-item .page-link {
+            color: #0f6cbf;
+        }
+
+        .page-item.active .page-link {
+            background-color: #0f6cbf;
+            border-color: #0f6cbf;
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .dropdown-item {
+            cursor: pointer;
+        }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -88,13 +156,15 @@ echo $OUTPUT->header();
                         <?php if (!empty($kategoriler)): ?>
                             <div class="p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div class="input-group search-box" style="max-width:300px;">
-                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" id="searchInput" class="form-control" placeholder="Kategori ara...">
+                                    <div class="input-group search-box">
+                                    <span class="input-group-text" id="search-addon">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Kategori ara..." aria-label="Ara" aria-describedby="search-addon">
                                     </div>
                                     <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-sort me-1"></i>Sırala
+                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-sort me-1"></i>İsim (A-Z)
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="name-asc">İsim (A-Z)</a></li>
@@ -109,45 +179,40 @@ echo $OUTPUT->header();
                                 <table class="table table-hover mb-0" id="kategoriTable">
                                     <thead>
                                     <tr>
-                                        <th scope="col" class="border-0">
-                                            <i class="fas fa-tag me-2"></i>Kategori Adı
-                                        </th>
-                                        <th scope="col" class="border-0 text-center">Ürün Sayısı</th>
-                                        <th scope="col" class="border-0 text-center">Oluşturulma Tarihi</th>
-                                        <th scope="col" class="border-0 text-end">İşlemler</th>
+                                        <th scope="col">Kategori Adı</th>
+                                        <th scope="col">Ürün Sayısı</th>
+                                        <th scope="col">Oluşturulma Tarihi</th>
+                                        <th scope="col" class="text-end">İşlemler</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($kategoriler as $kategori):
-                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategoriid' => $kategori->id]);
+                                    <?php
+                                    $urun_sayilari = []; // Gerçek projede bu değeri veritabanından alabilirsiniz
+                                    foreach ($kategoriler as $kategori):
+                                        $urun_sayisi = isset($urun_sayilari[$kategori->id]) ? $urun_sayilari[$kategori->id] : 0;
+                                        $date_timestamp = isset($kategori->timecreated) ? $kategori->timecreated : 0;
+                                        $date_formatted = $date_timestamp ? userdate($date_timestamp, get_string('strftimedatetimeshort', 'core_langconfig')) : '';
                                         ?>
-                                        <tr data-id="<?php echo $kategori->id; ?>" data-name="<?php echo htmlspecialchars($kategori->name); ?>" data-date="<?php echo $kategori->timecreated ?? 0; ?>">
-                                            <td class="align-middle">
-                                                <span class="category-name"><?php echo htmlspecialchars($kategori->name); ?></span>
+                                        <tr data-date="<?php echo $date_timestamp; ?>">
+                                            <td>
+                                                <span class="category-name"><?php echo $kategori->name; ?></span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill"><?php echo $urun_sayisi; ?></span>
+                                            <td>
+                                        <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill">
+                                            <?php echo $urun_sayisi; ?> ürün
+                                        </span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <?php
-                                                if (!empty($kategori->timecreated)) {
-                                                    echo date('d.m.Y H:i', $kategori->timecreated);
-                                                } else {
-                                                    echo '<span class="text-muted">-</span>';
-                                                }
-                                                ?>
-                                            </td>
+                                            <td><?php echo $date_formatted; ?></td>
                                             <td class="text-end">
                                                 <div class="btn-group">
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_duzenle.php', ['id' => $kategori->id]); ?>"
-                                                       class="btn btn-sm btn-outline-primary" title="Düzenle">
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_edit.php', ['id' => $kategori->id]); ?>" class="btn btn-outline-primary btn-sm edit-btn" title="Düzenle">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['id' => $kategori->id, 'sesskey' => sesskey()]); ?>"
-                                                       class="btn btn-sm btn-outline-danger delete-btn"
-                                                       title="Sil"
+                                                       class="btn btn-outline-danger btn-sm delete-btn"
                                                        data-id="<?php echo $kategori->id; ?>"
-                                                       data-name="<?php echo htmlspecialchars($kategori->name); ?>">
+                                                       data-name="<?php echo $kategori->name; ?>"
+                                                       title="Sil">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </div>
@@ -160,11 +225,11 @@ echo $OUTPUT->header();
                             <div class="d-flex justify-content-between align-items-center p-3" id="pagination-container">
                                 <div>
                                     <select id="page-size" class="form-select form-select-sm" style="width: auto;">
-                                        <option value="10">10 / sayfa</option>
-                                        <option value="25">25 / sayfa</option>
-                                        <option value="50">50 / sayfa</option>
-                                        <option value="100">100 / sayfa</option>
-                                        <option value="all">Tümünü Göster</option>
+                                        <option value="10" selected>10 öğe</option>
+                                        <option value="25">25 öğe</option>
+                                        <option value="50">50 öğe</option>
+                                        <option value="100">100 öğe</option>
+                                        <option value="all">Tümü</option>
                                     </select>
                                 </div>
                                 <nav aria-label="Sayfalama">
@@ -233,9 +298,6 @@ echo $OUTPUT->header();
             var deleteModalText = document.getElementById('deleteModalText');
             var sortDropdown = document.getElementById('sortDropdown');
 
-            // Sıralama ayarları
-            var currentSort = { field: 'name', direction: 'asc' };
-
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
                 loadingOverlay.style.display = 'none';
@@ -252,7 +314,8 @@ echo $OUTPUT->header();
             });
 
             // İşlem butonlarına hover efekti
-            document.querySelectorAll('.btn-group .btn').forEach(function(btn) {
+            var buttons = document.querySelectorAll('.btn-group .btn');
+            buttons.forEach(function(btn) {
                 btn.addEventListener('mouseenter', function() {
                     this.style.transform = 'translateY(-2px)';
                     this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
@@ -263,8 +326,9 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Silme işlemleri
-            document.querySelectorAll('.delete-btn').forEach(function(btn) {
+            // Silme butonu işlemleri
+            var deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     var kategoriId = this.getAttribute('data-id');
@@ -276,56 +340,100 @@ echo $OUTPUT->header();
                     deleteModal.show();
                 });
             });
+
+            // Modal ile silme onayı
             confirmDeleteBtn.addEventListener('click', function() {
                 loadingOverlay.style.display = 'flex';
             });
 
-            // Sıralama seçenekleri olayları
-            document.querySelectorAll('.sort-option').forEach(function(option) {
-                option.addEventListener('click', function(e) {
+            // Sıralama işlemi
+            var sortButtons = document.querySelectorAll('.sort-option');
+            sortButtons.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    var sortVal = this.getAttribute('data-sort'); // örn: 'name-asc'
-                    var parts = sortVal.split('-');
-                    currentSort.field = parts[0]; // 'name' veya 'date'
-                    currentSort.direction = parts[1]; // 'asc' veya 'desc'
+                    var sortOption = this.getAttribute('data-sort');
+                    var parts = sortOption.split('-');
+                    sortField = parts[0];
+                    sortDirection = parts[1];
 
-                    // Dropdown başlığını güncelle
-                    var dropdownBtn = document.querySelector('#sortDropdown');
-                    dropdownBtn.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
+                    // Sıralama başlığını güncelle
+                    sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
-                    // Sıralama yap
                     sortTable();
                     updateTable();
                 });
             });
 
-            // Page size değişimi
-            document.getElementById('page-size').addEventListener('change', function() {
-                var val = this.value;
-                if (val === 'all') {
+            // Tablo sıralama fonksiyonu - DÜZELTİLMİŞ
+            function sortTable() {
+                console.log("Sıralama: " + sortField + " " + sortDirection);
+                var rows = Array.from(tableRows);
+
+                rows.sort(function(a, b) {
+                    var aValue, bValue;
+
+                    if (sortField === 'name') {
+                        // İsim sıralaması
+                        aValue = a.querySelector('.category-name').textContent.toLowerCase().trim();
+                        bValue = b.querySelector('.category-name').textContent.toLowerCase().trim();
+                    } else if (sortField === 'date') {
+                        // Tarih sıralaması (data-date özniteliği kullanarak)
+                        aValue = parseInt(a.getAttribute('data-date')) || 0;
+                        bValue = parseInt(b.getAttribute('data-date')) || 0;
+                    }
+
+                    // Karşılaştırma için tam bir karşılaştırma operatörü kullanıyoruz
+                    var comparison = 0;
+                    if (aValue > bValue) {
+                        comparison = 1;
+                    } else if (aValue < bValue) {
+                        comparison = -1;
+                    }
+
+                    // Sıralama yönüne göre sonucu tersine çeviriyoruz
+                    return sortDirection === 'asc' ? comparison : -comparison;
+                });
+
+                // Sıralanmış satırları tabloya yerleştir
+                var tbody = document.querySelector('#kategoriTable tbody');
+                // Önce tüm satırları kaldır
+                while (tbody.firstChild) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                // Sonra sıralanmış satırları ekle
+                rows.forEach(function(row) {
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Arama fonksiyonu
+            searchInput.addEventListener('keyup', function() {
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Sayfa boyutu değişim işlemi
+            pageSizeSelect.addEventListener('change', function() {
+                var selectedValue = this.value;
+                if (selectedValue === 'all') {
                     pageSize = tableRows.length;
                 } else {
-                    pageSize = parseInt(val);
+                    pageSize = parseInt(selectedValue);
                 }
                 currentPage = 1;
                 updateTable();
             });
 
-            // Arama
-            document.getElementById('searchInput').addEventListener('keyup', function() {
-                currentPage = 1;
-                updateTable();
-            });
-
-            // Tabloyu güncelleyen fonksiyon
+            // Tablo güncelleme fonksiyonu
             function updateTable() {
-                var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                var searchTerm = searchInput.value.toLowerCase();
                 var visibleRows = [];
+                var startIndex, endIndex;
 
-                // Filtrele
+                // Önce arama kriterlerine göre görünür satırları belirle
                 tableRows.forEach(function(row) {
-                    var name = row.querySelector('.category-name').textContent.toLowerCase();
-                    if (name.indexOf(searchTerm) > -1) {
+                    var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
+                    if (kategoriName.indexOf(searchTerm) > -1) {
                         row.dataset.visible = 'true';
                         visibleRows.push(row);
                     } else {
@@ -333,14 +441,13 @@ echo $OUTPUT->header();
                     }
                 });
 
-                // Sayfalama sınırları
-                var totalItems = visibleRows.length;
-                var startIdx = 0;
-                var endIdx = totalItems;
-
-                if (pageSize !== 'all' && pageSize < totalItems) {
-                    startIdx = (currentPage - 1) * pageSize;
-                    endIdx = Math.min(startIdx + pageSize, totalItems);
+                // Sayfalama sınırlarını belirle
+                if (pageSize === tableRows.length || pageSize >= visibleRows.length) {
+                    startIndex = 0;
+                    endIndex = visibleRows.length;
+                } else {
+                    startIndex = (currentPage - 1) * pageSize;
+                    endIndex = Math.min(startIndex + pageSize, visibleRows.length);
                 }
 
                 // Tüm satırları gizle
@@ -348,58 +455,69 @@ echo $OUTPUT->header();
                     row.style.display = 'none';
                 });
 
-                // Geçerli sayfa satırlarını göster
-                for (var i = startIdx; i < endIdx; i++) {
-                    visibleRows[i].style.display = '';
+                // Geçerli sayfa için satırları göster
+                for (var i = startIndex; i < endIndex; i++) {
+                    if (i < visibleRows.length) {
+                        visibleRows[i].style.display = '';
+                    }
                 }
 
-                // Güncelleme
-                document.getElementById('totalCount').textContent = tableRows.length;
-                document.getElementById('displayedCount').textContent = totalItems;
+                // Sayfalama oluştur
+                createPagination(visibleRows.length);
 
-                // Sayfalama
-                createPagination(totalItems);
+                // Sayaçları güncelle
+                totalCountEl.textContent = tableRows.length;
+                displayedCountEl.textContent = visibleRows.length;
             }
 
-            // Sayfalama
+            // Sayfalama oluşturma fonksiyonu
             function createPagination(totalItems) {
-                var container = document.getElementById('pagination-container');
-                var ul = container.querySelector('.pagination');
-                ul.innerHTML = '';
-
-                if (pageSize === 'all' || totalItems <= pageSize) {
-                    container.style.display = 'none';
+                if (pageSizeSelect.value === 'all' || pageSize >= totalItems) {
+                    document.getElementById('pagination-container').style.display = 'none';
                     return;
-                } else {
-                    container.style.display = 'flex';
                 }
+
+                document.getElementById('pagination-container').style.display = 'flex';
+                paginationContainer.innerHTML = '';
 
                 var totalPages = Math.ceil(totalItems / pageSize);
-                if (totalPages <= 1) {
-                    container.style.display = 'none';
-                    return;
-                }
-
-                // önceki
-                if (currentPage > 1) {
-                    ul.innerHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}"><span aria-hidden="true">«</span></a></li>`;
-                }
-
-                // sayfa numaraları
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, startPage + 4);
 
+                // Önceki sayfa butonu
+                if (currentPage > 1) {
+                    paginationContainer.innerHTML += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                `;
+                }
+
+                // Sayfa numaraları
                 for (var i = startPage; i <= endPage; i++) {
-                    ul.innerHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                    paginationContainer.innerHTML += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
                 }
 
-                // sonraki
+                // Sonraki sayfa butonu
                 if (currentPage < totalPages) {
-                    ul.innerHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}"><span aria-hidden="true">»</span></a></li>`;
+                    paginationContainer.innerHTML += `
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                `;
                 }
 
-                // olaylar
-                ul.querySelectorAll('.page-link').forEach(function(link) {
+                // Sayfa butonlarına olay dinleyicisi ekle
+                var pageLinks = document.querySelectorAll('.page-link');
+                pageLinks.forEach(function(link) {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
                         currentPage = parseInt(this.getAttribute('data-page'));
@@ -408,35 +526,7 @@ echo $OUTPUT->header();
                 });
             }
 
-            // Sıralama fonksiyonu
-            function sortTable() {
-                var rowsArray = Array.from(tableRows);
-
-                rowsArray.sort(function(a, b) {
-                    var aValue, bValue;
-
-                    if (currentSort.field === 'name') {
-                        aValue = a.querySelector('.category-name').textContent.toLowerCase();
-                        bValue = b.querySelector('.category-name').textContent.toLowerCase();
-                    } else if (currentSort.field === 'date') {
-                        aValue = parseInt(a.getAttribute('data-date')) || 0;
-                        bValue = parseInt(b.getAttribute('data-date')) || 0;
-                    }
-
-                    if (aValue > bValue) return currentSort.direction === 'asc' ? 1 : -1;
-                    if (aValue < bValue) return currentSort.direction === 'asc' ? -1 : 1;
-                    return 0;
-                });
-
-                // Yeniden sırala ve tabloya ekle
-                var tbody = document.querySelector('#kategoriTable tbody');
-                tbody.innerHTML = '';
-                rowsArray.forEach(function(row) {
-                    tbody.appendChild(row);
-                });
-            }
-
-            // ilk yüklemede
+            // İlk yükleme
             updateTable();
         });
     </script>
