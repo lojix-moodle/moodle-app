@@ -22,31 +22,30 @@ class depo_ekle_form extends moodleform {
         global $DB;
         $mform = $this->_form;
 
-        // Form container başlangıcı
         $mform->addElement('html', '<div class="card shadow-sm border-0">
-            <div class="card-body p-4">');
+            <div class="card-body p-4">
+                <div class="form-header text-center mb-4">
+                    <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
+                        <i class="fas fa-warehouse text-primary fa-2x"></i>
+                    </div>
+                    <h3 class="form-title">Yeni Depo Ekle</h3>
+                    <p class="text-muted">Lütfen aşağıdaki formu doldurun</p>
+                </div>
 
-        // Başlık
-        $mform->addElement('html', '<div class="form-header text-center mb-4">
-            <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
-                <i class="fas fa-warehouse text-primary fa-2x"></i>
-            </div>
-            <h3 class="form-title">Yeni Depo Ekle</h3>
-            <p class="text-muted">Lütfen depo bilgilerini giriniz</p>
-        </div>');
+                <div class="form-floating mb-4">');
 
-        // Depo adı
-        $mform->addElement('html', '<div class="form-group mb-4">
-            <label class="form-label fw-bold mb-2">Depo Adı</label>');
         $mform->addElement('text', 'name', '', [
-            'class' => 'form-control form-control-lg',
-            'placeholder' => 'Depo adını giriniz'
+            'class' => 'form-control',
+            'placeholder' => 'Depo Adı',
+            'id' => 'depoAdi'
         ]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addElement('html', '</div>');
 
-        // Depo sorumlusu
+        $mform->addElement('html', '<label for="depoAdi">Depo Adı <span class="text-danger">*</span></label>
+                </div>');
+
+        // Depo sorumlusu seçimi
         $admins = get_admins();
         $admin_ids = array_map(fn($a) => $a->id, $admins);
         $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
@@ -61,26 +60,26 @@ class depo_ekle_form extends moodleform {
             }
         }
 
-        $mform->addElement('html', '<div class="form-group mb-4">
-            <label class="form-label fw-bold mb-2">Depo Sorumlusu</label>');
+        $mform->addElement('html', '<div class="form-floating mb-4">');
         $mform->addElement('select', 'sorumluid', '', $user_options, [
-            'class' => 'form-select form-select-lg'
+            'class' => 'form-select',
+            'id' => 'depoSorumlusu'
         ]);
         $mform->setType('sorumluid', PARAM_INT);
-        $mform->addElement('html', '</div>');
+        $mform->addElement('html', '<label for="depoSorumlusu">Depo Sorumlusu <span class="text-danger">*</span></label>
+                </div>');
 
         // Butonlar
-        $mform->addElement('html', '<div class="form-buttons d-flex gap-2 mt-4">');
+        $mform->addElement('html', '<div class="d-grid gap-2">');
         $mform->addElement('submit', 'submitbutton', 'Depoyu Kaydet', [
-            'class' => 'btn btn-primary btn-lg flex-grow-1'
+            'class' => 'btn btn-primary btn-lg'
         ]);
         $mform->addElement('html', '
-            <a href="' . new moodle_url('/my') . '" class="btn btn-light btn-lg">
-                <i class="fas fa-arrow-left me-2"></i>Geri
-            </a>
-        </div>');
-
-        $mform->addElement('html', '</div></div>');
+                <a href="' . new moodle_url('/my') . '" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Geri
+                </a>
+            </div>
+        </div></div>');
     }
 }
 
@@ -121,7 +120,6 @@ echo $OUTPUT->header();
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
         }
 
         .form-title {
@@ -134,12 +132,47 @@ echo $OUTPUT->header();
         .card {
             border-radius: 15px;
             overflow: hidden;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .form-floating {
+            position: relative;
+        }
+
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: calc(3.5rem + 2px);
+            padding: 1rem 0.75rem;
+        }
+
+        .form-floating > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 1rem 0.75rem;
+            pointer-events: none;
+            border: 1px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+            color: #6c757d;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select ~ label {
+            opacity: .65;
+            transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+            background-color: white;
+            height: auto;
+            padding: 0 5px;
+            margin-left: 5px;
         }
 
         .form-control, .form-select {
+            border: 2px solid #edf2f7;
             border-radius: 10px;
-            border: 1px solid #dde2e5;
-            padding: 0.75rem 1rem;
             font-size: 1rem;
             transition: all 0.2s ease;
         }
@@ -147,11 +180,6 @@ echo $OUTPUT->header();
         .form-control:focus, .form-select:focus {
             border-color: #0f6fc5;
             box-shadow: 0 0 0 0.25rem rgba(15, 111, 197, 0.1);
-        }
-
-        .form-label {
-            font-size: 0.9rem;
-            color: #495057;
         }
 
         .btn {
@@ -173,11 +201,16 @@ echo $OUTPUT->header();
 
         .btn-light {
             background: #f8f9fa;
-            border: 1px solid #dde2e5;
+            border: 2px solid #edf2f7;
         }
 
         .btn-light:hover {
             background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .text-danger {
+            color: #dc3545;
         }
     </style>
 
