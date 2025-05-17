@@ -8,56 +8,67 @@ require_login();
 global $DB, $USER;
 
 try {
-    $kategoriid = required_param('kategoriid', PARAM_INT);
+    // Parametreyi güvenli bir şekilde al
+    $kategoriid = optional_param('kategoriid', 0, PARAM_INT);
 
-    // Kategori var mı kontrol et
-    $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $kategoriid]);
+    if (!$kategoriid) {
+        throw new moodle_exception('Kategori ID parametresi gerekli.');
+    }
+
+    // Veritabanı bağlantısını kontrol et
+    if (!$DB) {
+        throw new moodle_exception('Veritabanı bağlantısı kurulamadı.');
+    }
+
+    // Kategoriyi kontrol et
+    $sql = "SELECT * FROM {block_depo_yonetimi_kategoriler} WHERE id = :kategoriid";
+    $params = ['kategoriid' => $kategoriid];
+    $kategori = $DB->get_record_sql($sql, $params);
+
     if (!$kategori) {
         throw new moodle_exception('Kategori bulunamadı.');
     }
 
-    // Yetki kontrolü
-    $kullanici_depo_eslesme = [
-        2 => 3,
-        5 => 1,
-    ];
+    // Bağlı ürünleri kontrol et
+    $sql_urunler = "SELECT COUNT(*) as toplam 
+                    FROM {block_depo_yonetimi_urunler} 
+                    WHERE kategoriid = :kategoriid 
+                    AND deleted = 0";
 
-    if (!has_capability('block/depo_yonetimi:viewall', context_system::instance()) &&
-        (!isset($kullanici_depo_eslesme[$USER->id]) || $kullanici_depo_eslesme[$USER->id] != $kategori->depoid)) {
-        throw new moodle_exception('Bu depoya erişim izniniz yok.');
-    }
-
-    // Ürünleri kontrol ederken aktif ürünleri filtreleyelim
-    $sql = "SELECT COUNT(*) 
-            FROM {block_depo_yonetimi_urunler} 
-            WHERE kategoriid = :kategoriid 
-            AND deleted = 0";
-
-    $bagli_urunler = $DB->count_records_sql($sql, ['kategoriid' => $kategoriid]);
+    $bagli_urunler = $DB->get_field_sql($sql_urunler, ['kategoriid' => $kategoriid]);
 
     if ($bagli_urunler > 0) {
         redirect(
-            new moodle_url('/my', ['view' => 'kategoriler']),
-            'Bu kategoriye bağlı ' . $bagli_urunler . ' ürün var. Önce bu ürünlerin kategorisini değiştirin veya silin.',
+            new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
+            'Bu kategoriye bağlı ' . $bagli_urunler . ' ürün var.',
             null,
             \core\output\notification::NOTIFY_ERROR
         );
-    } else {
-        // Kategoriyi sil
-        if ($DB->delete_records('block_depo_yonetimi_kategoriler', ['id' => $kategoriid])) {
-            redirect(
-                new moodle_url('/my', ['view' => 'kategoriler']),
-                'Kategori başarıyla silindi.',
-                null,
-                \core\output\notification::NOTIFY_SUCCESS
-            );
-        } else {
-            throw new moodle_exception('Kategori silinirken bir hata oluştu.');
-        }
     }
+
+    // Kategoriyi sil
+    $sonuc = $DB->delete_records('block_depo_yonetimi_kategoriler', ['id' => $kategoriid]);
+    if (!$sonuc) {
+        throw new moodle_exception('Kategori silinirken bir hata oluştu.');
+    }
+
+    redirect(
+        new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
+        'Kategori başarıyla silindi.',
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
+
+} catch (dml_exception $e) {
+    redirect(
+        new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
+        'Veritabanı hatası: ' . $e->getMessage(),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
 } catch (Exception $e) {
     redirect(
-        new moodle_url('/my', ['view' => 'kategoriler']),
+        new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php'),
         'Bir hata oluştu: ' . $e->getMessage(),
         null,
         \core\output\notification::NOTIFY_ERROR
