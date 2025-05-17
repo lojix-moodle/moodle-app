@@ -279,12 +279,6 @@ form.mform {
     font-size: 1.5rem;
 }
 
-.depo-dashboard .fas.fa-warehouse
-{
-    color: #a989e9 !important;
-}
-
-
 /* Ürün Tablosu */
 .urun-tablosu thead th {
     font-weight: 600;
