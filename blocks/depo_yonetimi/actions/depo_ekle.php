@@ -28,211 +28,155 @@ $PAGE->requires->css(new moodle_url('/lib/jquery/themes/base/jquery.ui.all.css')
 $PAGE->requires->js_call_amd('block_depo_yonetimi/validation', 'init');
 
 echo $OUTPUT->header();
+?>
 
-echo '<style>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-warehouse fa-fw me-2"></i>Yeni Depo Ekle
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" action="" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="name" class="form-label"><i class="fas fa-tag me-2"></i>Depo Adı</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Depo adını girin" required>
+                                <div class="invalid-feedback">Lütfen depo adı girin</div>
+                            </div>
 
-/* Form kutusu */
-.depo-form-card {
-    background: #fff;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-width: 600px;
-    width: 100%; /* ekran genişliğine uyum sağlasın */
-    margin: 0; /* artık otomatik margin gerek yok */
-    box-sizing: border-box;
-}
+                            <div class="mb-3">
+                                <label for="sorumluid" class="form-label"><i class="fas fa-user me-2"></i>Depo Sorumlusu</label>
+                                <select class="form-select" id="sorumluid" name="sorumluid" required>
+                                    <option value="">Depo Sorumlusu Seçiniz...</option>
+                                    <?php
+                                    $admins = get_admins();
+                                    $admin_ids = array_map(fn($a) => $a->id, $admins);
+                                    $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
+                                    $teacher_ids = array_keys($teachers);
+                                    $user_ids = array_unique(array_merge($admin_ids, $teacher_ids));
 
+                                    if (!empty($user_ids)) {
+                                        list($insql, $inparams) = $DB->get_in_or_equal($user_ids);
+                                        $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams, 'lastname, firstname');
+                                        foreach ($users as $user) {
+                                            echo '<option value="'.$user->id.'">'.fullname($user).'</option>';
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <div class="invalid-feedback">Lütfen bir depo sorumlusu seçin</div>
+                            </div>
 
-/* Başlık ve ikon */
-.depo-form-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-.depo-icon-circle {
-    background: #0073e6;
-    color: white;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    margin: auto;
-    margin-bottom: 1rem;
-}
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Depoyu Kaydet
+                                </button>
+                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>" class="btn btn-outline-secondary ms-auto">
+                                    <i class="fas fa-arrow-left me-2"></i>Geri
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-/* Label genişliği ve hizalama */
-.depo-label {
-    display: block;
-    min-width: 150px;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 0.3rem;
-    color: #333;
-}
+    <script>
+        (function () {
+            'use strict'
 
-/* Input ve select alanları hizalanması */
-.depo-input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-.depo-input-group label {
-    width: 150px;
-    font-weight: 600;
-}
-.depo-input-group input,
-.depo-input-group select {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.95rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-}
+            // Form doğrulama
+            var forms = document.querySelectorAll('.needs-validation')
 
-/* Butonlar container */
-.depo-form-buttons {
-    display: flex;
-    justify-content: center; /* ortala */
-    gap: 20px; /* aralık */
-    margin-top: 1.5rem;
-}
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    } else {
+                        // Form geçerli ise gönderme işlemi burada
+                        var name = document.getElementById('name').value.trim()
+                        var sorumluid = document.getElementById('sorumluid').value
 
-/* Buton stilleri */
-.depo-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.75rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    height: 36px;
-    min-width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-.depo-btn-primary {
-    background-color: #0073e6;
-    color: #fff;
-}
-.depo-btn-secondary {
-    background-color: #aaa;
-    color: #fff;
-}
-</style>';
+                        if (name === '' || sorumluid === '') {
+                            event.preventDefault()
+                            return false
+                        }
 
-class depo_ekle_form extends moodleform {
-    protected function definition() {
-        global $DB;
-        $mform = $this->_form;
+                        // Form post işlemi
+                        var formData = new FormData()
+                        formData.append('name', name)
+                        formData.append('sorumluid', sorumluid)
+                        formData.append('submit', 'true')
 
-        $mform->addElement('html', '<div class="depo-form-card"><div class="depo-form-header">
-            <div class="depo-icon-circle"><i class="fas fa-warehouse fa-2x"></i></div>
-            <h3>Yeni Depo Ekle</h3>
-            <p>Lütfen tüm gerekli alanları doldurun</p>
-        </div>');
+                        // AJAX yerine POST form submission
+                        return true
+                    }
 
-        // Depo Adı
-        $mform->addElement('html', '<div class="depo-input-group">');
-        $mform->addElement('html', '<label class="depo-label" for="id_name">Depo Adı</label>');
-        $mform->addElement('text', 'name', '', [
-            'id' => 'id_name',
-            'class' => 'depo-form-control required-check',
-            'placeholder' => 'Depo adını girin'
-        ]);
-        $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', 'Depo adı zorunludur', 'required', null, 'client');
-        $mform->addElement('html', '</div>');
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
 
-        // Depo Sorumlusu
-        $admins = get_admins();
-        $admin_ids = array_map(fn($a) => $a->id, $admins);
-        $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
-        $teacher_ids = array_keys($teachers);
-        $user_ids = array_unique(array_merge($admin_ids, $teacher_ids));
-        $user_options = [0 => 'Depo Sorumlusu Seçiniz...'];
+<?php
+// Form işleme
+if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
+    $name = required_param('name', PARAM_TEXT);
+    $sorumluid = required_param('sorumluid', PARAM_INT);
 
-        if (!empty($user_ids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($user_ids);
-            $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams, 'lastname, firstname');
-            foreach ($users as $user) {
-                $user_options[$user->id] = fullname($user);
-            }
-        }
+    // Doğrulama
+    $errors = [];
 
-        $mform->addElement('html', '<div class="depo-input-group">');
-        $mform->addElement('html', '<label class="depo-label" for="id_sorumluid">Depo Sorumlusu</label>');
-        $mform->addElement('select', 'sorumluid', '', $user_options, [
-            'id' => 'id_sorumluid',
-            'class' => 'depo-form-control required-check'
-        ]);
-        $mform->setType('sorumluid', PARAM_INT);
-        $mform->addRule('sorumluid', 'Lütfen bir depo sorumlusu seçin', 'required', null, 'client');
-        $mform->addElement('html', '</div>');
-
-        // Butonlar
-        $mform->addElement('html', '<div class="depo-form-buttons">');
-        $mform->addElement('html', '<button class="depo-btn depo-btn-primary" type="submit" name="submit">Depoyu Kaydet</button>');
-        $mform->addElement('html', '<a href="' . new moodle_url('/blocks/depo_yonetimi/index.php') . '" class="depo-btn depo-btn-secondary">
-            Geri
-        </a>');
-        $mform->addElement('html', '</div></div>');
+    if (empty($name)) {
+        $errors['name'] = 'Depo adı zorunludur';
+    } else if ($DB->record_exists('block_depo_yonetimi_depolar', ['name' => $name])) {
+        $errors['name'] = 'Bu isimde bir depo zaten mevcut';
     }
 
-    function validation($data, $files) {
-        global $DB;
-        $errors = parent::validation($data, $files);
+    if (empty($sorumluid)) {
+        $errors['sorumluid'] = 'Lütfen bir depo sorumlusu seçin';
+    }
 
-        if (!empty($data['name'])) {
-            if ($DB->record_exists('block_depo_yonetimi_depolar', ['name' => $data['name']])) {
-                $errors['name'] = 'Bu isimde bir depo zaten mevcut';
-            }
+    // Hata yoksa kaydet
+    if (empty($errors)) {
+        $newdepo = new stdClass();
+        $newdepo->name = trim($name);
+        $newdepo->sorumluid = $sorumluid;
+        $newdepo->timecreated = time();
+        $newdepo->timemodified = time();
+        $newdepo->createdby = $USER->id;
+
+        try {
+            $DB->start_delegated_transaction();
+            $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
+
+            $log = new stdClass();
+            $log->depoid = $depoid;
+            $log->userid = $USER->id;
+            $log->action = 'create';
+            $log->details = 'Depo oluşturuldu';
+            $log->timecreated = time();
+            $DB->insert_record('block_depo_yonetimi_logs', $log);
+
+            $DB->commit_delegated_transaction();
+
+            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+        } catch (Exception $e) {
+            $DB->rollback_delegated_transaction();
+            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
-
-        if (empty($data['sorumluid']) || $data['sorumluid'] == 0) {
-            $errors['sorumluid'] = 'Lütfen bir depo sorumlusu seçin';
+    } else {
+        // Hata varsa göster
+        foreach ($errors as $key => $error) {
+            \core\notification::error($error);
         }
-
-        return $errors;
     }
 }
 
-$form = new depo_ekle_form();
-
-if ($form->is_cancelled()) {
-    redirect(new moodle_url('/blocks/depo_yonetimi/index.php'));
-} else if ($data = $form->get_data()) {
-    global $DB, $USER;
-    $newdepo = new stdClass();
-    $newdepo->name = trim($data->name);
-    $newdepo->sorumluid = $data->sorumluid;
-    $newdepo->timecreated = time();
-    $newdepo->timemodified = time();
-    $newdepo->createdby = $USER->id;
-
-    try {
-        $DB->start_delegated_transaction();
-        $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
-
-        $log = new stdClass();
-        $log->depoid = $depoid;
-        $log->userid = $USER->id;
-        $log->action = 'create';
-        $log->details = 'Depo oluşturuldu';
-        $log->timecreated = time();
-        $DB->insert_record('block_depo_yonetimi_logs', $log);
-
-        $DB->commit_delegated_transaction();
-
-        redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
-    } catch (Exception $e) {
-        $DB->rollback_delegated_transaction();
-        redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
-    }
-}
-
-$form->display();
 echo $OUTPUT->footer();
 ?>
