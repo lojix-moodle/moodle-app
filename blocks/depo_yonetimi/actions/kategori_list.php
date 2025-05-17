@@ -345,7 +345,7 @@ echo $OUTPUT->header();
             var pageSizeSelect = document.getElementById('page-size');
             var paginationContainer = document.querySelector('.pagination');
             var currentPage = 1;
-            var pageSize = 10;
+            var pageSize = parseInt(pageSizeSelect.value) || 10;
             var sortField = 'name';
             var sortDirection = 'asc';
             var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
@@ -451,12 +451,12 @@ echo $OUTPUT->header();
                 });
 
                 var tbody = document.querySelector('#kategoriTable tbody');
-                while (tbody.firstChild) {
-                    tbody.removeChild(tbody.firstChild);
-                }
                 rows.forEach(function(row) {
+                    row.style.display = 'none'; // Tüm satırları önce gizle
                     tbody.appendChild(row);
                 });
+
+                filterTable(); // Filtreleme ve sayfalama işlemini tetikle
             }
 
             // Tablo filtreleme
@@ -468,6 +468,7 @@ echo $OUTPUT->header();
                     var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
                     var isVisible = kategoriName.includes(searchTerm);
 
+                    // Filtreleme durumunu kaydet
                     row.classList.toggle('filtered-out', !isVisible);
                     row.dataset.visible = isVisible ? 'true' : 'false';
 
@@ -478,13 +479,16 @@ echo $OUTPUT->header();
                 updatePagination();
             }
 
-            // Sayfalama güncelleme
+            // Sayfalama güncelleme - Bu fonksiyon düzgün sayfalama sağlar
             function updatePagination() {
                 var visibleRows = Array.from(tableRows).filter(function(row) {
                     return row.dataset.visible !== 'false';
                 });
 
                 var totalItems = visibleRows.length;
+                totalCountEl.textContent = tableRows.length;
+                displayedCountEl.textContent = totalItems;
+
                 var totalPages = Math.ceil(totalItems / pageSize);
 
                 // Tüm satırları gizle
@@ -562,6 +566,14 @@ echo $OUTPUT->header();
 
                 li.appendChild(a);
                 paginationContainer.appendChild(li);
+            }
+
+            // Filtrelenmiş içerik için CSS
+            if (!document.getElementById('filtered-style')) {
+                var style = document.createElement('style');
+                style.id = 'filtered-style';
+                style.innerHTML = '.filtered-out { display: none !important; }';
+                document.head.appendChild(style);
             }
 
             // İlk yükleme
