@@ -1,45 +1,58 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
+global $CFG, $PAGE, $DB, $OUTPUT;
 require_once($CFG->libdir . '/formslib.php');
-require_once($CFG->dirroot . '/user/lib.php'); // fullname için gerekli
 
 require_login();
-
 $context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
-$PAGE->set_title('Depo Ekle');
-$PAGE->set_heading('Depo Ekle');
-$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'));
-
 if (has_capability('block/depo_yonetimi:viewall', $context)) {
     $yetki = 'admin';
 } elseif (has_capability('block/depo_yonetimi:viewown', $context)) {
     $yetki = 'depoyetkilisi';
 }
 
+$PAGE->set_context($context);
+$PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
+$PAGE->set_title('Depo Ekle');
+$PAGE->set_heading('Depo Ekle');
+$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'));
+
 class depo_ekle_form extends moodleform {
     protected function definition() {
         global $DB;
         $mform = $this->_form;
 
-        // Depo adı
-        $mform->addElement('text', 'name', 'Depo Adı', [
+        $mform->addElement('html', '<div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="form-header text-center mb-4">
+                    <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
+                        <i class="fas fa-warehouse text-primary fa-2x"></i>
+                    </div>
+                    <h3 class="form-title">Yeni Depo Ekle</h3>
+                    <p class="text-muted">Lütfen aşağıdaki formu doldurun</p>
+                </div>
+
+                <div class="form-floating mb-4">');
+
+        $mform->addElement('text', 'name', '', [
             'class' => 'form-control',
             'placeholder' => 'Depo Adı',
             'id' => 'depoAdi'
         ]);
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', 'Bu alan zorunludur', 'required');
+        $mform->addRule('name', null, 'required', null, 'client');
 
-        // Depo sorumlusu
+        $mform->addElement('html', '<label for="depoAdi">Depo Adı <span class="text-danger">*</span></label>
+                </div>');
+
+        // Depo sorumlusu seçimi
         $admins = get_admins();
         $admin_ids = array_map(fn($a) => $a->id, $admins);
         $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
         $teacher_ids = array_keys($teachers);
         $user_ids = array_unique(array_merge($admin_ids, $teacher_ids));
-
         $user_options = [0 => 'Depo Sorumlusu Seçiniz...'];
+
         if (!empty($user_ids)) {
             $users = $DB->get_records_list('user', 'id', $user_ids, 'lastname, firstname');
             foreach ($users as $user) {
@@ -47,17 +60,26 @@ class depo_ekle_form extends moodleform {
             }
         }
 
-        $mform->addElement('select', 'sorumluid', 'Depo Sorumlusu', $user_options, [
+        $mform->addElement('html', '<div class="form-floating mb-4">');
+        $mform->addElement('select', 'sorumluid', '', $user_options, [
             'class' => 'form-select',
             'id' => 'depoSorumlusu'
         ]);
         $mform->setType('sorumluid', PARAM_INT);
-        $mform->addRule('sorumluid', 'Bu alan zorunludur', 'required');
+        $mform->addElement('html', '<label for="depoSorumlusu">Depo Sorumlusu <span class="text-danger">*</span></label>
+                </div>');
 
         // Butonlar
+        $mform->addElement('html', '<div class="d-grid gap-2">');
         $mform->addElement('submit', 'submitbutton', 'Depoyu Kaydet', [
-            'class' => 'btn btn-primary btn-md'
+            'class' => 'btn btn-primary btn-lg'
         ]);
+        $mform->addElement('html', '
+                <a href="' . new moodle_url('/my') . '" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Geri
+                </a>
+            </div>
+        </div></div>');
     }
 }
 
@@ -85,45 +107,137 @@ if ($form->is_cancelled()) {
 echo $OUTPUT->header();
 ?>
 
-<style>
-    .form-container {
-        max-width: 600px;
-        margin: 2rem auto;
-    }
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+        }
 
-    .btn-primary {
-        background: #0f6fc5;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 500;
-    }
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .btn-primary:hover {
-        background: #0d5aa1;
-    }
+        .form-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
 
-    label {
-        font-weight: 500;
-        margin-bottom: .3rem;
-    }
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+        }
 
-    select, input {
-        margin-bottom: 1rem;
-    }
-</style>
+        /* Form elemanları düzenlemeleri */
+        .form-floating {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
 
-<div class="form-container">
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <div class="text-center mb-4">
-                <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-warehouse text-primary fa-2x"></i>
-                </div>
-                <h3 class="form-title">Yeni Depo Ekle</h3>
-                <p class="text-muted">Lütfen aşağıdaki formu doldurun</p>
-            </div>
-            <?php $form->display(); ?>
-            <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-light btn-lg w-100 mt-2">
-                <i class="fas fa-arrow-left me-2"></i> Geri
-            </a>
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: 60px;
+            line-height: 1.25;
+            padding: 1rem 0.75rem;
+            font-size: 1rem;
+        }
+
+        .form-floating > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: auto;
+            padding: 1rem;
+            overflow: hidden;
+            text-align: start;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity .15s ease-in-out, transform .15s ease-in-out;
+            color: #6c757d;
+            z-index: 1;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select ~ label {
+            transform: scale(0.85) translateY(-1rem) translateX(0.15rem);
+            background: #fff;
+            padding: 0 0.5rem;
+            height: auto;
+            color: #0f6fc5;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #edf2f7;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            background-color: #fff;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0f6fc5;
+            box-shadow: 0 0 0 0.25rem rgba(15, 111, 197, 0.1);
+            outline: 0;
+        }
+
+        /* Buton stilleri */
+        .btn {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #0f6fc5;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #0d5aa1;
+            transform: translateY(-1px);
+        }
+
+        .btn-light {
+            background: #f8f9fa;
+            border: 2px solid #edf2f7;
+            margin-top: 0.5rem;
+        }
+
+        .btn-light:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        /* Yıldız işareti */
+        .text-danger {
+            color: #dc3545;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+
+        /* Form düğmeleri arası boşluk */
+        .d-grid {
+            gap: 0.75rem !important;
+        }
+    </style>
+
+    <div class="form-container">
+        <?php $form->display(); ?>
+    </div>
+
+<?php
+echo $OUTPUT->footer();
+?>
