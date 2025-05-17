@@ -321,10 +321,34 @@
             margin: 20px 0;
         }
     }
+
+    /* Yeni butonlar için stil */
+    .action-btn {
+        background-color: transparent;
+        border: 2px solid #6a11cb;
+        color: #6a11cb;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 0 10px;
+        transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+        background-color: #6a11cb;
+        color: #fff;
+    }
 </style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
+
+    <!-- Eklenen butonlar -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button id="btn-giris" class="action-btn">Giriş Yap</button>
+        <button id="btn-kayit" class="action-btn">Kayıt Ol</button>
+    </div>
 
     <div class="login-card">
         <div class="login-header">
@@ -338,18 +362,12 @@
                 <div class="active-tab-indicator"></div>
             </div>
 
-            <!-- Login Form (Default) -->
-            <!-- Login Form (Default) -->
+            <!-- Giriş Form -->
             <div id="login-form">
                 {{{ output.main_content }}}
-
-                <button type="submit" class="submit-btn">
-                    <span class="btn-text">Giriş Yap</span>
-                    <div class="loader"></div>
-                </button>
             </div>
 
-            <!-- Register Form (Hidden initially) -->
+            <!-- Kayıt Form -->
             <div id="register-form">
                 <form method="post" action="register.php" id="register-form-element">
                     <div class="form-group">
@@ -403,185 +421,33 @@
     </div>
 </div>
 
+<!-- Eklenen JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get tab elements
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const tabIndicator = document.querySelector('.active-tab-indicator');
+        // Mevcut kodlar...
 
-        // Process any existing Moodle login form
-        function processMoodleForm() {
-            // Find and process Moodle's form elements
-            const moodleForm = document.querySelector('#login-form form');
-            if (moodleForm) {
-                // Create our custom form elements
-                const inputs = moodleForm.querySelectorAll('input[type="text"], input[type="password"]');
-                inputs.forEach(function(input) {
-                    const newInput = document.createElement('input');
-                    newInput.type = input.type;
-                    newInput.name = input.name;
-                    newInput.id = input.id || input.name;
-                    newInput.className = 'form-input';
-                    newInput.placeholder = ' ';
-                    newInput.required = true;
+        // Giriş ve Kayıt butonları
+        const btnGiris = document.getElementById('btn-giris');
+        const btnKayit = document.getElementById('btn-kayit');
 
-                    const formGroup = document.createElement('div');
-                    formGroup.className = 'form-group';
+        btnGiris.addEventListener('click', function() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
 
-                    const icon = document.createElement('i');
-                    icon.className = 'input-icon';
-
-                    // Set icon based on input type
-                    if (input.type === 'password') {
-                        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/></svg>';
-                    } else {
-                        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg>';
-                    }
-
-                    const label = document.createElement('label');
-                    label.setAttribute('for', newInput.id);
-                    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
-
-                    formGroup.appendChild(newInput);
-                    formGroup.appendChild(icon);
-                    formGroup.appendChild(label);
-
-                    loginForm.querySelector('form') ?
-                            loginForm.querySelector('form').insertBefore(formGroup, loginForm.querySelector('button')) :
-                            loginForm.appendChild(formGroup);
-
-                    // Hide original input
-                    input.style.display = 'none';
-
-                    // Sync values
-                    newInput.addEventListener('input', function() {
-                        input.value = newInput.value;
-                    });
-                });
-
-                // Process submit button
-                const submitBtn = moodleForm.querySelector('input[type="submit"]');
-                if (submitBtn) {
-                    const newBtn = document.createElement('button');
-                    newBtn.type = 'submit';
-                    newBtn.className = 'submit-btn';
-
-                    const btnText = document.createElement('span');
-                    btnText.className = 'btn-text';
-                    btnText.textContent = 'Giriş Yap';
-
-                    const loader = document.createElement('div');
-                    loader.className = 'loader';
-
-                    newBtn.appendChild(btnText);
-                    newBtn.appendChild(loader);
-
-                    // Create a custom form if one doesn't exist
-                    if (!loginForm.querySelector('form')) {
-                        const customForm = document.createElement('form');
-                        customForm.id = 'login-form-element';
-                        customForm.method = moodleForm.method;
-                        customForm.action = moodleForm.action;
-                        loginForm.appendChild(customForm);
-                    }
-
-                    // Add the new button to our form
-                    loginForm.querySelector('form').appendChild(newBtn);
-
-                    // Hide original button
-                    submitBtn.style.display = 'none';
-
-                    // Sync submission
-                    newBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        newBtn.parentElement.classList.add('submitting');
-                        setTimeout(function() {
-                            submitBtn.click();
-                        }, 800);
-                    });
-                }
-            }
-
-            // Hide all Moodle's original elements
-            const moodleElements = document.querySelectorAll('#login-form > *:not(form), #login-form form > *:not(.form-group):not(.submit-btn)');
-            moodleElements.forEach(function(el) {
-                el.style.display = 'none';
-            });
-        }
-
-        // Add click event listeners to tabs with animation
-        loginTab.addEventListener('click', function() {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            tabIndicator.style.transform = 'translateX(0)';
-
-            // Animate form transition
-            registerForm.style.opacity = '0';
-            registerForm.style.transform = 'translateX(20px)';
-
-            setTimeout(function() {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
-
-                setTimeout(function() {
-                    loginForm.style.opacity = '1';
-                    loginForm.style.transform = 'translateX(0)';
-                }, 50);
-            }, 300);
+            document.getElementById('login-form').style.opacity = '1';
+            document.getElementById('login-form').style.transform = 'translateX(0)';
+            document.getElementById('register-form').style.opacity = '0';
+            document.getElementById('register-form').style.transform = 'translateX(20px)';
         });
 
-        registerTab.addEventListener('click', function() {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            tabIndicator.style.transform = 'translateX(100%)';
+        btnKayit.addEventListener('click', function() {
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('login-form').style.display = 'none';
 
-            // Animate form transition
-            loginForm.style.opacity = '0';
-            loginForm.style.transform = 'translateX(-20px)';
-
-            setTimeout(function() {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-
-                setTimeout(function() {
-                    registerForm.style.opacity = '1';
-                    registerForm.style.transform = 'translateX(0)';
-                }, 50);
-            }, 300);
-        });
-
-        // Add form submission animations
-        const forms = document.querySelectorAll('form');
-        forms.forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('.submit-btn');
-                if (submitBtn) {
-                    e.preventDefault();
-                    this.classList.add('submitting');
-
-                    setTimeout(function() {
-                        form.submit();
-                    }, 800);
-                }
-            });
-        });
-
-        // Process any existing Moodle form
-        processMoodleForm();
-
-        // Add floating animation to inputs
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(function(input) {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused');
-            });
+            document.getElementById('register-form').style.opacity = '1';
+            document.getElementById('register-form').style.transform = 'translateX(0)';
+            document.getElementById('login-form').style.opacity = '0';
+            document.getElementById('login-form').style.transform = 'translateX(-20px)';
         });
     });
 </script>
