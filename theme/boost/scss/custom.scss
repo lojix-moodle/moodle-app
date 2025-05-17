@@ -23,7 +23,7 @@ body {
 
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   padding: 30px;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -39,10 +39,24 @@ body {
 }
 
 .login-card a {
-  color: #ffc107;
   font-weight: 500;
 }
 
-.login-card a:hover {
-  text-decoration: underline;
+.btn-primary {
+  background-color: #4e54c8;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3b44a1;
+}
+
+.btn-outline-light {
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.btn-outline-light:hover {
+  background-color: #fff;
+  color: #4e54c8;
 }

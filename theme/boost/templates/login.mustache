@@ -1,6 +1,6 @@
 {{!
     @template theme_boost/login
-    Modern ve etkileyici login sayfası tasarımı
+    Modern ve farklı login sayfası tasarımı
 }}
 {{> theme_boost/head }}
 
@@ -11,17 +11,18 @@
 
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-card glass-effect shadow-lg p-5 rounded animate__animated animate__zoomIn">
+    <div class="login-card glass-effect shadow-lg p-5 rounded animate__animated animate__fadeIn">
         <div class="text-center mb-4">
-            <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo" class="mb-3" style="max-width: 120px;">
+            <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo" class="mb-3" style="max-width: 100px;">
             <h2 class="fw-bold text-white">Hoş Geldiniz</h2>
             <p class="text-light">Hesabınıza giriş yaparak devam edin</p>
         </div>
         <div>
             {{{ output.main_content }}}
         </div>
-        <div class="text-center mt-4">
-            <p class="text-light">Hesabınız yok mu? <a href="/login/signup.php" class="text-decoration-none text-warning fw-bold">Kayıt Ol</a></p>
+        <div class="text-center mt-4 d-flex justify-content-center gap-3">
+            <a href="/login/index.php" class="btn btn-primary px-4 py-2">Giriş Yap</a>
+            <a href="/login/signup.php" class="btn btn-outline-light px-4 py-2">Kayıt Ol</a>
         </div>
     </div>
 
