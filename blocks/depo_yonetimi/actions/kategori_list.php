@@ -281,6 +281,60 @@ echo $OUTPUT->header();
     </div>
 
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.getElementById('searchInput');
+            var tableRows = document.querySelectorAll('#kategoriTable tbody tr');
+            var sortButtons = document.querySelectorAll('.sort-option');
+            var sortField = 'name';
+            var sortDirection = 'asc';
+
+            // Arama fonksiyonu
+            searchInput.addEventListener('keyup', function() {
+                var searchTerm = searchInput.value.toLowerCase();
+                tableRows.forEach(function(row) {
+                    var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
+                    row.style.display = kategoriName.includes(searchTerm) ? '' : 'none';
+                });
+            });
+
+            // Sıralama fonksiyonu
+            sortButtons.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var sortOption = this.getAttribute('data-sort');
+                    var parts = sortOption.split('-');
+                    sortField = parts[0];
+                    sortDirection = parts[1];
+
+                    sortTable();
+                });
+            });
+
+            function sortTable() {
+                var rows = Array.from(tableRows);
+                rows.sort(function(a, b) {
+                    var aValue = a.querySelector('.category-name').textContent.toLowerCase();
+                    var bValue = b.querySelector('.category-name').textContent.toLowerCase();
+
+                    if (sortField === 'date') {
+                        aValue = parseInt(a.getAttribute('data-date')) || 0;
+                        bValue = parseInt(b.getAttribute('data-date')) || 0;
+                    }
+
+                    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                    return 0;
+                });
+
+                var tbody = document.querySelector('#kategoriTable tbody');
+                tbody.innerHTML = '';
+                rows.forEach(function(row) {
+                    tbody.appendChild(row);
+                });
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             // Değişkenler
             var loadingOverlay = document.getElementById('loadingOverlay');
