@@ -186,7 +186,7 @@ echo $OUTPUT->header();
                                         // Her kategori için ürün sayısını sorgula
 // Her kategori için ürün sayısını sorgula
                                         // Her kategori için ürün sayısını sorgula
-                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategori_id' => $kategori->id]);                                       ?>
+                                        $urun_sayisi = $DB->count_records('block_depo_yonetimi_urunler', ['kategoriid' => $kategori->id]);                                       ?>
                                         <tr data-id="<?php echo $kategori->id; ?>" data-name="<?php echo htmlspecialchars($kategori->name); ?>" data-date="<?php echo $kategori->timecreated ?? 0; ?>">
                                             <td class="align-middle">
                                                 <span class="category-name"><?php echo htmlspecialchars($kategori->name); ?></span>
