@@ -53,6 +53,18 @@
                     {{#headercontent}}
                         {{> core/activity_header }}
                     {{/headercontent}}
+
+                    <!-- Giriş Yapmadan Gösterilecek Özel Kutu -->
+                    <div class="custom-welcome-box p-4 mb-4 rounded bg-light text-center">
+                        <h1>Depo Yönetim Sistemine Hoş Geldiniz</h1>
+                        <p>Lütfen giriş yapınız veya kayıt olunuz.</p>
+                        <a href="/login/index.php" class="btn btn-primary m-2">Giriş Yap</a>
+                        <a href="/login/signup.php" class="btn btn-outline-secondary m-2">Kayıt Ol</a>
+                    </div>
+
+
+
+
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
                     {{{ output.course_content_footer }}}
