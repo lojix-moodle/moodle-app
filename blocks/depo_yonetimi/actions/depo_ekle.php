@@ -33,6 +33,38 @@ $PAGE->set_pagelayout('admin');
 $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'));
 $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles/depo.css'));
 
+// JS ekleme - form doğrulama için
+$PAGE->requires->js_init_code('
+    document.addEventListener("DOMContentLoaded", function() {
+        const requiredFields = document.querySelectorAll(".depo-required");
+        const inputs = document.querySelectorAll(".depo-form-control");
+        
+        // Hide required icons initially
+        requiredFields.forEach(icon => {
+            icon.style.display = "none";
+        });
+        
+        // Show required icon only when input is empty and has been focused
+        inputs.forEach(input => {
+            input.addEventListener("blur", function() {
+                const parent = this.closest(".depo-form-group");
+                const icon = parent.querySelector(".depo-required");
+                if(icon && !this.value.trim()) {
+                    icon.style.display = "inline-block";
+                }
+            });
+            
+            input.addEventListener("input", function() {
+                const parent = this.closest(".depo-form-group");
+                const icon = parent.querySelector(".depo-required");
+                if(icon) {
+                    icon.style.display = this.value.trim() ? "none" : "inline-block";
+                }
+            });
+        });
+    });
+');
+
 /**
  * Depo ekleme formu sınıfı
  */
@@ -56,7 +88,7 @@ class depo_ekle_form extends moodleform {
 
         // Depo adı
         $mform->addElement('html', '<div class="depo-form-group">');
-        $mform->addElement('text', 'name', 'Depo Adı', [
+        $mform->addElement('text', 'name', 'Depo Adı <span class="depo-required text-danger">*</span>', [
             'class' => 'depo-form-control',
             'placeholder' => 'Depo adını girin'
         ]);
@@ -84,23 +116,12 @@ class depo_ekle_form extends moodleform {
             }
         }
 
-        $mform->addElement('select', 'sorumluid', 'Depo Sorumlusu', $user_options, [
+        $mform->addElement('select', 'sorumluid', 'Depo Sorumlusu <span class="depo-required text-danger">*</span>', $user_options, [
             'class' => 'depo-form-control'
         ]);
         $mform->setType('sorumluid', PARAM_INT);
         $mform->addRule('sorumluid', 'Lütfen bir depo sorumlusu seçin', 'required', null, 'client');
         $mform->addElement('html', '<div class="depo-form-hint">Depo sorumlusu, depo ile ilgili tüm işlemleri yönetebilir</div>');
-        $mform->addElement('html', '</div>');
-
-        // Depo açıklaması
-        $mform->addElement('html', '<div class="depo-form-group">');
-        $mform->addElement('textarea', 'description', 'Depo Açıklaması', [
-            'class' => 'depo-form-control',
-            'placeholder' => 'Depo hakkında açıklama girin',
-            'rows' => 3
-        ]);
-        $mform->setType('description', PARAM_TEXT);
-        $mform->addElement('html', '<div class="depo-form-hint">Depo hakkında kısa bir açıklama ekleyin</div>');
         $mform->addElement('html', '</div>');
 
         // Butonlar
@@ -151,7 +172,6 @@ if ($form->is_cancelled()) {
     $newdepo = new stdClass();
     $newdepo->name = trim($data->name);
     $newdepo->sorumluid = $data->sorumluid;
-    $newdepo->description = isset($data->description) ? trim($data->description) : '';
     $newdepo->timecreated = time();
     $newdepo->timemodified = time();
     $newdepo->createdby = $USER->id;
@@ -276,7 +296,8 @@ echo $OUTPUT->header();
         /* Butonlar */
         .depo-form-buttons {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: space-between;
             gap: 1rem;
             margin-top: 2rem;
         }
@@ -287,10 +308,10 @@ echo $OUTPUT->header();
             text-align: center;
             vertical-align: middle;
             user-select: none;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
             line-height: 1.5;
-            border-radius: 12px;
+            border-radius: 8px;
             text-decoration: none;
             transition: all 0.2s ease-in-out;
             cursor: pointer;
@@ -300,6 +321,7 @@ echo $OUTPUT->header();
             color: #fff;
             background-color: #0f6fc5;
             border: none;
+            min-width: 140px;
         }
 
         .depo-btn-primary:hover {
@@ -312,6 +334,7 @@ echo $OUTPUT->header();
             color: #495057;
             background-color: #f8f9fa;
             border: 2px solid #edf2f7;
+            min-width: 100px;
             text-align: center;
         }
 
@@ -328,15 +351,21 @@ echo $OUTPUT->header();
             display: block;
         }
 
+        /* Label genişliği artırıldı */
+        .fitem_id_name .fitemtitle,
+        .fitem_id_sorumluid .fitemtitle {
+            min-width: 180px;
+            display: inline-block;
+        }
+
         /* Duyarlı tasarım */
-        @media (min-width: 768px) {
+        @media (max-width: 768px) {
             .depo-form-buttons {
-                flex-direction: row;
-                justify-content: space-between;
+                flex-direction: column;
             }
 
             .depo-btn {
-                flex: 1;
+                width: 100%;
             }
         }
     </style>
