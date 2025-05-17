@@ -14,6 +14,7 @@ $string['depo_ekle'] = 'Depo Ekle';
 $string['depo_adi'] = 'Depo Adı';
 $string['depo_sorumlusu'] = 'Depo Sorumlusu';
 $string['depo_ekle_success'] = 'Depo başarıyla eklendi.';
+$string['depo_eklendi'] = 'Depo başarıyla eklendi.';
 $string['depo_ekle_error'] = 'Depo eklenirken hata oluştu.';
 $string['depo_guncelle'] = 'Depo Güncelle';
 $string['depo_guncelle_success'] = 'Depo başarıyla güncellendi.';
