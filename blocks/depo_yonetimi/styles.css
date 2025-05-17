@@ -279,8 +279,8 @@ form.mform {
     font-size: 1.5rem;
 }
 
-.depo-dashboard .fas.fa-warehouse,
-.depo-dashboard i.text-primary {
+.depo-dashboard .fas.fa-warehouse
+{
     color: #a989e9 !important;
 }
 
