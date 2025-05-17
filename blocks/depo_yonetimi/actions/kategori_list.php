@@ -134,7 +134,7 @@ echo $OUTPUT->header();
 
     <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-7">
+            <div class="col-lg-10 col-xl-9">
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-primary text-white">
                         <div class="d-flex align-items-center justify-content-between">
@@ -163,8 +163,8 @@ echo $OUTPUT->header();
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="name-asc">İsim (A-Z)</a></li>
                                             <li><a class="dropdown-item sort-option" href="#" data-sort="name-desc">İsim (Z-A)</a></li>
-                                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-new">Oluşturma (Yeni-Eski)</a></li>
-                                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-old">Oluşturma (Eski-Yeni)</a></li>
+                                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-asc">Oluşturma (Eski-Yeni)</a></li>
+                                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-desc">Oluşturma (Yeni-Eski)</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -191,29 +191,24 @@ echo $OUTPUT->header();
                                                 <span class="category-name"><?php echo htmlspecialchars($kategori->name); ?></span>
                                             </td>
                                             <td class="align-middle text-center">
-                                            <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill">
-                                                <?php echo $urun_sayisi; ?>
-                                            </span>
+                                                <span class="badge bg-<?php echo $urun_sayisi > 0 ? 'primary' : 'secondary'; ?> rounded-pill"><?php echo $urun_sayisi; ?></span>
                                             </td>
                                             <td class="align-middle text-center">
-                                                <small class="text-muted">
-                                                    <?php
-                                                    if (!empty($kategori->timecreated)) {
-                                                        echo date('d.m.Y H:i', $kategori->timecreated);
-                                                    } else {
-                                                        echo '-';
-                                                    }
-                                                    ?>
-                                                </small>
+                                                <?php
+                                                if (!empty($kategori->timecreated)) {
+                                                    echo date('d.m.Y H:i', $kategori->timecreated);
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
+                                                ?>
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group">
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_duzenle.php', ['kategoriid' => $kategori->id]); ?>"
-                                                       class="btn btn-sm btn-outline-primary"
-                                                       title="Düzenle">
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_duzenle.php', ['id' => $kategori->id]); ?>"
+                                                       class="btn btn-sm btn-outline-primary" title="Düzenle">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['kategoriid' => $kategori->id]); ?>"
+                                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/kategori_sil.php', ['id' => $kategori->id, 'sesskey' => sesskey()]); ?>"
                                                        class="btn btn-sm btn-outline-danger delete-btn"
                                                        title="Sil"
                                                        data-id="<?php echo $kategori->id; ?>"
@@ -298,9 +293,10 @@ echo $OUTPUT->header();
             var pageSize = 10;
             var sortField = 'name';
             var sortDirection = 'asc';
-            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'), {});
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             var deleteModalText = document.getElementById('deleteModalText');
+            var sortDropdown = document.getElementById('sortDropdown');
 
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
@@ -348,7 +344,6 @@ echo $OUTPUT->header();
             // Modal ile silme onayı
             confirmDeleteBtn.addEventListener('click', function() {
                 loadingOverlay.style.display = 'flex';
-                deleteModal.hide();
             });
 
             // Sıralama işlemi
@@ -361,7 +356,7 @@ echo $OUTPUT->header();
                     sortField = parts[0];
                     sortDirection = parts[1];
 
-                    document.getElementById('sortDropdown').innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
+                    sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
                     sortTable();
                     updateTable();
@@ -379,8 +374,8 @@ echo $OUTPUT->header();
                         aValue = a.getAttribute('data-name').toLowerCase();
                         bValue = b.getAttribute('data-name').toLowerCase();
                     } else if (sortField === 'date') {
-                        aValue = parseInt(a.getAttribute('data-date'));
-                        bValue = parseInt(b.getAttribute('data-date'));
+                        aValue = parseInt(a.getAttribute('data-date')) || 0;
+                        bValue = parseInt(b.getAttribute('data-date')) || 0;
                     }
 
                     if (sortDirection === 'asc') {
@@ -433,7 +428,7 @@ echo $OUTPUT->header();
                 });
 
                 // Sayfalama sınırlarını belirle
-                if (pageSize === 'all' || pageSize >= visibleRows.length) {
+                if (pageSize === tableRows.length || pageSize >= visibleRows.length) {
                     startIndex = 0;
                     endIndex = visibleRows.length;
                 } else {
