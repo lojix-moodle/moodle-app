@@ -368,19 +368,6 @@ echo $OUTPUT->header();
                 });
             });
 
-            // İşlem butonlarına hover efekti
-            var buttons = document.querySelectorAll('.btn-group .btn');
-            buttons.forEach(function(btn) {
-                btn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-                });
-                btn.addEventListener('mouseleave', function() {
-                    this.style.transform = '';
-                    this.style.boxShadow = '';
-                });
-            });
-
             // Silme butonu işlemleri
             var deleteButtons = document.querySelectorAll('.delete-btn');
             deleteButtons.forEach(function(btn) {
@@ -397,8 +384,20 @@ echo $OUTPUT->header();
             });
 
             // Modal ile silme onayı
-            confirmDeleteBtn.addEventListener('click', function() {
+            confirmDeleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 loadingOverlay.style.display = 'flex';
+
+                // Form gönderimini geciktirerek loading ekranının görünmesini sağla
+                setTimeout(function() {
+                    window.location.href = confirmDeleteBtn.getAttribute('href');
+                }, 100);
+            });
+
+            // Arama fonksiyonu
+            searchInput.addEventListener('keyup', function() {
+                currentPage = 1;
+                filterTable();
             });
 
             // Sıralama işlemi
@@ -415,11 +414,23 @@ echo $OUTPUT->header();
                     sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
 
                     sortTable();
-                    updateTable();
+                    updatePagination();
                 });
             });
 
-            // Tablo sıralama fonksiyonu - DÜZELTİLMİŞ
+            // Sayfa boyutu değişim işlemi
+            pageSizeSelect.addEventListener('change', function() {
+                var selectedValue = this.value;
+                if (selectedValue === 'all') {
+                    pageSize = tableRows.length;
+                } else {
+                    pageSize = parseInt(selectedValue);
+                }
+                currentPage = 1;
+                updatePagination();
+            });
+
+            // Tablo sıralama fonksiyonu
             function sortTable() {
                 var rows = Array.from(tableRows);
 
@@ -434,80 +445,62 @@ echo $OUTPUT->header();
                         bValue = parseInt(b.getAttribute('data-date')) || 0;
                     }
 
-                    // Karşılaştırma için tam bir karşılaştırma operatörü kullanıyoruz
-                    var comparison = 0;
-                    if (aValue > bValue) {
-                        comparison = 1;
-                    } else if (aValue < bValue) {
-                        comparison = -1;
-                    }
-
-                    // Sıralama yönüne göre sonucu tersine çeviriyoruz
-                    return sortDirection === 'asc' ? comparison : -comparison;
+                    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                    return 0;
                 });
 
-                // Sıralanmış satırları tabloya yerleştir
                 var tbody = document.querySelector('#kategoriTable tbody');
-                // Önce tüm satırları kaldır
                 while (tbody.firstChild) {
                     tbody.removeChild(tbody.firstChild);
                 }
-                // Sonra sıralanmış satırları ekle
                 rows.forEach(function(row) {
                     tbody.appendChild(row);
                 });
             }
 
-            // Arama fonksiyonu
-            searchInput.addEventListener('keyup', function() {
-                currentPage = 1;
-                updateTable();
-            });
-
-            // Sayfa boyutu değişim işlemi
-            pageSizeSelect.addEventListener('change', function() {
-                var selectedValue = this.value;
-                if (selectedValue === 'all') {
-                    pageSize = tableRows.length;
-                } else {
-                    pageSize = parseInt(selectedValue);
-                }
-                currentPage = 1;
-                updateTable();
-            });
-
-            // Tablo güncelleme fonksiyonu
-            function updateTable() {
+            // Tablo filtreleme
+            function filterTable() {
                 var searchTerm = searchInput.value.toLowerCase();
-                var visibleRows = [];
-                var startIndex, endIndex;
+                var visibleCount = 0;
 
-                // Önce arama kriterlerine göre görünür satırları belirle
                 tableRows.forEach(function(row) {
                     var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
-                    if (kategoriName.indexOf(searchTerm) > -1) {
-                        row.dataset.visible = 'true';
-                        visibleRows.push(row);
-                    } else {
-                        row.dataset.visible = 'false';
-                    }
+                    var isVisible = kategoriName.includes(searchTerm);
+
+                    row.classList.toggle('filtered-out', !isVisible);
+                    row.dataset.visible = isVisible ? 'true' : 'false';
+
+                    if (isVisible) visibleCount++;
                 });
 
-                // Sayfalama sınırlarını belirle
-                if (pageSize === tableRows.length || pageSize >= visibleRows.length) {
-                    startIndex = 0;
-                    endIndex = visibleRows.length;
-                } else {
-                    startIndex = (currentPage - 1) * pageSize;
-                    endIndex = Math.min(startIndex + pageSize, visibleRows.length);
-                }
+                displayedCountEl.textContent = visibleCount;
+                updatePagination();
+            }
+
+            // Sayfalama güncelleme
+            function updatePagination() {
+                var visibleRows = Array.from(tableRows).filter(function(row) {
+                    return row.dataset.visible !== 'false';
+                });
+
+                var totalItems = visibleRows.length;
+                var totalPages = Math.ceil(totalItems / pageSize);
 
                 // Tüm satırları gizle
                 tableRows.forEach(function(row) {
                     row.style.display = 'none';
                 });
 
+                // Sayfalama kontrolü
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                }
+
                 // Geçerli sayfa için satırları göster
+                var startIndex = (currentPage - 1) * pageSize;
+                var endIndex = Math.min(startIndex + pageSize, visibleRows.length);
+
                 for (var i = startIndex; i < endIndex; i++) {
                     if (i < visibleRows.length) {
                         visibleRows[i].style.display = '';
@@ -515,22 +508,19 @@ echo $OUTPUT->header();
                 }
 
                 // Sayfalama oluştur
-                createPagination(visibleRows.length);
-
-                // Sayaçları güncelle
-                totalCountEl.textContent = tableRows.length;
-                displayedCountEl.textContent = visibleRows.length;
+                createPagination(totalItems);
             }
 
-            // Sayfalama oluşturma fonksiyonu
+            // Sayfalama oluşturma
             function createPagination(totalItems) {
+                paginationContainer.innerHTML = '';
+
                 if (pageSizeSelect.value === 'all' || pageSize >= totalItems) {
                     document.getElementById('pagination-container').style.display = 'none';
                     return;
                 }
 
                 document.getElementById('pagination-container').style.display = 'flex';
-                paginationContainer.innerHTML = '';
 
                 var totalPages = Math.ceil(totalItems / pageSize);
                 var startPage = Math.max(1, currentPage - 2);
@@ -538,48 +528,45 @@ echo $OUTPUT->header();
 
                 // Önceki sayfa butonu
                 if (currentPage > 1) {
-                    paginationContainer.innerHTML += `
-                    <li class="page-item">
-                        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Önceki">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                `;
+                    addPageItem(currentPage - 1, '&laquo;', 'Önceki');
                 }
 
                 // Sayfa numaraları
                 for (var i = startPage; i <= endPage; i++) {
-                    paginationContainer.innerHTML += `
-                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="#" data-page="${i}">${i}</a>
-                    </li>
-                `;
+                    addPageItem(i, i, '', i === currentPage);
                 }
 
                 // Sonraki sayfa butonu
                 if (currentPage < totalPages) {
-                    paginationContainer.innerHTML += `
-                    <li class="page-item">
-                        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Sonraki">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                `;
+                    addPageItem(currentPage + 1, '&raquo;', 'Sonraki');
                 }
+            }
 
-                // Sayfa butonlarına olay dinleyicisi ekle
-                var pageLinks = document.querySelectorAll('.page-link');
-                pageLinks.forEach(function(link) {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        currentPage = parseInt(this.getAttribute('data-page'));
-                        updateTable();
-                    });
+            // Sayfalama öğesi ekleme
+            function addPageItem(pageNum, text, ariaLabel, isActive) {
+                var li = document.createElement('li');
+                li.className = 'page-item' + (isActive ? ' active' : '');
+
+                var a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.setAttribute('data-page', pageNum);
+                if (ariaLabel) a.setAttribute('aria-label', ariaLabel);
+                a.innerHTML = text;
+
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentPage = parseInt(this.getAttribute('data-page'));
+                    updatePagination();
                 });
+
+                li.appendChild(a);
+                paginationContainer.appendChild(li);
             }
 
             // İlk yükleme
-            updateTable();
+            filterTable();
+            updatePagination();
         });
     </script>
 
