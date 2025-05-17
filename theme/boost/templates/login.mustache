@@ -1,116 +1,118 @@
 {{! @template theme_boost/login }}
-
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}} id="page-login-index">
 {{> core/local/toast/wrapper }}
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
     body#page-login-index {
         margin: 0;
         padding: 0;
-        height: 100vh;
-        background: linear-gradient(135deg, #1e3c72, #2a5298, #4e54c8);
-        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        font-family: 'Inter', sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;
         color: #fff;
     }
 
-    .login-box {
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 20px;
-        padding: 40px;
+    .login-container {
+        background: rgba(255, 255, 255, 0.07);
+        padding: 30px 25px;
+        border-radius: 16px;
         width: 100%;
-        max-width: 400px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        animation: fadeInDown 0.8s ease;
+        max-width: 360px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        animation: fadeIn 0.6s ease-in-out;
     }
 
-    .login-box .logo {
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-container h2 {
+        font-size: 22px;
+        margin-bottom: 6px;
         text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .login-box .logo img {
-        max-width: 80px;
-    }
-
-    .login-box h2 {
-        text-align: center;
-        font-size: 26px;
         font-weight: 600;
-        margin-bottom: 10px;
-        color: #fff;
     }
 
-    .login-box p {
+    .login-container p {
+        font-size: 13px;
         text-align: center;
-        color: #ddd;
-        font-size: 14px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
+        color: #cfd8dc;
     }
 
-    .login-box form {
+    .login-container form {
         display: flex;
         flex-direction: column;
     }
 
-    .login-box input[type="text"],
-    .login-box input[type="password"] {
-        padding: 12px;
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+        padding: 10px 12px;
         margin-bottom: 15px;
         border: none;
         border-radius: 8px;
+        font-size: 14px;
     }
 
-    .login-box .btn-primary {
-        background-color: #4e54c8;
+    .login-container .btn-primary {
+        background: linear-gradient(90deg, #6a11cb, #2575fc);
         border: none;
-        padding: 12px;
+        padding: 10px;
         border-radius: 8px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        transition: background 0.3s;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.3s;
     }
 
-    .login-box .btn-primary:hover {
-        background-color: #3b44a1;
+    .login-container .btn-primary:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
     }
 
-    .login-box .additional-links {
+    .login-container .additional-links {
+        font-size: 12px;
+        margin-top: 10px;
         text-align: center;
-        font-size: 13px;
-        margin-top: 15px;
     }
 
-    .login-box .additional-links a {
-        color: #fff;
+    .login-container .additional-links a {
+        color: #81d4fa;
+        text-decoration: none;
+    }
+
+    .login-container .additional-links a:hover {
         text-decoration: underline;
     }
 
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 24px 20px;
+            max-width: 90%;
+        }
+
+        .login-container h2 {
+            font-size: 20px;
+        }
+    }
 </style>
 
 <div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div class="login-box animate__animated animate__fadeInDown">
-        <div class="logo">
-            <img src="/theme/image.php?theme=boost&component=core&image=logo" alt="Site Logo">
-        </div>
+    <div class="login-container">
         <h2>Hoş Geldiniz</h2>
-        <p>Lütfen giriş bilgilerinizi girin</p>
-
-        <div>
-            {{{ output.main_content }}}
-        </div>
+        <p>Lojix:Depo Yönetim Paneli</p>
+        {{{ output.main_content }}}
     </div>
 
     {{> theme_boost/footer }}
