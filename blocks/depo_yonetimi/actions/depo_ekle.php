@@ -31,14 +31,27 @@ echo $OUTPUT->header();
 
 echo '<style>
 /* Ana form kutusunu ortala ve genişliği uygun yap */
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* isteğe bağlı, arka plan rengi */
+}
+
+/* Form kutusu */
 .depo-form-card {
     background: #fff;
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     max-width: 600px;
-    margin: 3rem auto;
+    width: 100%; /* ekran genişliğine uyum sağlasın */
+    margin: 0; /* artık otomatik margin gerek yok */
+    box-sizing: border-box;
 }
+
 
 /* Başlık ve ikon */
 .depo-form-header {
