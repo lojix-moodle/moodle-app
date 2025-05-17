@@ -348,7 +348,7 @@ echo $OUTPUT->header();
 
             // Durum değişkenleri
             var currentPage = 1;
-            var pageSize = 10; // Başlangıç değeri
+            var pageSize = 10;
             var sortField = 'name';
             var sortDirection = 'asc';
 
@@ -358,25 +358,24 @@ echo $OUTPUT->header();
             var deleteModalText = document.getElementById('deleteModalText');
             var sortDropdown = document.getElementById('sortDropdown');
 
-            // Sayfa boyutunu ayarla
+            // Sayfa boyutunu başlangıçta ayarla
             pageSizeSelect.value = "10";
 
-            // Loading overlay gizle
+            // Loading overlay'i gizle
             window.addEventListener('load', function() {
                 loadingOverlay.style.display = 'none';
             });
 
-            // Silme butonu işlemi - Alert ekleme
+            // Silme butonlarına tıklama olayı - ÖNEMLİ: Burada alert eklenecek
             document.querySelectorAll('.delete-btn').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     var kategoriName = this.getAttribute('data-name');
-                    var kategoriId = this.getAttribute('data-id');
                     var deleteUrl = this.href;
 
-                    // Önce alert göster
+                    // Önce confirm ile uyarı göster
                     if (confirm('"' + kategoriName + '" kategorisini silmek istediğinizden emin misiniz?')) {
-                        // Ardından modal göster (daha detaylı onay için)
+                        // Kullanıcı OK'e tıkladıysa, modal içinde daha detaylı onay
                         deleteModalText.textContent = '"' + kategoriName + '" kategorisini silmek üzeresiniz. Bu işlem geri alınamaz!';
                         confirmDeleteBtn.href = deleteUrl;
                         deleteModal.show();
@@ -384,7 +383,7 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Silme onayı
+            // Modal'da silme onayı
             confirmDeleteBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 loadingOverlay.style.display = 'flex';
@@ -393,13 +392,13 @@ echo $OUTPUT->header();
                 }, 100);
             });
 
-            // Arama
+            // Arama işlevi
             searchInput.addEventListener('keyup', function() {
                 currentPage = 1;
-                applyFiltersAndPagination();
+                filterAndPaginate();
             });
 
-            // Sıralama
+            // Sıralama işlevi
             document.querySelectorAll('.sort-option').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -408,7 +407,7 @@ echo $OUTPUT->header();
                     sortField = parts[0];
                     sortDirection = parts[1];
                     sortDropdown.innerHTML = '<i class="fas fa-sort me-1"></i>' + this.textContent;
-                    applyFiltersAndPagination();
+                    filterAndPaginate();
                 });
             });
 
@@ -417,24 +416,24 @@ echo $OUTPUT->header();
                 var selectedValue = this.value;
                 pageSize = selectedValue === 'all' ? allRows.length : parseInt(selectedValue);
                 currentPage = 1;
-                applyFiltersAndPagination();
+                filterAndPaginate();
             });
 
-            // Filtreleme ve sayfalama
-            function applyFiltersAndPagination() {
-                // 1. Tüm satırları gizle
+            // Tablonun filtrelenmesi ve sayfalanması
+            function filterAndPaginate() {
+                // Önce tüm satırları gizle
                 allRows.forEach(function(row) {
                     row.style.display = 'none';
                 });
 
-                // 2. Arama filtresi
+                // Arama filtresi uygula
                 var searchTerm = searchInput.value.toLowerCase();
                 var filteredRows = allRows.filter(function(row) {
                     var kategoriName = row.querySelector('.category-name').textContent.toLowerCase();
                     return kategoriName.includes(searchTerm);
                 });
 
-                // 3. Sıralama
+                // Sıralama uygula
                 filteredRows.sort(function(a, b) {
                     var aValue, bValue;
 
@@ -451,7 +450,7 @@ echo $OUTPUT->header();
                     return 0;
                 });
 
-                // 4. Sayfalama hesapla
+                // Sayfalama hesapla
                 var totalItems = filteredRows.length;
                 var totalPages = Math.ceil(totalItems / pageSize);
 
@@ -459,7 +458,7 @@ echo $OUTPUT->header();
                     currentPage = totalPages;
                 }
 
-                // 5. Sadece gerekli satırları göster
+                // Sadece gerekli satırları göster
                 var startIndex = (currentPage - 1) * pageSize;
                 var endIndex = Math.min(startIndex + pageSize, totalItems);
 
@@ -467,16 +466,16 @@ echo $OUTPUT->header();
                     filteredRows[i].style.display = '';
                 }
 
-                // 6. Sayfalama kontrollerini güncelle
-                updatePaginationControls(totalItems);
+                // Sayfalama kontrollerini güncelle
+                updatePagination(totalItems);
 
-                // 7. Sayaçları güncelle
+                // Sayaçları güncelle
                 totalCountEl.textContent = allRows.length;
                 displayedCountEl.textContent = totalItems;
             }
 
-            // Sayfalama UI güncelleme
-            function updatePaginationControls(totalItems) {
+            // Sayfalama arayüzünü güncelleme
+            function updatePagination(totalItems) {
                 paginationContainer.innerHTML = '';
 
                 if (pageSizeSelect.value === 'all' || pageSize >= totalItems) {
@@ -491,20 +490,20 @@ echo $OUTPUT->header();
                 var endPage = Math.min(totalPages, startPage + 4);
 
                 if (currentPage > 1) {
-                    addPaginationItem(currentPage - 1, '«', 'Önceki');
+                    addPageItem(currentPage - 1, '«', 'Önceki');
                 }
 
                 for (var i = startPage; i <= endPage; i++) {
-                    addPaginationItem(i, i, '', i === currentPage);
+                    addPageItem(i, i, '', i === currentPage);
                 }
 
                 if (currentPage < totalPages) {
-                    addPaginationItem(currentPage + 1, '»', 'Sonraki');
+                    addPageItem(currentPage + 1, '»', 'Sonraki');
                 }
             }
 
-            // Sayfalama öğesi ekleme
-            function addPaginationItem(pageNum, text, ariaLabel, isActive) {
+            // Sayfalama öğesi oluşturma
+            function addPageItem(pageNum, text, ariaLabel, isActive) {
                 var li = document.createElement('li');
                 li.className = 'page-item' + (isActive ? ' active' : '');
 
@@ -518,16 +517,16 @@ echo $OUTPUT->header();
                 a.addEventListener('click', function(e) {
                     e.preventDefault();
                     currentPage = parseInt(this.getAttribute('data-page'));
-                    applyFiltersAndPagination();
+                    filterAndPaginate();
                 });
 
                 li.appendChild(a);
                 paginationContainer.appendChild(li);
             }
 
-            // İlk yükleme - kısa gecikme ile başlat
+            // Sayfa yüklendiğinde filtreleme ve sayfalamayı uygula
             setTimeout(function() {
-                applyFiltersAndPagination();
+                filterAndPaginate();
             }, 200);
         });
     </script>
