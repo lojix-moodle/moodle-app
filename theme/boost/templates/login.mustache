@@ -11,7 +11,7 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        background: linear-gradient(135deg, #1f1c2c, #928dab);
         font-family: 'Inter', sans-serif;
         display: flex;
         justify-content: center;
@@ -20,25 +20,25 @@
     }
 
     .login-container {
-        background: rgba(255, 255, 255, 0.07);
-        padding: 30px 25px;
-        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 30px 40px;
+        border-radius: 18px;
         width: 100%;
-        max-width: 360px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        animation: fadeIn 0.6s ease-in-out;
+        max-width: 480px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        animation: fadeIn 0.5s ease-in-out;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(10px); }
         to   { opacity: 1; transform: translateY(0); }
     }
 
     .login-container h2 {
-        font-size: 22px;
-        margin-bottom: 6px;
+        font-size: 24px;
+        margin-bottom: 8px;
         text-align: center;
         font-weight: 600;
     }
@@ -47,7 +47,7 @@
         font-size: 13px;
         text-align: center;
         margin-bottom: 25px;
-        color: #cfd8dc;
+        color: #dbe4ea;
     }
 
     .login-container form {
@@ -57,11 +57,12 @@
 
     .login-container input[type="text"],
     .login-container input[type="password"] {
-        padding: 10px 12px;
-        margin-bottom: 15px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
         border: none;
         border-radius: 8px;
-        font-size: 14px;
+        font-size: 15px;
+        color: #000;
     }
 
     .login-container .btn-primary {
@@ -70,18 +71,19 @@
         padding: 10px;
         border-radius: 8px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 15px;
         transition: 0.3s;
+        color: white;
     }
 
     .login-container .btn-primary:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
+        opacity: 0.95;
+        transform: scale(1.01);
     }
 
     .login-container .additional-links {
-        font-size: 12px;
-        margin-top: 10px;
+        font-size: 13px;
+        margin-top: 14px;
         text-align: center;
     }
 
@@ -97,11 +99,11 @@
     @media (max-width: 480px) {
         .login-container {
             padding: 24px 20px;
-            max-width: 90%;
+            max-width: 92%;
         }
 
         .login-container h2 {
-            font-size: 20px;
+            font-size: 21px;
         }
     }
 </style>
@@ -111,7 +113,7 @@
 
     <div class="login-container">
         <h2>Hoş Geldiniz</h2>
-        <p>Lojix:Depo Yönetim Paneli</p>
+        <p>Lütfen giriş bilgilerinizi girin</p>
         {{{ output.main_content }}}
     </div>
 
