@@ -1,34 +1,33 @@
+@import "https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css";
+
 body {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  font-family: 'Open Sans', sans-serif;
-}
-
-.login-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.login-container {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
-.login-container h2 {
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  font-family: 'Roboto', sans-serif;
   color: #333;
-  margin-bottom: 20px;
 }
 
-.login-container a {
-  color: #1e3c72;
-  font-weight: bold;
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.login-container a:hover {
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.login-card h2 {
+  color: #4e54c8;
+}
+
+.login-card a {
+  color: #4e54c8;
+  font-weight: 500;
+}
+
+.login-card a:hover {
   text-decoration: underline;
 }
