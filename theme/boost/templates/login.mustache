@@ -406,6 +406,7 @@
         const tabIndicator = document.querySelector('.active-tab-indicator');
 
         // Process any existing Moodle login form
+        // Process any existing Moodle login form
         function processMoodleForm() {
             // Find and process Moodle's form elements
             const moodleForm = document.querySelector('#login-form form');
@@ -420,6 +421,7 @@
                     newInput.className = 'form-input';
                     newInput.placeholder = ' ';
                     newInput.required = true;
+                    newInput.value = input.value; // Mevcut değeri kopyala
 
                     const formGroup = document.createElement('div');
                     formGroup.className = 'form-group';
@@ -436,28 +438,86 @@
 
                     const label = document.createElement('label');
                     label.setAttribute('for', newInput.id);
-                    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+                    label.textContent = input.name === 'username' ? 'Kullanıcı Adı' :
+                            (input.name === 'password' ? 'Şifre' :
+                                    input.name.charAt(0).toUpperCase() + input.name.slice(1));
 
                     formGroup.appendChild(newInput);
                     formGroup.appendChild(icon);
                     formGroup.appendChild(label);
 
-                    loginForm.querySelector('form') ?
-                            loginForm.querySelector('form').insertBefore(formGroup, loginForm.querySelector('button')) :
-                            loginForm.appendChild(formGroup);
+                    if (loginForm.querySelector('form')) {
+                        const submitBtn = loginForm.querySelector('.submit-btn');
+                        if (submitBtn) {
+                            loginForm.querySelector('form').insertBefore(formGroup, submitBtn);
+                        } else {
+                            loginForm.querySelector('form').appendChild(formGroup);
+                        }
+                    } else {
+                        // Eğer form yok ise yeni bir form oluştur
+                        const newForm = document.createElement('form');
+                        newForm.id = 'login-form-element';
+                        newForm.method = moodleForm.method;
+                        newForm.action = moodleForm.action;
 
-                    // Hide original input
+                        newForm.appendChild(formGroup);
+                        loginForm.appendChild(newForm);
+                    }
+
+                    // Orijinal input'u gizle
                     input.style.display = 'none';
 
-                    // Sync values
+                    // Değerleri senkronize et
                     newInput.addEventListener('input', function() {
                         input.value = newInput.value;
                     });
                 });
 
-                // Process submit button
-                const submitBtn = moodleForm.querySelector('input[type="submit"]');
+                // Submit butonunu işle
+                const submitBtn = moodleForm.querySelector('input[type="submit"], button[type="submit"]');
                 if (submitBtn) {
+                    // Eğer zaten bir submit butonu eklenmişse, tekrar ekleme
+                    if (!loginForm.querySelector('.submit-btn')) {
+                        const newBtn = document.createElement('button');
+                        newBtn.type = 'submit';
+                        newBtn.className = 'submit-btn';
+
+                        const btnText = document.createElement('span');
+                        btnText.className = 'btn-text';
+                        btnText.textContent = 'Giriş Yap';
+
+                        const loader = document.createElement('div');
+                        loader.className = 'loader';
+
+                        newBtn.appendChild(btnText);
+                        newBtn.appendChild(loader);
+
+                        // Form yoksa oluştur
+                        if (!loginForm.querySelector('form')) {
+                            const customForm = document.createElement('form');
+                            customForm.id = 'login-form-element';
+                            customForm.method = moodleForm.method;
+                            customForm.action = moodleForm.action;
+                            loginForm.appendChild(customForm);
+                        }
+
+                        // Yeni butonu forma ekle
+                        loginForm.querySelector('form').appendChild(newBtn);
+
+                        // Orijinal butonu gizle
+                        submitBtn.style.display = 'none';
+
+                        // Form gönderimini senkronize et
+                        newBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            this.parentElement.classList.add('submitting');
+                            setTimeout(function() {
+                                submitBtn.click();
+                            }, 800);
+                        });
+                    }
+                } else {
+                    // Eğer orijinal form butonu yoksa, kendi butonumuzu ekleyelim
                     const newBtn = document.createElement('button');
                     newBtn.type = 'submit';
                     newBtn.className = 'submit-btn';
@@ -472,33 +532,28 @@
                     newBtn.appendChild(btnText);
                     newBtn.appendChild(loader);
 
-                    // Create a custom form if one doesn't exist
-                    if (!loginForm.querySelector('form')) {
+                    if (loginForm.querySelector('form')) {
+                        loginForm.querySelector('form').appendChild(newBtn);
+                    } else {
                         const customForm = document.createElement('form');
                         customForm.id = 'login-form-element';
-                        customForm.method = moodleForm.method;
-                        customForm.action = moodleForm.action;
+                        customForm.method = 'post';
+                        customForm.action = '';
+                        customForm.appendChild(newBtn);
                         loginForm.appendChild(customForm);
                     }
 
-                    // Add the new button to our form
-                    loginForm.querySelector('form').appendChild(newBtn);
-
-                    // Hide original button
-                    submitBtn.style.display = 'none';
-
-                    // Sync submission
                     newBtn.addEventListener('click', function(e) {
                         e.preventDefault();
-                        newBtn.parentElement.classList.add('submitting');
+                        this.parentElement.classList.add('submitting');
                         setTimeout(function() {
-                            submitBtn.click();
-                        }, 800);
+                            this.parentElement.submit();
+                        }.bind(this), 800);
                     });
                 }
             }
 
-            // Hide all Moodle's original elements
+            // Moodle'ın orijinal öğelerini gizle
             const moodleElements = document.querySelectorAll('#login-form > *:not(form), #login-form form > *:not(.form-group):not(.submit-btn)');
             moodleElements.forEach(function(el) {
                 el.style.display = 'none';
