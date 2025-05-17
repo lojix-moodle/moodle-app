@@ -22,7 +22,8 @@ class depo_ekle_form extends moodleform {
         global $DB;
         $mform = $this->_form;
 
-        $mform->addElement('html', '<div class="card shadow-sm border-0">
+        $mform->addElement('html', '
+        <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="form-header text-center mb-4">
                     <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
@@ -31,21 +32,21 @@ class depo_ekle_form extends moodleform {
                     <h3 class="form-title">Yeni Depo Ekle</h3>
                     <p class="text-muted">Lütfen aşağıdaki formu doldurun</p>
                 </div>
+                <div class="row g-3">
+        ');
 
-                <div class="form-floating mb-4">');
-
-        $mform->addElement('text', 'name', '', [
+        // Depo Adı
+        $mform->addElement('html', '<div class="col-md-6">');
+        $mform->addElement('text', 'name', 'Depo Adı', [
             'class' => 'form-control',
             'placeholder' => 'Depo Adı',
             'id' => 'depoAdi'
         ]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addElement('html', '</div>');
 
-        $mform->addElement('html', '<label for="depoAdi">Depo Adı <span class="text-danger">*</span></label>
-                </div>');
-
-        // Depo sorumlusu seçimi
+        // Depo Sorumlusu
         $admins = get_admins();
         $admin_ids = array_map(fn($a) => $a->id, $admins);
         $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
@@ -60,26 +61,29 @@ class depo_ekle_form extends moodleform {
             }
         }
 
-        $mform->addElement('html', '<div class="form-floating mb-4">');
-        $mform->addElement('select', 'sorumluid', '', $user_options, [
+        $mform->addElement('html', '<div class="col-md-6">');
+        $mform->addElement('select', 'sorumluid', 'Depo Sorumlusu', $user_options, [
             'class' => 'form-select',
             'id' => 'depoSorumlusu'
         ]);
         $mform->setType('sorumluid', PARAM_INT);
-        $mform->addElement('html', '<label for="depoSorumlusu">Depo Sorumlusu <span class="text-danger">*</span></label>
-                </div>');
+        $mform->addRule('sorumluid', null, 'required', null, 'client');
+        $mform->addElement('html', '</div>');
 
         // Butonlar
-        $mform->addElement('html', '<div class="d-grid gap-2">');
-        $mform->addElement('submit', 'submitbutton', 'Depoyu Kaydet', [
-            'class' => 'btn btn-primary btn-lg'
-        ]);
         $mform->addElement('html', '
-                <a href="' . new moodle_url('/my') . '" class="btn btn-light btn-lg">
+            <div class="col-12 d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary me-2">Depoyu Kaydet</button>
+                <a href="' . new moodle_url('/my') . '" class="btn btn-light">
                     <i class="fas fa-arrow-left me-2"></i>Geri
                 </a>
             </div>
-        </div></div>');
+        ');
+
+        $mform->addElement('html', '
+                </div>
+            </div>
+        </div>');
     }
 }
 
@@ -107,136 +111,83 @@ if ($form->is_cancelled()) {
 echo $OUTPUT->header();
 ?>
 
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 2rem auto;
-        }
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
 
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        .form-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
 
-        .card {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
-        }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
 
-        /* Form elemanları düzenlemeleri */
-        .form-floating {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
+    .form-control,
+    .form-select {
+        height: 48px;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 2px solid #edf2f7;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        background-color: #fff;
+    }
 
-        .form-floating > .form-control,
-        .form-floating > .form-select {
-            height: 60px;
-            line-height: 1.25;
-            padding: 1rem 0.75rem;
-            font-size: 1rem;
-        }
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0f6fc5;
+        box-shadow: 0 0 0 0.25rem rgba(15, 111, 197, 0.1);
+        outline: 0;
+    }
 
-        .form-floating > label {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: auto;
-            padding: 1rem;
-            overflow: hidden;
-            text-align: start;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            pointer-events: none;
-            border: 1px solid transparent;
-            transform-origin: 0 0;
-            transition: opacity .15s ease-in-out, transform .15s ease-in-out;
-            color: #6c757d;
-            z-index: 1;
-        }
+    .btn {
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
 
-        .form-floating > .form-control:focus ~ label,
-        .form-floating > .form-control:not(:placeholder-shown) ~ label,
-        .form-floating > .form-select ~ label {
-            transform: scale(0.85) translateY(-1rem) translateX(0.15rem);
-            background: #fff;
-            padding: 0 0.5rem;
-            height: auto;
-            color: #0f6fc5;
-        }
+    .btn-primary {
+        background: #0f6fc5;
+        border: none;
+    }
 
-        .form-control,
-        .form-select {
-            border: 2px solid #edf2f7;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            background-color: #fff;
-        }
+    .btn-primary:hover {
+        background: #0d5aa1;
+        transform: translateY(-1px);
+    }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #0f6fc5;
-            box-shadow: 0 0 0 0.25rem rgba(15, 111, 197, 0.1);
-            outline: 0;
-        }
+    .btn-light {
+        background: #f8f9fa;
+        border: 2px solid #edf2f7;
+    }
 
-        /* Buton stilleri */
-        .btn {
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+    .btn-light:hover {
+        background: #e9ecef;
+        border-color: #dee2e6;
+    }
+</style>
 
-        .btn-primary {
-            background: #0f6fc5;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: #0d5aa1;
-            transform: translateY(-1px);
-        }
-
-        .btn-light {
-            background: #f8f9fa;
-            border: 2px solid #edf2f7;
-            margin-top: 0.5rem;
-        }
-
-        .btn-light:hover {
-            background: #e9ecef;
-            border-color: #dee2e6;
-        }
-
-        /* Yıldız işareti */
-        .text-danger {
-            color: #dc3545;
-            font-weight: bold;
-            margin-left: 2px;
-        }
-
-        /* Form düğmeleri arası boşluk */
-        .d-grid {
-            gap: 0.75rem !important;
-        }
-    </style>
-
-    <div class="form-container">
-        <?php $form->display(); ?>
-    </div>
+<div class="form-container">
+    <?php $form->display(); ?>
+</div>
 
 <?php
 echo $OUTPUT->footer();
