@@ -223,59 +223,64 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to enhance Moodle's login form
+        function enhanceLoginForm() {
+            // Fix login form elements
+            var loginInputs = document.querySelectorAll('#login-form input[type="text"], #login-form input[type="password"]');
+            loginInputs.forEach(function(input) {
+                input.classList.add('form-input');
+            });
+
+            var loginButton = document.querySelector('#login-form input[type="submit"]');
+            if (loginButton) {
+                loginButton.value = "Giriş Yap";
+            }
+
+            // Hide unnecessary elements
+            var loginLinks = document.querySelectorAll('#login-form a');
+            loginLinks.forEach(function(link) {
+                link.style.display = 'none';
+            });
+
+            // Hide the text shown in the image
+            var guestAccessText = document.querySelectorAll('.login-form-section p, .login-form-section h1, .login-form-section h2, .login-form-section h3');
+            guestAccessText.forEach(function(element) {
+                element.style.display = 'none';
+            });
+
+            // Hide any guest access buttons
+            var guestButtons = document.querySelectorAll('.login-form-section a.btn, .login-form-section button.btn');
+            guestButtons.forEach(function(button) {
+                button.style.display = 'none';
+            });
+        }
+
+        // Get tab elements
+        var loginTab = document.getElementById('login-tab');
+        var registerTab = document.getElementById('register-tab');
+        var loginForm = document.getElementById('login-form');
+        var registerForm = document.getElementById('register-form');
+
+        // Add click event listeners to tabs
+        loginTab.addEventListener('click', function() {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        registerTab.addEventListener('click', function() {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        // Run enhancement functions
+        enhanceLoginForm();
+    });
+</script>
 </body>
 </html>
-
-{{#js}}
-    M.util.js_pending('theme_boost/loader');
-    require(['theme_boost/loader'], function() {
-    M.util.js_complete('theme_boost/loader');
-
-    // Tab switching functionality
-    document.addEventListener('DOMContentLoaded', function() {
-    // Function to enhance Moodle's login form
-    function enhanceLoginForm() {
-    // Fix login form elements
-    var loginInputs = document.querySelectorAll('#login-form input[type="text"], #login-form input[type="password"]');
-    loginInputs.forEach(function(input) {
-    input.classList.add('form-input');
-    });
-
-    var loginButton = document.querySelector('#login-form input[type="submit"]');
-    if (loginButton) {
-    loginButton.value = "Giriş Yap";
-    }
-
-    // Hide unnecessary elements
-    var loginLinks = document.querySelectorAll('#login-form a');
-    loginLinks.forEach(function(link) {
-    link.style.display = 'none';
-    });
-    }
-
-    // Get tab elements
-    var loginTab = document.getElementById('login-tab');
-    var registerTab = document.getElementById('register-tab');
-    var loginForm = document.getElementById('login-form');
-    var registerForm = document.getElementById('register-form');
-
-    // Add click event listeners to tabs
-    loginTab.addEventListener('click', function() {
-    loginTab.classList.add('active');
-    registerTab.classList.remove('active');
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
-    });
-
-    registerTab.addEventListener('click', function() {
-    registerTab.classList.add('active');
-    loginTab.classList.remove('active');
-    registerForm.style.display = 'block';
-    loginForm.style.display = 'none';
-    });
-
-    // Run enhancement functions
-    enhanceLoginForm();
-    });
-    });
-{{/js}}
