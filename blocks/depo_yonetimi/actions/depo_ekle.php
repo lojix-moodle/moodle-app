@@ -277,7 +277,12 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             // Log kaydı oluşturma (siz istemediğiniz için bu kısmı siliyoruz)
 
-            $DB->commit_delegated_transaction();
+            $transaction = $DB->start_delegated_transaction();
+            $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
+
+            $DB->commit_delegated_transaction($transaction);
+
+
 
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
