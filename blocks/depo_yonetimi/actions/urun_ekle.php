@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Renk ve boyut verilerini al
     // Renk ve boyut verilerini al
-    $colors = clean_array($_POST['colors']);
-    $sizes = clean_array($_POST['sizes']);
+    $colors = optional_param_array('colors', [], PARAM_CLEAN);
+    $sizes = optional_param_array('sizes', [], PARAM_CLEAN);
     $varyasyonlar = optional_param_array('varyasyon', [], PARAM_CLEAN);
 
     $transaction = $DB->start_delegated_transaction();

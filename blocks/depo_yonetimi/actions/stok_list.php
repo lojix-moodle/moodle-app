@@ -307,31 +307,5 @@ function get_string_from_value($value, $type) {
     return $value;
 }
 
-/**
- * Bir diziyi temizler, boş değerleri kaldırır ve HTML karakterlerini güvenli hale getirir
- *
- * @param array $array Temizlenecek dizi
- * @return array Temizlenmiş dizi
- */
-function clean_array($array) {
-    if (!is_array($array)) {
-        return [];
-    }
-
-    $temiz_dizi = [];
-    foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            $temiz_dizi[$key] = clean_array($value);
-        } else {
-            // Boş değerleri atla
-            if ($value !== '' && $value !== null) {
-                $temiz_dizi[$key] = clean_param($value, PARAM_TEXT);
-            }
-        }
-    }
-
-    return $temiz_dizi;
-}
-
 echo $OUTPUT->footer();
 ?>
