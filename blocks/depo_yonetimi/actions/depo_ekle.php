@@ -282,7 +282,7 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             // Moodle'un standart yönlendirme fonksiyonunu kullanın
             redirect(
-                new moodle_url('/blocks/depo_yonetimi/index.php'),
+                new moodle_url('/my '),
                 'Depo başarıyla eklendi.',
                 0,  // Hemen yönlendirme
                 \core\output\notification::NOTIFY_SUCCESS
