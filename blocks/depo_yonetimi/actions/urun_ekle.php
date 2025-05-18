@@ -181,7 +181,7 @@ echo $OUTPUT->header();
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                    <select multiple class="form-select" id="colors" name="colors[]" size="4">
+                                    <select multiple class="form-control" id="colors" name="colors[]" size="4">
                                         <option value="kirmizi">Kırmızı</option>
                                         <option value="mavi">Mavi</option>
                                         <option value="siyah">Siyah</option>
@@ -205,7 +205,7 @@ echo $OUTPUT->header();
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                                    <select multiple class="form-select" id="sizes" name="sizes[]" size="4">
+                                    <select multiple class="form-control" id="sizes" name="sizes[]" size="4">
                                         <option value="xs">XS</option>
                                         <option value="s">S</option>
                                         <option value="m">M</option>
