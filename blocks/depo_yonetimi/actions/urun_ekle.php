@@ -443,53 +443,54 @@ echo $OUTPUT->header();
                                 <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
                             </div>
 
-                            <!-- Renkler ve Boyutlar (Alt Alta) -->
-                            <!-- Renkler -->
-                            <div class="mb-4">
-                                <label for="colors" class="form-label">
-                                    <i class="fas fa-palette me-2 text-primary"></i>Renkler
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                    <select multiple class="form-select" id="colors" name="colors[]" size="5">
-                                        <option value="kirmizi">Kırmızı</option>
-                                        <option value="mavi">Mavi</option>
-                                        <option value="siyah">Siyah</option>
-                                        <option value="beyaz">Beyaz</option>
-                                        <option value="yesil">Yeşil</option>
-                                        <option value="sari">Sarı</option>
-                                        <option value="turuncu">Turuncu</option>
-                                        <option value="mor">Mor</option>
-                                        <option value="pembe">Pembe</option>
-                                        <option value="gri">Gri</option>
-                                    </select>
+                            <!-- Renkler ve Boyutlar (Yan Yana) -->
+                            <div class="row mb-4">
+                                <!-- Renkler - Sol Kolon -->
+                                <div class="col-md-6">
+                                    <label for="colors" class="form-label">
+                                        <i class="fas fa-palette me-2 text-primary"></i>Renkler
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                                        <select multiple class="form-select" id="colors" name="colors[]" size="5">
+                                            <option value="kirmizi">Kırmızı</option>
+                                            <option value="mavi">Mavi</option>
+                                            <option value="siyah">Siyah</option>
+                                            <option value="beyaz">Beyaz</option>
+                                            <option value="yesil">Yeşil</option>
+                                            <option value="sari">Sarı</option>
+                                            <option value="turuncu">Turuncu</option>
+                                            <option value="mor">Mor</option>
+                                            <option value="pembe">Pembe</option>
+                                            <option value="gri">Gri</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-text small">
+                                        <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+                                    </div>
                                 </div>
-                                <div class="form-text small">
-                                    <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-                                </div>
-                            </div>
 
-                            <!-- Boyutlar -->
-                            <div class="mb-4">
-                                <label for="sizes" class="form-label">
-                                    <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                                    <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
-                                        <option value="xs">XS</option>
-                                        <option value="s">S</option>
-                                        <option value="m">M</option>
-                                        <option value="l">L</option>
-                                        <option value="xl">XL</option>
-                                        <option value="xxl">XXL</option>
-                                        <option value="xxxl">XXXL</option>
-                                    </select>
+                                <!-- Boyutlar - Sağ Kolon -->
+                                <div class="col-md-6">
+                                    <label for="sizes" class="form-label">
+                                        <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                                        <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
+                                            <option value="xs">XS</option>
+                                            <option value="s">S</option>
+                                            <option value="m">M</option>
+                                            <option value="l">L</option>
+                                            <option value="xl">XL</option>
+                                            <option value="xxl">XXL</option>
+                                            <option value="xxxl">XXXL</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-text small">
+                                        <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+                                    </div>
                                 </div>
-                                <div class="form-text small">
-                                    <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-                                </div>
-                            </div>
                             </div>
                         </div>
 
@@ -537,23 +538,23 @@ echo $OUTPUT->header();
                                         <!-- JavaScript ile dinamik oluşturulacak -->
                                         </tbody>
                                     </table>
+                                </div>
 
-                                    <!-- Sayfalama Kontrolleri -->
-                                    <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
-                                        <div class="pagination-info">
-                                            <span id="pageInfo">Sayfa 1 / 1</span>
-                                        </div>
-                                        <div class="pagination-controls">
-                                            <button type="button" id="prevPage" class="btn btn-sm btn-outline-primary me-2" disabled>
-                                                <i class="fas fa-chevron-left"></i> Önceki
-                                            </button>
-                                            <button type="button" id="nextPage" class="btn btn-sm btn-outline-primary" disabled>
-                                                Sonraki <i class="fas fa-chevron-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <!-- Sayfalama Bilgisi -->
+                                <div id="pageInfo" class="text-center text-muted mt-2"></div>
+
+                                <!-- Sayfalama Kontrolleri -->
+                                <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
+                                    <button id="prevPage" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-chevron-left me-1"></i> Önceki
+                                    </button>
+                                    <button id="nextPage" class="btn btn-sm btn-outline-primary">
+                                        Sonraki <i class="fas fa-chevron-right ms-1"></i>
+                                    </button>
                                 </div>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
                             </div>
                         </div>
                     </div>
