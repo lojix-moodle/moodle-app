@@ -364,7 +364,7 @@ class block_depo_yonetimi extends block_base {
                     if (!empty($depo->sorumluid)) {
                         $sorumlu = $DB->get_record('user', ['id' => $depo->sorumluid]);
                         if ($sorumlu) {
-                            $sorumlu_ismi = $sorumlu->fullname;
+                            $sorumlu_ismi = fullname($sorumlu);
                         }
                     }
 
