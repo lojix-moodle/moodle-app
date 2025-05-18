@@ -79,12 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             }
-
-            // Ana ürünün toplam varyasyon sayısını güncelle
-            if ($total_variants > 0) {
-                $ana_urun->variant_count = $total_variants;
-                $DB->update_record('block_depo_yonetimi_urunler', $ana_urun);
-            }
         }
 
         $DB->commit_delegated_transaction($transaction);
@@ -582,16 +576,22 @@ echo $OUTPUT->header();
 
             // Varyasyon oluşturma
             varyasyonOlusturBtn.addEventListener('click', function() {
-                const selectedColors = Array.from(colorSelect.selectedOptions).map(option => ({
-                    value: option.value,
-                    text: option.text
-                }));
+                // Seçilen renkler ve boyutları al
+                const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
+                    return {
+                        value: opt.value,
+                        text: opt.text
+                    };
+                });
 
-                const selectedSizes = Array.from(sizeSelect.selectedOptions).map(option => ({
-                    value: option.value,
-                    text: option.text
-                }));
+                const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
+                    return {
+                        value: opt.value,
+                        text: opt.text
+                    };
+                });
 
+                // Hiçbir seçim yapılmadıysa uyarı ver
                 if (selectedColors.length === 0 || selectedSizes.length === 0) {
                     Swal.fire({
                         icon: 'warning',
@@ -603,47 +603,45 @@ echo $OUTPUT->header();
                     return;
                 }
 
-                // Varyasyon tablosunu temizle
-                const tableBody = varyasyonTablo.querySelector('tbody');
-                tableBody.innerHTML = '';
+                // Varyasyon bölümünü göster
+                varyasyonBolumu.classList.remove('d-none');
 
-                // Her renk ve boyut kombinasyonu için satır ekle
-                selectedColors.forEach((color, colorIdx) => {
-                    selectedSizes.forEach((size, sizeIdx) => {
+                // Tabloyu temizle
+                varyasyonTablo.innerHTML = '';
+
+                // Tüm renk-boyut kombinasyonları için satır oluştur
+                selectedColors.forEach(color => {
+                    selectedSizes.forEach(size => {
                         const row = document.createElement('tr');
 
-                        // Renk hücresi
-                        const colorCell = document.createElement('td');
-                        colorCell.className = 'd-flex align-items-center';
+                        // Renk + Boyut hücresi
+                        const variantCell = document.createElement('td');
+                        variantCell.className = 'd-flex align-items-center';
 
-                        // Renk örneği (küçük renkli daire)
+                        // Renk göstergesi
                         const colorBadge = document.createElement('span');
-                        colorBadge.className = 'color-badge';
+                        colorBadge.className = 'badge me-2';
                         colorBadge.style.backgroundColor = getColorHex(color.value);
                         colorBadge.style.color = getContrastColor(color.value);
+                        colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
 
-                        colorCell.appendChild(colorBadge);
-                        colorCell.appendChild(document.createTextNode(color.text));
-
-                        // Boyut hücresi
-                        const sizeCell = document.createElement('td');
-                        sizeCell.textContent = size.text;
+                        variantCell.appendChild(colorBadge);
+                        variantCell.appendChild(document.createTextNode(color.text + ' / ' + size.text));
 
                         // Stok miktarı hücresi
                         const stockCell = document.createElement('td');
                         const stockInput = document.createElement('input');
                         stockInput.type = 'number';
-                        stockInput.name = `varyasyon[${color.index}_${size.index}]`;
+                        // Doğru name formatı - sorun buradaydı
+                        stockInput.name = `varyasyon[${color.value}][${size.value}]`;
                         stockInput.className = 'form-control form-control-sm';
                         stockInput.min = 0;
                         stockInput.value = 0;
-                        stockInput.dataset.color = color.value;
-                        stockInput.dataset.size = size.value;
+                        stockInput.required = true;
 
                         stockCell.appendChild(stockInput);
 
-                        row.appendChild(colorCell);
-                        row.appendChild(sizeCell);
+                        row.appendChild(variantCell);
                         row.appendChild(stockCell);
                         varyasyonTablo.appendChild(row);
                     });
