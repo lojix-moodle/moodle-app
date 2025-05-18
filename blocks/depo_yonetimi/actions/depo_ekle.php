@@ -155,7 +155,7 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn" name="submit">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>"
+                                <a href="<?php echo $CFG->wwwroot . '/blocks/depo_yonetimi/index.php'; ?>"
                                    class="btn btn-outline-secondary ms-auto">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
@@ -210,7 +210,8 @@ echo $OUTPUT->header();
                             }
                         })
                     } else {
-                        // Form geçerli ise yükleme animasyonunu göster
+                        // Form geçerli ise sadece yükleme animasyonunu göster
+                        // Normal form submit işleminin devam etmesine izin ver
                         loadingOverlay.style.display = 'flex'
                         submitBtn.disabled = true
                     }
@@ -250,6 +251,7 @@ if (isset($_POST['submit'])) {
         $newdepo->timecreated = time();
         $newdepo->timemodified = time();
         $newdepo->createdby = $USER->id;
+
         try {
             $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
@@ -264,14 +266,18 @@ if (isset($_POST['submit'])) {
 
             $DB->commit_delegated_transaction();
 
-            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+            // Sabit URL kullan, moodle_url nesnesini kullanmak yerine
+            $redirect_url = $CFG->wwwroot . '/blocks/depo_yonetimi/index.php';
+            echo "<script>window.location.href = '$redirect_url';</script>";
+            die(); // JavaScript yönlendirmeden sonra koşulun devam etmesi engelleniyor
         } catch (Exception $e) {
-            // Hatalı kod: $DB->rollback_delegated_transaction();
-            // Düzeltilmiş kod:
+            // Hata durumunda transaction'ı geri al
             if ($DB->is_transaction_started()) {
                 $DB->force_transaction_rollback();
             }
-            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+
+            // Hata mesajını göster
+            \core\notification::error('Depo eklenirken bir hata oluştu: ' . $e->getMessage());
         }
     } else {
         // Hata varsa göster
