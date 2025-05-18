@@ -151,9 +151,18 @@ echo $OUTPUT->header();
 
                                         if (!empty($available_user_ids)) {
                                             list($insql, $inparams) = $DB->get_in_or_equal($available_user_ids);
-                                            $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams, 'lastname, firstname');
+                                            $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams);
+
+                                            // Kullanıcıları tam adlarına göre sırala
+                                            $sorted_users = [];
                                             foreach ($users as $user) {
-                                                echo '<option value="'.$user->id.'">'.fullname($user).'</option>';
+                                                $sorted_users[$user->id] = fullname($user);
+                                            }
+                                            asort($sorted_users); // Alfabetik olarak sırala
+
+                                            // Sıralanmış kullanıcıları göster
+                                            foreach ($sorted_users as $userid => $fullname) {
+                                                echo '<option value="'.$userid.'">'.htmlspecialchars($fullname).'</option>';
                                             }
                                         }
                                         ?>
