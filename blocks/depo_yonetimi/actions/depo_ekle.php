@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../../../config.php');
+require_once(DIR . '/../../../config.php');
 global $CFG, $PAGE, $OUTPUT, $DB, $USER;
 require_once($CFG->libdir . '/formslib.php');
 
@@ -272,8 +272,7 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $newdepo->createdby = $USER->id;
 
         try {
-            $transaction = $DB->start_delegated_transaction();
-
+            $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             $log = new stdClass();
@@ -284,14 +283,14 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $log->timecreated = time();
             $DB->insert_record('block_depo_yonetimi_logs', $log);
 
-            $transaction->allow_commit();
+            $DB->commit_delegated_transaction();
 
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            $transaction->rollback($e); // ← Hata burada çözülüyor
+            // Fix: Add the required parameters to rollback_delegated_transaction
+            $DB->rollback_delegated_transaction($e, false);
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
-
     } else {
         // Hata varsa göster
         foreach ($errors as $key => $error) {
