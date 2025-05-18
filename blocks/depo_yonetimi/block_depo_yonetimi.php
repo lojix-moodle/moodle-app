@@ -113,6 +113,8 @@ class block_depo_yonetimi extends block_base {
                 'id' => $urun->id,
                 'name' => $urun->name,
                 'adet' => $urun->adet,
+                'stok_miktari' => $urun->stok_miktari, // Bu satırı ekleyin
+
                 'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                     'depoid' => $depoid,
                     'urunid' => $urun->id
