@@ -155,7 +155,7 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo $CFG->wwwroot . '/blocks/depo_yonetimi/index.php'; ?>"
+                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>"
                                    class="btn btn-outline-secondary ms-auto">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
@@ -200,32 +200,51 @@ echo $OUTPUT->header();
                 // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
+                        event.preventDefault()
+                        event.stopPropagation()
 
                         // Geçersiz alanları işaretle
                         Array.prototype.slice.call(inputs).forEach(function(input) {
                             if (!input.checkValidity()) {
-                                input.classList.add('is-invalid');
+                                input.classList.add('is-invalid')
                             }
-                        });
+                        })
                     } else {
-                        // Form geçerli ise yükleme animasyonunu göster ve formu normal şekilde gönder
-                        loadingOverlay.style.display = 'flex';
-                        submitBtn.disabled = true;
-                        // Form submit fonksiyonun normal çalışmasına izin ver
-                        return true;
+                        // Form geçerli ise yükleme animasyonunu göster
+                        loadingOverlay.style.display = 'flex'
+                        submitBtn.disabled = true
+
+                        // Form verileri
+                        var name = document.getElementById('name').value.trim()
+                        var sorumluid = document.getElementById('sorumluid').value
+
+                        if (name === '' || sorumluid === '') {
+                            event.preventDefault()
+                            loadingOverlay.style.display = 'none'
+                            submitBtn.disabled = false
+                            return false
+                        }
+
+                        // Form post işlemi
+                        var formData = new FormData()
+                        formData.append('name', name)
+                        formData.append('sorumluid', sorumluid)
+                        formData.append('submit', 'true')
+                        formData.append('sesskey', document.querySelector('input[name="sesskey"]').value)
+
+                        // Normal form gönderimi devam edecek
+                        return true
                     }
 
-                    form.classList.add('was-validated');
-                }, false);
+                    form.classList.add('was-validated')
+                }, false)
             })
         })()
     </script>
 
 <?php
 // Form işleme
-if (isset($_POST['submit'])) {
+if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
     require_sesskey();
 
     $name = required_param('name', PARAM_TEXT);
@@ -252,6 +271,7 @@ if (isset($_POST['submit'])) {
         $newdepo->timecreated = time();
         $newdepo->timemodified = time();
         $newdepo->createdby = $USER->id;
+
         try {
             $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
@@ -266,16 +286,10 @@ if (isset($_POST['submit'])) {
 
             $DB->commit_delegated_transaction();
 
-            // URL direkt tanımlayalım
-            $redirect_url = $CFG->wwwroot . '/blocks/depo_yonetimi/index.php';
-            redirect($redirect_url, 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            if ($DB->is_transaction_started()) {
-                $DB->force_transaction_rollback();
-            }
-            // Hata durumunda URL'yi direkt belirtelim
-            $redirect_url = $CFG->wwwroot . '/blocks/depo_yonetimi/actions/depo_ekle.php';
-            redirect($redirect_url, 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+            $DB->rollback_delegated_transaction();
+            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
         // Hata varsa göster
