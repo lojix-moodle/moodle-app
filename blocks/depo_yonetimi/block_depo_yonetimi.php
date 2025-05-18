@@ -131,7 +131,6 @@ class block_depo_yonetimi extends block_base {
 
         $html = '
             <div class="depo-dashboard">
-                <!-- Üst Panel -->
                 <div class="depo-header mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
@@ -153,8 +152,7 @@ class block_depo_yonetimi extends block_base {
                         </div>
                     </div>
                 </div>
-                
-                <!-- Filtreleme ve Arama -->
+
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <div class="row">
@@ -185,8 +183,7 @@ class block_depo_yonetimi extends block_base {
                         </div>
                     </div>
                 </div>
-                
-                <!-- Ürün Tablosu -->
+
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -260,29 +257,29 @@ class block_depo_yonetimi extends block_base {
                     </div>
                 </div>
             </div>
-            
+
             <script>
             document.addEventListener("DOMContentLoaded", function() {
                 // Arama fonksiyonu
                 const searchInput = document.getElementById("urunArama");
                 const kategoriSelect = document.getElementById("kategoriFiltre");
                 const urunSatirlar = document.querySelectorAll("table.urun-tablosu tbody tr");
-                
+
                 function filterTable() {
                     const searchTerm = searchInput.value.toLowerCase();
                     const kategoriFiltre = kategoriSelect.value.toLowerCase();
-                    
+
                     urunSatirlar.forEach(satir => {
                         const urunAdi = satir.querySelector("td:first-child strong").textContent.toLowerCase();
                         const kategori = satir.getAttribute("data-kategori").toLowerCase();
-                        
+
                         const searchMatch = urunAdi.includes(searchTerm);
                         const kategoriMatch = kategoriFiltre === "" || kategori === kategoriFiltre;
-                        
+
                         satir.style.display = (searchMatch && kategoriMatch) ? "" : "none";
                     });
                 }
-                
+
                 searchInput.addEventListener("input", filterTable);
                 kategoriSelect.addEventListener("change", filterTable);
             });
@@ -294,15 +291,11 @@ class block_depo_yonetimi extends block_base {
     /**
      * Depo dashboard sayfasını render et
      */
-    /**
-     * Depo dashboard sayfasını render et
-     */
     private function render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
         global $PAGE, $USER, $DB;
 
         $html = '
     <div class="depo-dashboard">
-        <!-- Dashboard Başlık -->
         <div class="dashboard-header mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
@@ -318,11 +311,11 @@ class block_depo_yonetimi extends block_base {
         if ($yetki === 'admin') {
             $html .= '
                 <div class="dashboard-actions d-flex gap-2 flex-wrap">
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" 
+                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
                        class="btn btn-primary rounded-pill d-flex align-items-center">
                         <i class="fas fa-plus me-2"></i> Depo Ekle
                     </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '" 
+                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '"
                        class="btn btn-outline-primary rounded-pill d-flex align-items-center">
                         <i class="fas fa-tags me-2"></i> Kategoriler
                     </a>
@@ -332,8 +325,7 @@ class block_depo_yonetimi extends block_base {
         $html .= '
             </div>
         </div>
-        
-        <!-- Depo Kartları -->
+
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">';
 
         // Admin için tüm depoları göster
@@ -346,7 +338,7 @@ class block_depo_yonetimi extends block_base {
                         <i class="fas fa-warehouse text-muted mb-3" style="font-size: 3rem;"></i>
                         <h4>Henüz depo bulunmuyor</h4>
                         <p class="text-muted">İlk deponuzu eklemek için "Depo Ekle" butonunu kullanabilirsiniz.</p>
-                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '" 
+                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
                            class="btn btn-primary mt-3">
                             <i class="fas fa-plus me-2"></i> Depo Ekle
                         </a>
@@ -413,36 +405,34 @@ class block_depo_yonetimi extends block_base {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
 
                     // Depo sorumlusu bilgisini al
-                    $sorumlu_ismi = 'Atanmamış';
-                    if (!empty($depo->sorumluid)) {
-                        $sorumlu = $DB->get_record('user', ['id' => $depo->sorumluid]);
-                        if ($sorumlu) {
-                            $sorumlu_ismi = $sorumlu->fullname;
-                        }
+                    $sorumlu_ismi = 'Siz'; // Yetkili kendi deposunu görüyorsa varsayılan olarak "Siz" yazılabilir.
+                    $sorumlu = $DB->get_record('user', ['id' => $depo->sorumluid]);
+                    if ($sorumlu && $sorumlu->id != $USER->id) {
+                        $sorumlu_ismi = $sorumlu->fullname;
                     }
 
                     $html .= '
-        <div class="col">
-            <div class="card depo-card h-100 shadow-sm border-0">
-                <div class="card-header bg-transparent border-0 pt-4 pb-0">
-                    <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
-                        <i class="fas fa-warehouse text-primary"></i>
-                    </div>
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
-                    <div class="depo-info mb-3">
-                        <div class="d-flex align-items-center text-muted mb-2">
-                            <i class="fas fa-user me-2"></i>
-                            <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
+                <div class="col">
+                    <div class="card depo-card h-100 shadow-sm border-0">
+                        <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                            <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-warehouse text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+                            <div class="depo-info mb-3">
+                                <div class="d-flex align-items-center text-muted mb-2">
+                                    <i class="fas fa-user me-2"></i>
+                                    <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
+                                </div>
+                            </div>
+                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
+                                <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
+                            </a>
                         </div>
                     </div>
-                    <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
-                        <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
-                    </a>
-                </div>
-            </div>
-        </div>';
+                </div>';
                 }
             } else {
                 $html .= '
