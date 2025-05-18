@@ -22,11 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adet = required_param('adet', PARAM_INT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
 
+    // Renk ve boyut verilerini al (boş olabilir)
+    $colors = optional_param_array('colors', [], PARAM_TEXT);
+    $sizes = optional_param_array('sizes', [], PARAM_TEXT);
+
+    // JSON'a dönüştür
+    $colors_json = json_encode($colors);
+    $sizes_json = json_encode($sizes);
+
     $urun = new stdClass();
     $urun->depoid = $depoid;
     $urun->name = $name;
     $urun->adet = $adet;
     $urun->kategoriid = $kategoriid;
+    $urun->colors = $colors_json;
+    $urun->sizes = $sizes_json;
 
     $DB->insert_record('block_depo_yonetimi_urunler', $urun);
     \core\notification::success('Ürün başarıyla eklendi.');
@@ -163,6 +173,51 @@ echo $OUTPUT->header();
                                 </div>
                                 <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
                                 <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="colors" class="form-label">
+                                    <i class="fas fa-palette me-2"></i>Renkler
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                                    <select multiple class="form-select" id="colors" name="colors[]" size="4">
+                                        <option value="kirmizi">Kırmızı</option>
+                                        <option value="mavi">Mavi</option>
+                                        <option value="siyah">Siyah</option>
+                                        <option value="beyaz">Beyaz</option>
+                                        <option value="yesil">Yeşil</option>
+                                        <option value="sari">Sarı</option>
+                                        <option value="turuncu">Turuncu</option>
+                                        <option value="mor">Mor</option>
+                                        <option value="pembe">Pembe</option>
+                                        <option value="gri">Gri</option>
+                                    </select>
+                                </div>
+                                <div class="form-text text-muted">
+                                    <small>Birden fazla renk seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="sizes" class="form-label">
+                                    <i class="fas fa-ruler-combined me-2"></i>Boyutlar
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                                    <select multiple class="form-select" id="sizes" name="sizes[]" size="4">
+                                        <option value="xs">XS</option>
+                                        <option value="s">S</option>
+                                        <option value="m">M</option>
+                                        <option value="l">L</option>
+                                        <option value="xl">XL</option>
+                                        <option value="xxl">XXL</option>
+                                        <option value="xxxl">XXXL</option>
+                                    </select>
+                                </div>
+                                <div class="form-text text-muted">
+                                    <small>Birden fazla boyut seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
+                                </div>
                             </div>
 
 

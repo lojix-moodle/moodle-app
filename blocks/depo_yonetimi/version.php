@@ -4,6 +4,6 @@ defined('MOODLE_INTERNAL') || die();
 
 
 $plugin->component = 'block_depo_yonetimi';
-$plugin->version = 2025051864;
+$plugin->version = 2025051865;
 
 $plugin->requires = 2022112800; // Moodle 4.x
