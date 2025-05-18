@@ -10,6 +10,7 @@
         <th>Kategori</th>
         <th>Ürün Adı</th>
         <th>Adet</th>
+        <th>Stok Miktarı</th>
         <th>İşlemler</th>
     </tr>
     </thead>
@@ -19,6 +20,7 @@
             <td>{{kategori_name}}</td>
             <td>{{name}}</td>
             <td>{{adet}}</td>
+            <td>{{ stok_miktari }}</td>
             <td>
                 <a href="{{duzenle_url}}" class="btn btn-primary btn-sm" onclick="return confirm('Bu ürünü düzenlemek istediğinize emin misiniz?');">Düzenle</a>
                 <a href="{{sil_url}}" class="btn btn-danger" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Ürünü Sil</a>
