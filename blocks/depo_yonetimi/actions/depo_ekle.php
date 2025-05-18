@@ -243,7 +243,9 @@ echo $OUTPUT->header();
 
 <?php
 // Form işleme
-if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
+
+// Form işleme kısmı
+if (isset($_POST['submit'])) {
     require_sesskey();
 
     $name = required_param('name', PARAM_TEXT);
@@ -275,22 +277,28 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $transaction = $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
-            $log = new stdClass();
-            $log->depoid = $depoid;
-            $log->userid = $USER->id;
-            $log->action = 'create';
-            $log->details = 'Depo oluşturuldu';
-            $log->timecreated = time();
-            $DB->insert_record('block_depo_yonetimi_logs', $log);
+            // Log tablosunu kontrol et
+            $tableexists = $DB->get_manager()->table_exists('block_depo_yonetimi_logs');
+            if ($tableexists) {
+                $log = new stdClass();
+                $log->depoid = $depoid;
+                $log->userid = $USER->id;
+                $log->action = 'create';
+                $log->details = 'Depo oluşturuldu';
+                $log->timecreated = time();
+                $DB->insert_record('block_depo_yonetimi_logs', $log);
+            }
 
             $transaction->allow_commit();
 
-            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+            // Sabit URL kullanarak yönlendirme
+            $redirect_url = $CFG->wwwroot . '/blocks/depo_yonetimi/index.php';
+            redirect($redirect_url, 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            if (isset($transaction) && $transaction instanceof moodle_transaction) {
-                $transaction->rollback($e);
+            if ($DB->is_transaction_started()) {
+                $DB->force_transaction_rollback();
             }
-            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+            \core\notification::error('Depo eklenirken bir hata oluştu: ' . $e->getMessage());
         }
     } else {
         // Hata varsa göster
