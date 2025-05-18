@@ -443,7 +443,6 @@ echo $OUTPUT->header();
                                 <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
                             </div>
 
-                            <!-- Renkler -->
                             <!-- Renkler ve Boyutlar (Yan Yana) -->
                             <div class="row mb-4">
                                 <!-- Renkler - Sol Kolon -->
@@ -493,6 +492,7 @@ echo $OUTPUT->header();
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
                         <!-- Sağ Sütun - Varyasyonlar -->
                         <div class="col-lg-6 ps-lg-4">
