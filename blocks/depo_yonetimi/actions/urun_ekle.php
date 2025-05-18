@@ -52,14 +52,142 @@ echo $OUTPUT->header();
 ?>
 
     <style>
+        :root {
+            --primary: #3e64ff;
+            --primary-light: rgba(62, 100, 255, 0.1);
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10);
+            --shadow-lg: 0 1rem 2rem rgba(0, 0, 0, 0.12);
+            --border-radius: 0.5rem;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            background-color: #f9fafb;
+        }
+
+        .card {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(to right, var(--primary), #5a77ff);
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            margin-bottom: 0;
+            color: white;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
         .form-control, .form-select {
-            border-color: #dee2e6 !important;
-            transition: all 0.3s ease;
+            border-color: #e2e8f0;
+            padding: 0.65rem 1rem;
+            border-radius: 0.4rem;
+            box-shadow: none;
+            transition: var(--transition);
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #80bdff !important;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.15);
+        }
+
+        .input-group-text {
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn {
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.4rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), #5a77ff);
+            border: none;
+            box-shadow: 0 4px 12px rgba(62, 100, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(62, 100, 255, 0.35);
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #28a745, #48c76a);
+            border: none;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.35);
+        }
+
+        .btn-outline-secondary {
+            border-color: #dde1e7;
+            color: #64748b;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8fafc;
+            color: #334155;
+            border-color: #cbd5e1;
+        }
+
+        .section-title {
+            position: relative;
+            color: #334155;
+            font-weight: 600;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 40px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .badge {
+            padding: 0.45em 0.8em;
+            font-weight: 500;
         }
 
         .loading-overlay {
@@ -69,19 +197,34 @@ echo $OUTPUT->header();
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             z-index: 9999;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0f6cbf;
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid rgba(62, 100, 255, 0.1);
+            border-left: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        .form-text {
+            color: #64748b !important;
         }
 
         @keyframes spin {
@@ -89,118 +232,143 @@ echo $OUTPUT->header();
             100% { transform: rotate(360deg); }
         }
 
-        .input-group-text {
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-        }
-
-        .card {
-            border-radius: 0.5rem;
+        table.table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: var(--border-radius);
             overflow: hidden;
+            box-shadow: 0 0 0 1px #e5e7eb;
         }
 
-        .btn {
-            border-radius: 0.375rem;
-            transition: all 0.2s;
+        .table thead th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            border-top: none;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        .table tbody td {
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .border-end-md {
-            border-right: 1px solid #dee2e6;
+        .depo-info-bar {
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
         }
 
-        @media (max-width: 767.98px) {
-            .border-end-md {
-                border-right: none;
-                border-bottom: 1px solid #dee2e6;
-                padding-bottom: 2rem;
-                margin-bottom: 2rem;
+        .depo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), #5a77ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .card {
+                margin-bottom: 1.5rem;
             }
         }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p class="mt-3 mb-0">İşleminiz Yapılıyor...</p>
+        </div>
     </div>
 
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-box-open me-2"></i>
-                            <h5 class="mb-0">Yeni Ürün Ekle</h5>
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="mb-4">
-                            <div class="d-flex align-items-center text-muted">
-                                <i class="fas fa-warehouse me-2"></i>
-                                <span>Depo: <strong><?php echo htmlspecialchars($depo->name); ?></strong></span>
+    <div class="container-fluid py-4">
+        <!-- Depo Bilgi Başlığı -->
+        <div class="depo-info-bar mb-4">
+            <div class="depo-icon">
+                <i class="fas fa-warehouse"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($depo->name); ?></h6>
+                <small class="text-muted">Yeni ürün ekleniyor</small>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-box-open text-white me-2"></i>
+                    <h5 class="mb-0">Yeni Ürün Ekle</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate id="urunForm">
+                    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+
+                    <div class="row g-4">
+                        <!-- Sol Sütun - Ürün Bilgileri -->
+                        <div class="col-lg-6 pe-lg-4">
+                            <h4 class="section-title">Ürün Temel Bilgileri</h4>
+
+                            <div class="mb-4">
+                                <label for="kategoriid" class="form-label">
+                                    <i class="fas fa-tags me-2 text-primary"></i>Kategori
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                                    <select name="kategoriid" id="kategoriid" class="form-select" required>
+                                        <option value="">Kategori Seçiniz</option>
+                                        <?php foreach ($kategoriler as $kategori): ?>
+                                            <option value="<?php echo $kategori->id; ?>">
+                                                <?php echo htmlspecialchars($kategori->name); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="invalid-feedback">Lütfen bir kategori seçin.</div>
+                                <div class="form-text">Ürünün ait olduğu kategoriyi seçin</div>
                             </div>
-                        </div>
 
-                        <form method="post" class="needs-validation" novalidate>
-                            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-box me-2 text-primary"></i>Ürün Adı
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           placeholder="Ürün adını girin" required>
+                                </div>
+                                <div class="invalid-feedback">Lütfen ürün adını girin.</div>
+                                <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
+                            </div>
 
-                            <div class="row">
-                                <!-- Sol Taraf - Ürün Bilgileri -->
-                                <div class="col-md-6 border-end-md pb-md-0 pb-4 mb-md-0 mb-4">
-                                    <h4 class="mb-4 border-bottom pb-2">Ürün Bilgileri</h4>
+                            <div class="mb-4">
+                                <label for="adet" class="form-label">
+                                    <i class="fas fa-hashtag me-2 text-primary"></i>Adet
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+                                    <input type="number" class="form-control" id="adet" name="adet"
+                                           min="0" placeholder="Ürün adedini girin" required>
+                                </div>
+                                <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
+                                <div class="form-text">Depoya eklemek istediğiniz ürünün miktarını girin</div>
+                            </div>
 
-                                    <div class="mb-4">
-                                        <label for="kategoriid" class="form-label">
-                                            <i class="fas fa-tags me-2"></i>Kategori
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-folder"></i></span>
-                                            <select name="kategoriid" id="kategoriid" class="form-select" required>
-                                                <option value="">Kategori Seçiniz</option>
-                                                <?php foreach ($kategoriler as $kategori): ?>
-                                                    <option value="<?php echo $kategori->id; ?>">
-                                                        <?php echo htmlspecialchars($kategori->name); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="invalid-feedback">Lütfen bir kategori seçin.</div>
-                                        <small class="form-text text-muted">Ürünün ait olduğu kategoriyi seçin</small>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label for="name" class="form-label">
-                                            <i class="fas fa-box me-2"></i>Ürün Adı
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                                            <input type="text" class="form-control" id="name" name="name"
-                                                   placeholder="Ürün adını girin" required>
-                                        </div>
-                                        <div class="invalid-feedback">Lütfen ürün adını girin.</div>
-                                        <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün adını girin</small>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label for="adet" class="form-label">
-                                            <i class="fas fa-hashtag me-2"></i>Adet
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
-                                            <input type="number" class="form-control" id="adet" name="adet"
-                                                   min="0" placeholder="Ürün adedini girin" required>
-                                        </div>
-                                        <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
-                                        <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
-                                    </div>
-
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
                                     <div class="mb-4">
                                         <label for="colors" class="form-label">
-                                            <i class="fas fa-palette me-2"></i>Renkler
+                                            <i class="fas fa-palette me-2 text-primary"></i>Renkler
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
@@ -217,14 +385,14 @@ echo $OUTPUT->header();
                                                 <option value="gri">Gri</option>
                                             </select>
                                         </div>
-                                        <div class="form-text text-muted">
+                                        <div class="form-text">
                                             <small>Birden fazla renk seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
                                         </div>
                                     </div>
 
-                                    <div class="mb-4">
+                                    <div class="mb-0">
                                         <label for="sizes" class="form-label">
-                                            <i class="fas fa-ruler-combined me-2"></i>Boyutlar
+                                            <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
@@ -238,183 +406,236 @@ echo $OUTPUT->header();
                                                 <option value="xxxl">XXXL</option>
                                             </select>
                                         </div>
-                                        <div class="form-text text-muted">
+                                        <div class="form-text">
                                             <small>Birden fazla boyut seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <!-- Sağ Taraf - Varyasyonlar -->
-                                <div class="col-md-6 ps-md-4">
-                                    <h4 class="mb-4 border-bottom pb-2">Varyasyonlar</h4>
+                        <!-- Sağ Sütun - Varyasyonlar -->
+                        <div class="col-lg-6 ps-lg-4">
+                            <h4 class="section-title">Varyasyon Yönetimi</h4>
 
-                                    <div class="mb-4">
-                                        <button type="button" id="varyasyonOlustur" class="btn btn-success" title="Seçili renk ve boyutlar için varyasyonlar oluştur">
+                            <div class="alert alert-primary d-flex align-items-center mb-4">
+                                <i class="fas fa-info-circle fs-5 me-3"></i>
+                                <div>
+                                    Seçtiğiniz renk ve boyut kombinasyonlarıyla varyasyonlar oluşturabilirsiniz.
+                                    Varyasyonlar, aynı ürünün farklı versiyonlarını yönetmenize olanak tanır.
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-body">
+                                    <div class="d-grid mb-3">
+                                        <button type="button" id="varyasyonOlustur" class="btn btn-success d-flex justify-content-center align-items-center" title="Seçili renk ve boyutlar için varyasyonlar oluştur">
                                             <i class="fas fa-cubes me-2"></i>Varyasyon Oluştur
                                         </button>
-                                        <small class="d-block form-text text-muted mt-2">
-                                            Bu butonu kullanarak seçtiğiniz renk ve boyutlara göre tüm varyasyonları oluşturabilirsiniz
-                                        </small>
                                     </div>
 
-                                    <div id="varyasyonBolumu" class="mt-4 d-none">
-                                        <div class="alert alert-info">
-                                            <i class="fas fa-info-circle me-2"></i>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın
-                                        </div>
-
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-bordered">
-                                                <thead class="table-light">
-                                                <tr>
-                                                    <th>Varyasyon</th>
-                                                    <th>Stok Miktarı</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody id="varyasyonTablo">
-                                                <!-- JavaScript ile dinamik oluşturulacak -->
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                    <div class="text-center text-muted">
+                                        <small>Önce renk ve boyut seçimi yapmanız gerekiyor</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Form Butonları -->
-                            <div class="d-flex gap-2 mt-4 border-top pt-4">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">
-                                    <i class="fas fa-save me-2"></i>Ürünü Kaydet
-                                </button>
-                                <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>"
-                                   class="btn btn-outline-secondary ms-auto">
-                                    <i class="fas fa-arrow-left me-2"></i>Geri
-                                </a>
+                            <div id="varyasyonBolumu" class="mt-4 d-none">
+                                <div class="alert alert-info d-flex">
+                                    <i class="fas fa-info-circle me-3 fs-5"></i>
+                                    <div>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın</div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Varyasyon</th>
+                                            <th width="40%">Stok Miktarı</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="varyasyonTablo">
+                                        <!-- JavaScript ile dinamik oluşturulacak -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Form Butonları -->
+                    <div class="d-flex flex-wrap gap-3 mt-4 pt-4 border-top">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save me-2"></i>Ürünü Kaydet
+                        </button>
+                        <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>"
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Geri
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
         (function () {
-            'use strict'
+            'use strict';
 
             // Form doğrulama
-            var forms = document.querySelectorAll('.needs-validation')
-            var loadingOverlay = document.getElementById('loadingOverlay')
-            var submitBtn = document.getElementById('submitBtn')
+            const forms = document.querySelectorAll('.needs-validation');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const submitBtn = document.getElementById('submitBtn');
 
             // Renk ve boyut seçimleri
-            const colorSelect = document.getElementById('colors')
-            const sizeSelect = document.getElementById('sizes')
-            const varyasyonOlusturBtn = document.getElementById('varyasyonOlustur')
-            const varyasyonBolumu = document.getElementById('varyasyonBolumu')
-            const varyasyonTablo = document.getElementById('varyasyonTablo')
+            const colorSelect = document.getElementById('colors');
+            const sizeSelect = document.getElementById('sizes');
+            const varyasyonOlusturBtn = document.getElementById('varyasyonOlustur');
+            const varyasyonBolumu = document.getElementById('varyasyonBolumu');
+            const varyasyonTablo = document.getElementById('varyasyonTablo');
 
             // Varyasyon oluşturma
             varyasyonOlusturBtn.addEventListener('click', function() {
                 // Seçilen renkler ve boyutları al
                 const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                    return { value: opt.value, text: opt.text }
-                })
+                    return { value: opt.value, text: opt.text };
+                });
 
                 const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                    return { value: opt.value, text: opt.text }
-                })
+                    return { value: opt.value, text: opt.text };
+                });
 
                 // Hiçbir seçim yapılmadıysa uyarı ver
                 if (selectedColors.length === 0 || selectedSizes.length === 0) {
-                    alert('Lütfen en az bir renk ve bir boyut seçin!')
-                    return
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Eksik Seçim',
+                        text: 'Lütfen en az bir renk ve bir boyut seçin!',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#3e64ff'
+                    });
+                    return;
                 }
 
                 // Varyasyon bölümünü göster
-                varyasyonBolumu.classList.remove('d-none')
+                varyasyonBolumu.classList.remove('d-none');
 
                 // Uyarı mesajını kaldır
-                const alertElement = varyasyonBolumu.querySelector('.alert')
+                const alertElement = varyasyonBolumu.querySelector('.alert');
                 if (alertElement) {
-                    alertElement.remove()
+                    alertElement.remove();
                 }
 
                 // Tabloyu temizle
-                varyasyonTablo.innerHTML = ''
+                varyasyonTablo.innerHTML = '';
 
                 // Tüm renk-boyut kombinasyonları için satır oluştur
                 selectedColors.forEach(color => {
                     selectedSizes.forEach(size => {
-                        const row = document.createElement('tr')
+                        const row = document.createElement('tr');
 
-                        const varyasyonCell = document.createElement('td')
+                        const varyasyonCell = document.createElement('td');
+                        varyasyonCell.className = 'align-middle';
                         varyasyonCell.innerHTML = `
-                            <div class="d-flex align-items-center">
-                                <span class="badge bg-light text-dark border me-2">${color.text}</span> /
-                                <span class="badge bg-light text-dark border ms-2">${size.text}</span>
-                            </div>
-                        `
+                        <div class="d-flex align-items-center">
+                            <span class="badge rounded-pill me-2" style="background-color: ${getColorHex(color.value)}; color: ${getContrastColor(color.value)}">${color.text}</span>
+                            <span class="fw-medium mx-2">/</span>
+                            <span class="badge bg-light text-dark border">${size.text}</span>
+                        </div>
+                    `;
 
-                        const stokCell = document.createElement('td')
+                        const stokCell = document.createElement('td');
                         stokCell.innerHTML = `
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text"><i class="fas fa-boxes"></i></span>
                             <input type="number"
-                                   class="form-control form-control-sm"
-                                   name="varyasyon[${color.value}][${size.value}]"
-                                   value="0"
-                                   min="0"
-                                   title="${color.text} - ${size.text} varyasyonu için stok miktarı">
-                        `
+                                class="form-control"
+                                name="varyasyon[${color.value}][${size.value}]"
+                                value="0"
+                                min="0"
+                                title="${color.text} - ${size.text} varyasyonu için stok miktarı">
+                        </div>
+                    `;
 
-                        row.appendChild(varyasyonCell)
-                        row.appendChild(stokCell)
-                        varyasyonTablo.appendChild(row)
-                    })
-                })
-            })
+                        row.appendChild(varyasyonCell);
+                        row.appendChild(stokCell);
+                        varyasyonTablo.appendChild(row);
+                    });
+                });
+            });
+
+            // Renk kodlarını al
+            function getColorHex(colorName) {
+                const colorMap = {
+                    'kirmizi': '#dc3545',
+                    'mavi': '#0d6efd',
+                    'siyah': '#212529',
+                    'beyaz': '#f8f9fa',
+                    'yesil': '#198754',
+                    'sari': '#ffc107',
+                    'turuncu': '#fd7e14',
+                    'mor': '#6f42c1',
+                    'pembe': '#d63384',
+                    'gri': '#6c757d'
+                };
+
+                return colorMap[colorName] || '#6c757d';
+            }
+
+            // Kontrast rengi hesapla (koyu arka plan için beyaz, açık arka plan için siyah)
+            function getContrastColor(colorName) {
+                const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
+                return lightColors.includes(colorName) ? '#212529' : '#ffffff';
+            }
 
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
-                loadingOverlay.style.display = 'none'
-            })
+                loadingOverlay.style.display = 'none';
+            });
 
+            // Form doğrulama
             Array.prototype.slice.call(forms).forEach(function (form) {
                 // Dinamik doğrulama - alan değiştiğinde
-                var inputs = form.querySelectorAll('input, select')
+                const inputs = form.querySelectorAll('input, select');
                 Array.prototype.slice.call(inputs).forEach(function(input) {
                     input.addEventListener('change', function() {
                         // Geçerlilik kontrolü
                         if (input.checkValidity()) {
-                            input.classList.remove('is-invalid')
-                            input.classList.add('is-valid')
+                            input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
                         } else {
-                            input.classList.remove('is-valid')
-                            input.classList.add('is-invalid')
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
                         }
-                    })
-                })
+                    });
+                });
 
                 // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
+                        event.preventDefault();
+                        event.stopPropagation();
 
                         // Geçersiz alanları işaretle
                         Array.prototype.slice.call(inputs).forEach(function(input) {
                             if (!input.checkValidity()) {
-                                input.classList.add('is-invalid')
+                                input.classList.add('is-invalid');
                             }
-                        })
+                        });
                     } else {
                         // Form geçerli ise yükleme animasyonunu göster
-                        loadingOverlay.style.display = 'flex'
-                        submitBtn.disabled = true
+                        loadingOverlay.style.display = 'flex';
+                        submitBtn.disabled = true;
                     }
 
-                    form.classList.add('was-validated')
-                }, false)
-            })
-        })()
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
     </script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php
 echo $OUTPUT->footer();
