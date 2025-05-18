@@ -152,7 +152,7 @@ echo $OUTPUT->header();
                             </div>
 
                             <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <button type="submit" class="btn btn-primary" id="submitBtn" name="submit">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
                                 <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>"
@@ -213,27 +213,6 @@ echo $OUTPUT->header();
                         // Form geçerli ise yükleme animasyonunu göster
                         loadingOverlay.style.display = 'flex'
                         submitBtn.disabled = true
-
-                        // Form verileri
-                        var name = document.getElementById('name').value.trim()
-                        var sorumluid = document.getElementById('sorumluid').value
-
-                        if (name === '' || sorumluid === '') {
-                            event.preventDefault()
-                            loadingOverlay.style.display = 'none'
-                            submitBtn.disabled = false
-                            return false
-                        }
-
-                        // Form post işlemi
-                        var formData = new FormData()
-                        formData.append('name', name)
-                        formData.append('sorumluid', sorumluid)
-                        formData.append('submit', 'true')
-                        formData.append('sesskey', document.querySelector('input[name="sesskey"]').value)
-
-                        // Normal form gönderimi devam edecek
-                        return true
                     }
 
                     form.classList.add('was-validated')
@@ -244,7 +223,7 @@ echo $OUTPUT->header();
 
 <?php
 // Form işleme
-if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
+if (isset($_POST['submit'])) {
     require_sesskey();
 
     $name = required_param('name', PARAM_TEXT);
@@ -271,7 +250,6 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $newdepo->timecreated = time();
         $newdepo->timemodified = time();
         $newdepo->createdby = $USER->id;
-
         try {
             $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
@@ -288,7 +266,11 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            $DB->rollback_delegated_transaction();
+            // Hatalı kod: $DB->rollback_delegated_transaction();
+            // Düzeltilmiş kod:
+            if ($DB->is_transaction_started()) {
+                $DB->force_transaction_rollback();
+            }
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
