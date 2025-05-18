@@ -43,16 +43,19 @@
         <TABLE NAME="block_depo_yonetimi_logs" COMMENT="Depo işlemleri logları">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-                <FIELD NAME="action" TYPE="char" LENGTH="20" NOTNULL="true"/>
-                <FIELD NAME="details" TYPE="text" NOTNULL="false"/>
-                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="İlgili depo ID"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="İşlemi yapan kullanıcı ID"/>
+                <FIELD NAME="action" TYPE="char" LENGTH="50" NOTNULL="true" COMMENT="İşlem türü (create, update, delete vb.)"/>
+                <FIELD NAME="details" TYPE="text" NOTNULL="false" COMMENT="İşlem açıklaması"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Zaman damgası"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id" ONDELETE="cascade"/>
+                <KEY NAME="userid_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
+
 
     </TABLES>
 </XMLDB>
