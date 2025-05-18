@@ -113,7 +113,6 @@ class block_depo_yonetimi extends block_base {
                 'id' => $urun->id,
                 'name' => $urun->name,
                 'adet' => $urun->adet,
-                'stok_miktari' => $urun->stok_miktari, // Bu satırı ekleyin
 
                 'duzenle_url' => (new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                     'depoid' => $depoid,
@@ -195,7 +194,6 @@ class block_depo_yonetimi extends block_base {
                                         <th class="ps-4">Ürün Adı</th>
                                         <th>Kategori</th>
                                         <th class="text-center">Adet</th>
-                                        <th class="text-center">Stok Miktarı</th>
                                         <th class="text-end pe-4">İşlemler</th>
                                     </tr>
                                 </thead>
@@ -233,11 +231,7 @@ class block_depo_yonetimi extends block_base {
                     $urun->adet . ' adet
                                             </span>                                   
                                         </td>
-                                        <td class="text-center align-middle">
-                                        <span class="badge bg-info rounded-pill px-3 py-2">
-                                            <?php echo ($urun->stok_miktari > 0) ? $urun->stok_miktari : 0; ?> adet
-                                        </span>
-                                         </td>
+                                        
                                                                             
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">

@@ -24,6 +24,7 @@ require_capability('block/depo_yonetimi:viewall', context_system::instance());
 // Depo var mı kontrol et
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
 
+// Potansiyel depo sorumlularını getir (aktif kullanıcılar)
 
 
 // Mevcut depo sorumlusunu al (varsa)

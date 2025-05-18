@@ -45,12 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $yeni_ad = required_param('name', PARAM_TEXT);
     $yeni_adet = required_param('adet', PARAM_INT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $stok_miktari = required_param('stok_miktari', PARAM_INT);
 
     $urun->name = $yeni_ad;
     $urun->adet = $yeni_adet;
     $urun->kategoriid = $kategoriid;
-    $urun->stok_miktari = $stok_miktari;
     $DB->update_record('block_depo_yonetimi_urunler', $urun);
 
     redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', null, \core\output\notification::NOTIFY_SUCCESS);
@@ -177,19 +175,6 @@ echo $OUTPUT->header();
                                 <div class="invalid-feedback">Lütfen geçerli bir adet girin</div>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="stok_miktari" class="form-label">
-                                    <i class="fas fa-warehouse me-2"></i>Stok Miktarı
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-cubes"></i></span>
-                                    <input type="number" id="stok_miktari" name="stok_miktari"
-                                           value="<?php echo isset($urun) ? s($urun->stok_miktari) : '0'; ?>"
-                                           class="form-control" placeholder="Stok miktarını girin" required min="0">
-                                </div>
-                                <div class="invalid-feedback">Lütfen geçerli bir stok miktarı girin</div>
-                                <small class="text-muted">Mevcut toplam stok miktarını giriniz</small>
-                            </div>
 
                             <div class="d-flex gap-2 mt-4">
                                 <button type="submit" name="submitbutton" class="btn btn-primary" id="submitBtn">

@@ -21,14 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $adet = required_param('adet', PARAM_INT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $stok_miktari = required_param('stok_miktari', PARAM_INT);
 
     $urun = new stdClass();
     $urun->depoid = $depoid;
     $urun->name = $name;
     $urun->adet = $adet;
     $urun->kategoriid = $kategoriid;
-    $urun->stok_miktari = $stok_miktari;
 
     $DB->insert_record('block_depo_yonetimi_urunler', $urun);
     \core\notification::success('Ürün başarıyla eklendi.');
@@ -166,19 +164,7 @@ echo $OUTPUT->header();
                                 <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
                                 <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
                             </div>
-                            <div class="mb-4">
-                                <label for="stok_miktari" class="form-label">
-                                    <i class="fas fa-warehouse me-2"></i>Stok Miktarı
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-cubes"></i></span>
-                                    <input type="number" id="stok_miktari" name="stok_miktari"
-                                           value="<?php echo isset($urun) ? s($urun->stok_miktari) : '0'; ?>"
-                                           class="form-control" placeholder="Stok miktarını girin" required min="0">
-                                </div>
-                                <div class="invalid-feedback">Lütfen geçerli bir stok miktarı girin</div>
-                                <small class="text-muted">Mevcut toplam stok miktarını giriniz</small>
-                            </div>
+
 
                             <div class="d-flex gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
