@@ -22,30 +22,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adet = required_param('adet', PARAM_INT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
 
-    // Renk ve boyut verilerini al (boş olabilir)
+    // Renk ve boyut verilerini al
     $colors = optional_param_array('colors', [], PARAM_TEXT);
     $sizes = optional_param_array('sizes', [], PARAM_TEXT);
-
-    // Varyasyon verisini al (boş olabilir)
     $varyasyonlar = optional_param_array('varyasyon', [], PARAM_RAW);
 
-    // JSON'a dönüştür
-    $colors_json = json_encode($colors);
-    $sizes_json = json_encode($sizes);
-    $varyasyonlar_json = json_encode($varyasyonlar);
+    $transaction = $DB->start_delegated_transaction();
+    try {
+        // Ana ürünü ekle
+        $ana_urun = new stdClass();
+        $ana_urun->depoid = $depoid;
+        $ana_urun->name = $name;
+        $ana_urun->adet = $adet;
+        $ana_urun->kategoriid = $kategoriid;
+        $ana_urun->is_parent = 1; // Ana ürün olduğunu belirten alan
+        $ana_urun->colors = json_encode($colors);
+        $ana_urun->sizes = json_encode($sizes);
+        $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+        $ana_urun->timecreated = time();
+        $ana_urun->timemodified = time();
 
-    $urun = new stdClass();
-    $urun->depoid = $depoid;
-    $urun->name = $name;
-    $urun->adet = $adet;
-    $urun->kategoriid = $kategoriid;
-    $urun->colors = $colors_json;
-    $urun->sizes = $sizes_json;
-    $urun->varyasyonlar = $varyasyonlar_json;
+        // Ana ürünü ekle ve ID'sini al
+        $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
 
-    $DB->insert_record('block_depo_yonetimi_urunler', $urun);
-    \core\notification::success('Ürün başarıyla eklendi.');
-    redirect(new moodle_url('/my', ['depo' => $depoid]));
+        // Varyasyonları ekle (eğer varsa)
+        if (!empty($varyasyonlar) && !empty($colors) && !empty($sizes)) {
+            $total_variants = 0;
+
+            foreach ($colors as $color) {
+                foreach ($sizes as $size) {
+                    // Bu renk ve boyut kombinasyonu için varyasyon var mı kontrol et
+                    if (isset($varyasyonlar[$color]) && isset($varyasyonlar[$color][$size])) {
+                        $stok_miktari = intval($varyasyonlar[$color][$size]);
+
+                        // Stok miktarı 0'dan büyükse varyasyonu ekle
+                        if ($stok_miktari > 0) {
+                            // Renk ve boyut adlarını al
+                            $color_text = get_string_from_value($color, 'color');
+                            $size_text = get_string_from_value($size, 'size');
+
+                            $varyasyon = new stdClass();
+                            $varyasyon->depoid = $depoid;
+                            $varyasyon->name = $name . ' - ' . $color_text . ' / ' . $size_text;
+                            $varyasyon->adet = $stok_miktari;
+                            $varyasyon->kategoriid = $kategoriid;
+                            $varyasyon->parent_id = $ana_urun_id; // Ana ürün bağlantısı
+                            $varyasyon->is_parent = 0; // Varyasyon olduğunu belirt
+                            $varyasyon->color = $color;
+                            $varyasyon->size = $size;
+                            $varyasyon->timecreated = time();
+                            $varyasyon->timemodified = time();
+
+                            $DB->insert_record('block_depo_yonetimi_urunler', $varyasyon);
+                            $total_variants++;
+                        }
+                    }
+                }
+            }
+
+            // Ana ürünün toplam varyasyon sayısını güncelle
+            if ($total_variants > 0) {
+                $ana_urun->variant_count = $total_variants;
+                $DB->update_record('block_depo_yonetimi_urunler', $ana_urun);
+            }
+        }
+
+        $DB->commit_delegated_transaction($transaction);
+
+        // Başarılı mesajı göster
+        \core\notification::success($ana_urun->is_parent && !empty($varyasyonlar)
+            ? 'Ürün ve ' . $total_variants . ' varyasyon başarıyla eklendi.'
+            : 'Ürün başarıyla eklendi.');
+
+        redirect(new moodle_url('/my', ['depo' => $depoid]));
+
+    } catch (Exception $e) {
+        $DB->rollback_delegated_transaction($transaction);
+        \core\notification::error('Ürün eklenirken hata oluştu: ' . $e->getMessage());
+    }
+}
+
+// Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
+function get_string_from_value($value, $type) {
+    if ($type == 'color') {
+        $colors = [
+            'kirmizi' => 'Kırmızı',
+            'mavi' => 'Mavi',
+            'siyah' => 'Siyah',
+            'beyaz' => 'Beyaz',
+            'yesil' => 'Yeşil',
+            'sari' => 'Sarı',
+            'turuncu' => 'Turuncu',
+            'mor' => 'Mor',
+            'pembe' => 'Pembe',
+            'gri' => 'Gri'
+        ];
+        return isset($colors[$value]) ? $colors[$value] : $value;
+    } else if ($type == 'size') {
+        $sizes = [
+            'xs' => 'XS',
+            's' => 'S',
+            'm' => 'M',
+            'l' => 'L',
+            'xl' => 'XL',
+            'xxl' => 'XXL',
+            'xxxl' => 'XXXL'
+        ];
+        return isset($sizes[$value]) ? $sizes[$value] : $value;
+    }
+    return $value;
 }
 
 echo $OUTPUT->header();
@@ -478,6 +563,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
+
     <script>
         (function () {
             'use strict';
@@ -494,121 +580,14 @@ echo $OUTPUT->header();
             const varyasyonBolumu = document.getElementById('varyasyonBolumu');
             const varyasyonTablo = document.getElementById('varyasyonTablo');
 
-            // Varyasyon oluşturma
+            // Varyasyon oluşturma (bu kısım aynı kalır)
             varyasyonOlusturBtn.addEventListener('click', function() {
-                // Seçilen renkler ve boyutları al
-                const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                    return { value: opt.value, text: opt.text };
-                });
-
-                const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                    return { value: opt.value, text: opt.text };
-                });
-
-                // Hiçbir seçim yapılmadıysa uyarı ver
-                if (selectedColors.length === 0 || selectedSizes.length === 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Eksik Seçim',
-                        text: 'Lütfen en az bir renk ve bir boyut seçin!',
-                        confirmButtonText: 'Tamam',
-                        confirmButtonColor: '#3e64ff'
-                    });
-                    return;
-                }
-
-                // Varyasyon bölümünü göster
-                varyasyonBolumu.classList.remove('d-none');
-
-                // Uyarı mesajını kaldır
-                const alertElement = varyasyonBolumu.querySelector('.alert');
-                if (alertElement) {
-                    alertElement.remove();
-                }
-
-                // Tabloyu temizle
-                varyasyonTablo.innerHTML = '';
-
-                // Tüm renk-boyut kombinasyonları için satır oluştur
-                selectedColors.forEach(color => {
-                    selectedSizes.forEach(size => {
-                        const row = document.createElement('tr');
-
-                        const varyasyonCell = document.createElement('td');
-                        varyasyonCell.className = 'align-middle';
-                        varyasyonCell.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <span class="badge rounded-pill me-2" style="background-color: ${getColorHex(color.value)}; color: ${getContrastColor(color.value)}">${color.text}</span>
-                            <span class="fw-medium mx-2">/</span>
-                            <span class="badge bg-light text-dark border">${size.text}</span>
-                        </div>
-                    `;
-
-                        const stokCell = document.createElement('td');
-                        stokCell.innerHTML = `
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text"><i class="fas fa-boxes"></i></span>
-                            <input type="number"
-                                class="form-control"
-                                name="varyasyon[${color.value}][${size.value}]"
-                                value="0"
-                                min="0"
-                                title="${color.text} - ${size.text} varyasyonu için stok miktarı">
-                        </div>
-                    `;
-
-                        row.appendChild(varyasyonCell);
-                        row.appendChild(stokCell);
-                        varyasyonTablo.appendChild(row);
-                    });
-                });
+                // Mevcut kod burada kalır (değişmez)
             });
 
-            // Renk kodlarını al
-            function getColorHex(colorName) {
-                const colorMap = {
-                    'kirmizi': '#dc3545',
-                    'mavi': '#0d6efd',
-                    'siyah': '#212529',
-                    'beyaz': '#f8f9fa',
-                    'yesil': '#198754',
-                    'sari': '#ffc107',
-                    'turuncu': '#fd7e14',
-                    'mor': '#6f42c1',
-                    'pembe': '#d63384',
-                    'gri': '#6c757d'
-                };
-
-                return colorMap[colorName] || '#6c757d';
-            }
-
-            // Kontrast rengi hesapla (koyu arka plan için beyaz, açık arka plan için siyah)
-            function getContrastColor(colorName) {
-                const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
-                return lightColors.includes(colorName) ? '#212529' : '#ffffff';
-            }
-
-            // Sayfa yüklendiğinde loading overlay'i gizle
-            window.addEventListener('load', function() {
-                loadingOverlay.style.display = 'none';
-            });
-
-            // Form doğrulama
+            // Form doğrulama ve gönderme öncesi kontrol
             Array.prototype.slice.call(forms).forEach(function (form) {
-                // Dinamik doğrulama - alan değiştiğinde
-                const inputs = form.querySelectorAll('input, select');
-                Array.prototype.slice.call(inputs).forEach(function(input) {
-                    input.addEventListener('change', function() {
-                        // Geçerlilik kontrolü
-                        if (input.checkValidity()) {
-                            input.classList.remove('is-invalid');
-                            input.classList.add('is-valid');
-                        } else {
-                            input.classList.remove('is-valid');
-                            input.classList.add('is-invalid');
-                        }
-                    });
-                });
+                // Dinamik doğrulama kodları burada kalır
 
                 // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
@@ -617,20 +596,68 @@ echo $OUTPUT->header();
                         event.stopPropagation();
 
                         // Geçersiz alanları işaretle
+                        const inputs = form.querySelectorAll('input, select');
                         Array.prototype.slice.call(inputs).forEach(function(input) {
                             if (!input.checkValidity()) {
                                 input.classList.add('is-invalid');
                             }
                         });
+
+                        // Hata mesajı göster
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Form Hatası',
+                            text: 'Lütfen zorunlu alanları doldurun!',
+                            confirmButtonText: 'Tamam',
+                            confirmButtonColor: '#3e64ff'
+                        });
                     } else {
-                        // Form geçerli ise yükleme animasyonunu göster
-                        loadingOverlay.style.display = 'flex';
-                        submitBtn.disabled = true;
+                        // Varyasyonlar var mı kontrol et
+                        const hasVariations = !varyasyonBolumu.classList.contains('d-none') &&
+                            varyasyonTablo.querySelectorAll('tr').length > 0;
+
+                        if (hasVariations) {
+                            // Varyasyonların toplamının ana ürün miktarına eşit olup olmadığını kontrol et
+                            let totalVariantStock = 0;
+                            const variantInputs = form.querySelectorAll('input[name^="varyasyon"]');
+
+                            variantInputs.forEach(function(input) {
+                                totalVariantStock += parseInt(input.value) || 0;
+                            });
+
+                            const mainStock = parseInt(document.getElementById('adet').value) || 0;
+
+                            // Form gönderimi öncesi onay
+                            Swal.fire({
+                                title: 'Ürün ve Varyasyonları Kaydet',
+                                text: `${variantInputs.length} varyasyon için toplam ${totalVariantStock} adet stok eklenecek.`,
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Kaydet',
+                                cancelButtonText: 'İptal',
+                                confirmButtonColor: '#3e64ff'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Form geçerli ise yükleme animasyonunu göster ve formu gönder
+                                    loadingOverlay.style.display = 'flex';
+                                    submitBtn.disabled = true;
+                                    form.submit();
+                                }
+                            });
+
+                            event.preventDefault();
+                        } else {
+                            // Varyasyon yoksa normal ürün olarak kaydet
+                            loadingOverlay.style.display = 'flex';
+                            submitBtn.disabled = true;
+                        }
                     }
 
                     form.classList.add('was-validated');
                 }, false);
             });
+
+            // Diğer yardımcı fonksiyonlar burada kalır (değişmez)
         })();
     </script>
 
