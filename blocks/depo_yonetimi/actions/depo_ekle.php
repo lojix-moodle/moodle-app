@@ -285,7 +285,7 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             $transaction->allow_commit();
         } catch (Exception $e) {
-            $DB->rollback_delegated_transaction($transaction);
+            $DB->rollback_delegated_transaction($transaction, 'depo_ekle_islem_hatasi');
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
