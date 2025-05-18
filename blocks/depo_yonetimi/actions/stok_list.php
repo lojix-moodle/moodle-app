@@ -5,8 +5,15 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('Stoklar');
-$PAGE->set_heading('Stoklar');
+// blocks/depo_yonetimi/actions/stok_list.php başlığını ve açıklama kısmını güncelleyin
+$PAGE->set_title('Stok Listesi');
+$PAGE->set_heading('Stok Yönetimi');
+
+// İlk div'e eklenecek açıklama
+echo '<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    Bu sayfada tüm ürün varyasyonları ve stok durumları listelenmektedir. Filtreleme yaparak belirli ürünleri görüntüleyebilirsiniz.
+</div>';
 
 // Yetkilendirme kontrolleri
 if (!has_capability('block/depo_yonetimi:viewall', context_system::instance()) &&

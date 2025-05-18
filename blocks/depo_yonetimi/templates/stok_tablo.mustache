@@ -1,64 +1,72 @@
-<div class="mb-4">
-    {{^varyasyonlar}}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i> Seçilen kriterlere uygun ürün bulunamadı.
-        </div>
-    {{/varyasyonlar}}
+<!-- templates/stok_tablo.mustache -->
+<div class="stok-listesi mt-4">
+    <h4 class="mb-3"><i class="fas fa-boxes me-2"></i>Stok Listesi</h4>
 
     {{#varyasyonlar}}
         <div class="table-responsive">
-            <table class="table table-hover stock-table">
+            <table class="table table-hover table-striped">
                 <thead class="table-light">
                 <tr>
-                    <th>Ürün Adı</th>
-                    <th>Depo</th>
-                    <th>Kategori</th>
+                    <th>#</th>
+                    <th>Ürün</th>
+                    <th>Ana Ürün</th>
                     <th>Varyasyon</th>
+                    <th>Kategori</th>
+                    <th>Depo</th>
                     <th class="text-center">Stok Durumu</th>
                     <th class="text-end">İşlemler</th>
                 </tr>
                 </thead>
                 <tbody>
-                {{#varyasyonlar}}
+                {{#.}}
                     <tr>
+                        <td>{{id}}</td>
+                        <td>{{name}}</td>
+                        <td>{{parent_name}}</td>
                         <td>
-                            <strong>{{parent_name}}</strong>
-                            {{^parent_name}}{{name}}{{/parent_name}}
+                            {{#color}}<span class="badge bg-secondary me-1">{{color}}</span>{{/color}}
+                            {{#size}}<span class="badge bg-info">{{size}}</span>{{/size}}
                         </td>
-                        <td>
-                            <span class="badge bg-light text-dark border">{{depo_adi}}</span>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark border">{{kategori_adi}}</span>
-                        </td>
-                        <td>
-                            {{#color}}
-                                <span class="badge bg-secondary me-1">{{color}}</span>
-                            {{/color}}
-                            {{#size}}
-                                <span class="badge bg-light text-dark">{{size}}</span>
-                            {{/size}}
-                        </td>
+                        <td>{{kategori_adi}}</td>
+                        <td>{{depo_adi}}</td>
                         <td class="text-center">
-                            <span class="stock-tag {{stok_class}}">
-                                {{adet}} adet <i class="fas fa-circle-notch ms-1"></i>
-                            </span>
+                            <span class="badge {{stok_class}}">{{adet}} adet ({{stok_durum}})</span>
                         </td>
                         <td class="text-end">
-                            <a href="{{duzenle_url}}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit me-1"></i> Stok Düzenle
+                            <a href="{{duzenle_url}}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Düzenle
                             </a>
                         </td>
                     </tr>
-                {{/varyasyonlar}}
+                {{/.}}
                 </tbody>
             </table>
         </div>
     {{/varyasyonlar}}
 
+    {{^varyasyonlar}}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Seçili kriterlere uygun stok bulunamadı.
+        </div>
+    {{/varyasyonlar}}
+
     {{#has_pagination}}
-        <div class="mt-4">
+        <div class="d-flex justify-content-center mt-4">
             {{{pagination_html}}}
         </div>
     {{/has_pagination}}
 </div>
+
+<style>
+    .stock-good {
+        background-color: #198754;
+    }
+    .stock-medium {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .stock-low {
+        background-color: #dc3545;
+    }
+</style>
