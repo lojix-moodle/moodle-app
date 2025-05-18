@@ -446,7 +446,7 @@ echo $OUTPUT->header();
                             <!-- Renkler ve Boyutlar (Yan Yana) -->
                             <div class="row mb-4">
                                 <!-- Renkler - Sol Kolon -->
-                                <div class="col-md-12">
+                                <div class="mb-4">
                                     <label for="colors" class="form-label">
                                         <i class="fas fa-palette me-2 text-primary"></i>Renkler
                                     </label>
@@ -478,7 +478,7 @@ echo $OUTPUT->header();
                                 </div>
 
                                 <!-- Boyutlar - Sağ Kolon -->
-                                <div class="col-md-12">
+                                <div class="mb-4">
                                     <label for="sizes" class="form-label">
                                         <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
                                     </label>
