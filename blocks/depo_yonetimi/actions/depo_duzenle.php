@@ -24,12 +24,7 @@ require_capability('block/depo_yonetimi:viewall', context_system::instance());
 // Depo var mı kontrol et
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
 
-// Potansiyel depo sorumlularını getir (aktif kullanıcılar)
-$sql = "SELECT u.id, " . $DB->sql_concat('u.firstname', "' '", 'u.lastname') . " AS fullname
-        FROM {user} u
-        WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1
-        ORDER BY u.firstname ASC, u.lastname ASC";
-$users = $DB->get_records_sql($sql);
+
 
 // Mevcut depo sorumlusunu al (varsa)
 $sorumlu_id = $depo->sorumlu_id ?? 0;
@@ -187,19 +182,57 @@ echo $OUTPUT->header();
 
                             <div class="mb-4">
                                 <label for="sorumlu_id" class="form-label fw-bold">
-                                    <i class="icon fa fa-user fa-fw" aria-hidden="true"></i> Depo Sorumlusu
+                                    <i class="fas fa-user me-2"></i>Depo Sorumlusu
                                 </label>
-                                <select id="sorumlu_id" name="sorumlu_id" class="form-select form-select-lg">
-                                    <option value="0">-- Sorumlu Seçiniz --</option>
-                                    <?php foreach ($users as $user) : ?>
-                                        <option value="<?php echo $user->id; ?>" <?php echo ($user->id == $sorumlu_id) ? 'selected' : ''; ?>>
-                                            <?php echo s($user->fullname); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                    <select class="form-select" id="sorumlu_id" name="sorumlu_id">
+                                        <option value="0">-- Sorumlu Seçiniz --</option>
+                                        <?php
+                                        // Mevcut depo sorumlularını getir (düzenlenen deponun sorumlusu hariç)
+                                        $existing_supervisors = $DB->get_fieldset_select('block_depo_yonetimi_depolar', 'sorumluid', 'sorumluid IS NOT NULL AND id <> ?', [$depoid]);
+
+                                        // Admin kullanıcılarını getir
+                                        $admins = get_admins();
+                                        $admin_ids = array_map(fn($a) => $a->id, $admins);
+
+                                        // Çıkarılacak kullanıcı listesi (admin + mevcut sorumlular)
+                                        $excluded_users = array_unique(array_merge($admin_ids, $existing_supervisors));
+
+                                        // Ders yönetebilen kullanıcıları getir
+                                        $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
+                                        $teacher_ids = array_keys($teachers);
+
+                                        // Elverişli kullanıcı listesi (çıkarılanlar hariç)
+                                        $available_user_ids = array_diff($teacher_ids, $excluded_users);
+
+                                        // Mevcut sorumluyu da ekleyin (düzenleme durumunda seçili gelmesi için)
+                                        if (!empty($depo->sorumluid)) {
+                                            $available_user_ids[] = $depo->sorumluid;
+                                        }
+
+                                        if (!empty($available_user_ids)) {
+                                            list($insql, $inparams) = $DB->get_in_or_equal($available_user_ids);
+                                            $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams);
+
+                                            // Kullanıcıları tam adlarına göre sırala
+                                            $sorted_users = [];
+                                            foreach ($users as $user) {
+                                                $sorted_users[$user->id] = fullname($user);
+                                            }
+                                            asort($sorted_users); // Alfabetik olarak sırala
+
+                                            // Sıralanmış kullanıcıları göster
+                                            foreach ($sorted_users as $userid => $fullname) {
+                                                $selected = ($userid == $depo->sorumluid) ? 'selected' : '';
+                                                echo '<option value="'.$userid.'" '.$selected.'>'.htmlspecialchars($fullname).'</option>';
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                                 <small class="text-muted">Bu deponun yönetiminden sorumlu olacak kişiyi seçin.</small>
                             </div>
-
                             <div class="row mt-5">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                     <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-outline-secondary btn-lg w-100">
