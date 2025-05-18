@@ -360,6 +360,7 @@ class block_depo_yonetimi extends block_base {
                     $silUrl = new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]);
 
                     // Depo sorumlusu bilgisini al
+                    // Depo sorumlusu bilgisini al
                     $sorumlu_ismi = 'Atanmamış';
                     if (!empty($depo->sorumluid)) {
                         $sorumlu = $DB->get_record('user', ['id' => $depo->sorumluid]);

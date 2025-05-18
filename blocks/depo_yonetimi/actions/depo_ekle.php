@@ -287,9 +287,8 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            // Düzeltilmiş rollback çağrısı
-            $transaction = $DB->get_delegated_transaction();
-            $DB->rollback_delegated_transaction($transaction, $e);
+            // Düzeltilmiş kod - transaction nesnesini almaya çalışmıyoruz
+            $DB->rollback_delegated_transaction();
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
