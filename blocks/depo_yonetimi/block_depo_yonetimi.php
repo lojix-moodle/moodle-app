@@ -294,6 +294,13 @@ class block_depo_yonetimi extends block_base {
     private function render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
         global $PAGE, $USER, $DB;
 
+        // Sorumlu isimlerine göre depoları sırala
+        usort($depolar, function($a, $b) use ($DB) {
+            $sorumluA = !empty($a->sorumluid) ? fullname($DB->get_record('user', ['id' => $a->sorumluid])) : 'Atanmamış';
+            $sorumluB = !empty($b->sorumluid) ? fullname($DB->get_record('user', ['id' => $b->sorumluid])) : 'Atanmamış';
+            return strcmp($sorumluA, $sorumluB);
+        });
+
         $html = '
     <div class="depo-dashboard">
         <div class="dashboard-header mb-4">
