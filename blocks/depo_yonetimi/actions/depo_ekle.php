@@ -132,14 +132,25 @@ echo $OUTPUT->header();
                                     <select class="form-select" id="sorumluid" name="sorumluid" required>
                                         <option value="">Depo Sorumlusu Seçiniz...</option>
                                         <?php
+                                        // Mevcut depo sorumlularını getir
+                                        $existing_supervisors = $DB->get_fieldset_select('block_depo_yonetimi_depolar', 'sorumluid', 'sorumluid IS NOT NULL');
+
+                                        // Admin kullanıcılarını getir
                                         $admins = get_admins();
                                         $admin_ids = array_map(fn($a) => $a->id, $admins);
+
+                                        // Çıkarılacak kullanıcı listesi (admin + mevcut sorumlular)
+                                        $excluded_users = array_unique(array_merge($admin_ids, $existing_supervisors));
+
+                                        // Ders yönetebilen kullanıcıları getir
                                         $teachers = get_users_by_capability(context_system::instance(), 'moodle/course:manageactivities');
                                         $teacher_ids = array_keys($teachers);
-                                        $user_ids = array_unique(array_merge($admin_ids, $teacher_ids));
 
-                                        if (!empty($user_ids)) {
-                                            list($insql, $inparams) = $DB->get_in_or_equal($user_ids);
+                                        // Elverişli kullanıcı listesi (çıkarılanlar hariç)
+                                        $available_user_ids = array_diff($teacher_ids, $excluded_users);
+
+                                        if (!empty($available_user_ids)) {
+                                            list($insql, $inparams) = $DB->get_in_or_equal($available_user_ids);
                                             $users = $DB->get_records_select('user', "id $insql AND deleted = 0", $inparams, 'lastname, firstname');
                                             foreach ($users as $user) {
                                                 echo '<option value="'.$user->id.'">'.fullname($user).'</option>';
