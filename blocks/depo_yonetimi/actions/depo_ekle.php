@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
+global $CFG, $PAGE, $OUTPUT, $DB, $USER;
 require_once($CFG->libdir . '/formslib.php');
 
 require_login();
