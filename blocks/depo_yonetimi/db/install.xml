@@ -7,6 +7,9 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
                 <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" />
                 <FIELD NAME="sorumluid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Depo sorumlusu kullanıcı ID'si"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Oluşturulma zamanı"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Son güncelleme zamanı"/>
+                <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Oluşturan kullanıcı ID'si"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -36,6 +39,22 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+
+        <TABLE NAME="block_depo_yonetimi_logs" COMMENT="İşlem kayıtları">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="İlgili depo ID'si"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="İşlemi yapan kullanıcı ID'si"/>
+                <FIELD NAME="action" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="İşlem türü"/>
+                <FIELD NAME="details" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="İşlem detayları"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="İşlem zamanı"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
