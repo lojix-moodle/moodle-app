@@ -233,12 +233,12 @@ class block_depo_yonetimi extends block_base {
                     $urun->adet . ' adet
                                             </span>                                   
                                         </td>
-                                         <td class="text-center align-middle">
-                                    <span class="badge bg-info rounded-pill px-3 py-2">' .
-                                        $urun->stok_miktari . ' adet
-                                    </span>
-                                </td>
-                                        
+                                        <td class="text-center align-middle">
+                                        <span class="badge bg-info rounded-pill px-3 py-2">
+                                            <?php echo ($urun->stok_miktari > 0) ? $urun->stok_miktari : 0; ?> adet
+                                        </span>
+                                         </td>
+                                                                            
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">
                                                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
