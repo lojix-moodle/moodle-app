@@ -26,9 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $colors = optional_param_array('colors', [], PARAM_TEXT);
     $sizes = optional_param_array('sizes', [], PARAM_TEXT);
 
+    // Varyasyon verisini al (boş olabilir)
+    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_RAW);
+
     // JSON'a dönüştür
     $colors_json = json_encode($colors);
     $sizes_json = json_encode($sizes);
+    $varyasyonlar_json = json_encode($varyasyonlar);
 
     $urun = new stdClass();
     $urun->depoid = $depoid;
@@ -37,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $urun->kategoriid = $kategoriid;
     $urun->colors = $colors_json;
     $urun->sizes = $sizes_json;
+    $urun->varyasyonlar = $varyasyonlar_json;
 
     $DB->insert_record('block_depo_yonetimi_urunler', $urun);
     \core\notification::success('Ürün başarıyla eklendi.');
@@ -103,6 +108,19 @@ echo $OUTPUT->header();
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        .border-end-md {
+            border-right: 1px solid #dee2e6;
+        }
+
+        @media (max-width: 767.98px) {
+            .border-end-md {
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+                padding-bottom: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -111,7 +129,7 @@ echo $OUTPUT->header();
 
     <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-12">
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-primary text-white">
                         <div class="d-flex align-items-center">
@@ -130,98 +148,139 @@ echo $OUTPUT->header();
                         <form method="post" class="needs-validation" novalidate>
                             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
-                            <div class="mb-4">
-                                <label for="kategoriid" class="form-label">
-                                    <i class="fas fa-tags me-2"></i>Kategori
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-folder"></i></span>
-                                    <select name="kategoriid" id="kategoriid" class="form-select" required>
-                                        <option value="">Kategori Seçiniz</option>
-                                        <?php foreach ($kategoriler as $kategori): ?>
-                                            <option value="<?php echo $kategori->id; ?>">
-                                                <?php echo htmlspecialchars($kategori->name); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                            <div class="row">
+                                <!-- Sol Taraf - Ürün Bilgileri -->
+                                <div class="col-md-6 border-end-md pb-md-0 pb-4 mb-md-0 mb-4">
+                                    <h4 class="mb-4 border-bottom pb-2">Ürün Bilgileri</h4>
+
+                                    <div class="mb-4">
+                                        <label for="kategoriid" class="form-label">
+                                            <i class="fas fa-tags me-2"></i>Kategori
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                                            <select name="kategoriid" id="kategoriid" class="form-select" required>
+                                                <option value="">Kategori Seçiniz</option>
+                                                <?php foreach ($kategoriler as $kategori): ?>
+                                                    <option value="<?php echo $kategori->id; ?>">
+                                                        <?php echo htmlspecialchars($kategori->name); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="invalid-feedback">Lütfen bir kategori seçin.</div>
+                                        <small class="form-text text-muted">Ürünün ait olduğu kategoriyi seçin</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="name" class="form-label">
+                                            <i class="fas fa-box me-2"></i>Ürün Adı
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                   placeholder="Ürün adını girin" required>
+                                        </div>
+                                        <div class="invalid-feedback">Lütfen ürün adını girin.</div>
+                                        <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün adını girin</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="adet" class="form-label">
+                                            <i class="fas fa-hashtag me-2"></i>Adet
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+                                            <input type="number" class="form-control" id="adet" name="adet"
+                                                   min="0" placeholder="Ürün adedini girin" required>
+                                        </div>
+                                        <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
+                                        <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="colors" class="form-label">
+                                            <i class="fas fa-palette me-2"></i>Renkler
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                                            <select multiple class="form-select" id="colors" name="colors[]" size="4">
+                                                <option value="kirmizi">Kırmızı</option>
+                                                <option value="mavi">Mavi</option>
+                                                <option value="siyah">Siyah</option>
+                                                <option value="beyaz">Beyaz</option>
+                                                <option value="yesil">Yeşil</option>
+                                                <option value="sari">Sarı</option>
+                                                <option value="turuncu">Turuncu</option>
+                                                <option value="mor">Mor</option>
+                                                <option value="pembe">Pembe</option>
+                                                <option value="gri">Gri</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-text text-muted">
+                                            <small>Birden fazla renk seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="sizes" class="form-label">
+                                            <i class="fas fa-ruler-combined me-2"></i>Boyutlar
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                                            <select multiple class="form-select" id="sizes" name="sizes[]" size="4">
+                                                <option value="xs">XS</option>
+                                                <option value="s">S</option>
+                                                <option value="m">M</option>
+                                                <option value="l">L</option>
+                                                <option value="xl">XL</option>
+                                                <option value="xxl">XXL</option>
+                                                <option value="xxxl">XXXL</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-text text-muted">
+                                            <small>Birden fazla boyut seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="invalid-feedback">Lütfen bir kategori seçin.</div>
-                                <small class="form-text text-muted">Ürünün ait olduğu kategoriyi seçin</small>
+
+                                <!-- Sağ Taraf - Varyasyonlar -->
+                                <div class="col-md-6 ps-md-4">
+                                    <h4 class="mb-4 border-bottom pb-2">Varyasyonlar</h4>
+
+                                    <div class="mb-4">
+                                        <button type="button" id="varyasyonOlustur" class="btn btn-success" title="Seçili renk ve boyutlar için varyasyonlar oluştur">
+                                            <i class="fas fa-cubes me-2"></i>Varyasyon Oluştur
+                                        </button>
+                                        <small class="d-block form-text text-muted mt-2">
+                                            Bu butonu kullanarak seçtiğiniz renk ve boyutlara göre tüm varyasyonları oluşturabilirsiniz
+                                        </small>
+                                    </div>
+
+                                    <div id="varyasyonBolumu" class="mt-4 d-none">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                <tr>
+                                                    <th>Varyasyon</th>
+                                                    <th>Stok Miktarı</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="varyasyonTablo">
+                                                <!-- JavaScript ile dinamik oluşturulacak -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="name" class="form-label">
-                                    <i class="fas fa-box me-2"></i>Ürün Adı
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           placeholder="Ürün adını girin" required>
-                                </div>
-                                <div class="invalid-feedback">Lütfen ürün adını girin.</div>
-                                <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün adını girin</small>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="adet" class="form-label">
-                                    <i class="fas fa-hashtag me-2"></i>Adet
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
-                                    <input type="number" class="form-control" id="adet" name="adet"
-                                           min="0" placeholder="Ürün adedini girin" required>
-                                </div>
-                                <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
-                                <small class="form-text text-muted">Depoya eklemek istediğiniz ürünün miktarını girin</small>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="colors" class="form-label">
-                                    <i class="fas fa-palette me-2"></i>Renkler
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                    <select multiple class="form-control" id="colors" name="colors[]" size="4">
-                                        <option value="kirmizi">Kırmızı</option>
-                                        <option value="mavi">Mavi</option>
-                                        <option value="siyah">Siyah</option>
-                                        <option value="beyaz">Beyaz</option>
-                                        <option value="yesil">Yeşil</option>
-                                        <option value="sari">Sarı</option>
-                                        <option value="turuncu">Turuncu</option>
-                                        <option value="mor">Mor</option>
-                                        <option value="pembe">Pembe</option>
-                                        <option value="gri">Gri</option>
-                                    </select>
-                                </div>
-                                <div class="form-text text-muted">
-                                    <small>Birden fazla renk seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="sizes" class="form-label">
-                                    <i class="fas fa-ruler-combined me-2"></i>Boyutlar
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                                    <select multiple class="form-control" id="sizes" name="sizes[]" size="4">
-                                        <option value="xs">XS</option>
-                                        <option value="s">S</option>
-                                        <option value="m">M</option>
-                                        <option value="l">L</option>
-                                        <option value="xl">XL</option>
-                                        <option value="xxl">XXL</option>
-                                        <option value="xxxl">XXXL</option>
-                                    </select>
-                                </div>
-                                <div class="form-text text-muted">
-                                    <small>Birden fazla boyut seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
-                                </div>
-                            </div>
-
-
-                            <div class="d-flex gap-2 mt-4">
+                            <!-- Form Butonları -->
+                            <div class="d-flex gap-2 mt-4 border-top pt-4">
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Ürünü Kaydet
                                 </button>
@@ -245,6 +304,72 @@ echo $OUTPUT->header();
             var forms = document.querySelectorAll('.needs-validation')
             var loadingOverlay = document.getElementById('loadingOverlay')
             var submitBtn = document.getElementById('submitBtn')
+
+            // Renk ve boyut seçimleri
+            const colorSelect = document.getElementById('colors')
+            const sizeSelect = document.getElementById('sizes')
+            const varyasyonOlusturBtn = document.getElementById('varyasyonOlustur')
+            const varyasyonBolumu = document.getElementById('varyasyonBolumu')
+            const varyasyonTablo = document.getElementById('varyasyonTablo')
+
+            // Varyasyon oluşturma
+            varyasyonOlusturBtn.addEventListener('click', function() {
+                // Seçilen renkler ve boyutları al
+                const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
+                    return { value: opt.value, text: opt.text }
+                })
+
+                const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
+                    return { value: opt.value, text: opt.text }
+                })
+
+                // Hiçbir seçim yapılmadıysa uyarı ver
+                if (selectedColors.length === 0 || selectedSizes.length === 0) {
+                    alert('Lütfen en az bir renk ve bir boyut seçin!')
+                    return
+                }
+
+                // Varyasyon bölümünü göster
+                varyasyonBolumu.classList.remove('d-none')
+
+                // Uyarı mesajını kaldır
+                const alertElement = varyasyonBolumu.querySelector('.alert')
+                if (alertElement) {
+                    alertElement.remove()
+                }
+
+                // Tabloyu temizle
+                varyasyonTablo.innerHTML = ''
+
+                // Tüm renk-boyut kombinasyonları için satır oluştur
+                selectedColors.forEach(color => {
+                    selectedSizes.forEach(size => {
+                        const row = document.createElement('tr')
+
+                        const varyasyonCell = document.createElement('td')
+                        varyasyonCell.innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-light text-dark border me-2">${color.text}</span> /
+                                <span class="badge bg-light text-dark border ms-2">${size.text}</span>
+                            </div>
+                        `
+
+                        const stokCell = document.createElement('td')
+                        stokCell.innerHTML = `
+                            <input type="number"
+                                   class="form-control form-control-sm"
+                                   name="varyasyon[${color.value}][${size.value}]"
+                                   value="0"
+                                   min="0"
+                                   title="${color.text} - ${size.text} varyasyonu için stok miktarı">
+                        `
+
+                        row.appendChild(varyasyonCell)
+                        row.appendChild(stokCell)
+                        varyasyonTablo.appendChild(row)
+                    })
+                })
+            })
 
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
