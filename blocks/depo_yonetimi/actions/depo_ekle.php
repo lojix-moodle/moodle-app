@@ -275,15 +275,17 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $transaction = $DB->start_delegated_transaction();
         try {
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
-
-            // Log kaydı kaldırıldı
-
-            // Başarılı kayıt sonrası yönlendirme - delay parametresi 0 olarak ayarlandı
             $DB->commit_delegated_transaction($transaction);
-            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', 0, \core\output\notification::NOTIFY_SUCCESS);
+
+            // JavaScript yönlendirme ve işlemi sonlandır
+            echo "<script>window.location.href = '".(new moodle_url('/blocks/depo_yonetimi/index.php'))->out()."';</script>";
+            exit(); // PHP işlemini sonlandır - bu satırı ekleyin
         } catch (Exception $e) {
             $DB->rollback_delegated_transaction($transaction, $e);
-            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+            // Hata durumunda yönlendirme için de aynı yöntemi kullanabilirsiniz
+            echo "<script>alert('Depo eklenirken bir hata oluştu: " . addslashes($e->getMessage()) . "');</script>";
+            echo "<script>window.location.href = '".(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'))->out()."';</script>";
+            exit();
         }
     } else {
         // Hata varsa göster
