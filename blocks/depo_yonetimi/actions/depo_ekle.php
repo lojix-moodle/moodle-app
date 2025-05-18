@@ -20,15 +20,15 @@ if (!$canManage) {
     redirect(new moodle_url('/my'), 'Bu sayfaya erişim yetkiniz bulunmamaktadır.', null, \core\output\notification::NOTIFY_ERROR);
 }
 
+// Ana URL'yi belirle - bu blok ana sayfasıdır
+$indexurl = new moodle_url('/blocks/depo_yonetimi/index.php');
+
 // Sayfa ayarları
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
 $PAGE->set_title('Depo Ekle');
 $PAGE->set_heading('Depo Ekle');
 $PAGE->set_pagelayout('admin');
-
-// Ana URL'yi belirle - bu blok ana sayfasıdır
-$indexurl = new moodle_url('/blocks/depo_yonetimi/index.php');
 
 // CSS ve JavaScript dosyalarını yükle
 $PAGE->requires->css(new moodle_url('/lib/jquery/themes/base/jquery.ui.all.css'));
@@ -63,12 +63,13 @@ if (isset($_POST['name']) && isset($_POST['sorumluid']) && confirm_sesskey()) {
         $newdepo->createdby = $USER->id;
 
         try {
-            // Depoyu kaydet (log olmadan)
+            // Depoyu kaydet
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             if ($depoid) {
                 // Başarıyla eklendi, ana sayfaya yönlendir
                 redirect($indexurl, 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+                exit; // redirect sonrası kod çalışmaya devam etmemesi için
             } else {
                 \core\notification::error('Depo ekleme başarısız oldu.');
             }
@@ -160,7 +161,7 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <form method="post" action="" class="needs-validation" novalidate>
+                        <form method="post" action="" class="needs-validation" id="depoForm" novalidate>
                             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
                             <div class="mb-4">
@@ -209,7 +210,7 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo $indexurl; ?>"
+                                <a href="<?php echo $indexurl->out(false); ?>"
                                    class="btn btn-outline-secondary ms-auto" id="backBtn">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
@@ -224,7 +225,7 @@ echo $OUTPUT->header();
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Form elemanlarını seç
-            var form = document.querySelector('.needs-validation');
+            var form = document.getElementById('depoForm');
             var loadingOverlay = document.getElementById('loadingOverlay');
             var submitBtn = document.getElementById('submitBtn');
             var backBtn = document.getElementById('backBtn');
@@ -232,6 +233,7 @@ echo $OUTPUT->header();
             // Geri butonuna tıklandığında
             backBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                loadingOverlay.style.display = 'flex';
                 window.location.href = backBtn.getAttribute('href');
             });
 
