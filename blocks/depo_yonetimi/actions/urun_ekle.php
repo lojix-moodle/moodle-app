@@ -442,53 +442,56 @@ echo $OUTPUT->header();
 
                             <div class="card bg-light mb-4">
                                 <div class="card-body">
-                                    <div class="mb-4">
-                                        <label for="colors" class="form-label">
-                                            <i class="fas fa-palette me-2 text-primary"></i>Renkler
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                            <select multiple class="form-select" id="colors" name="colors[]" size="4">
-                                                <option value="kirmizi">Kırmızı</option>
-                                                <option value="mavi">Mavi</option>
-                                                <option value="siyah">Siyah</option>
-                                                <option value="beyaz">Beyaz</option>
-                                                <option value="yesil">Yeşil</option>
-                                                <option value="sari">Sarı</option>
-                                                <option value="turuncu">Turuncu</option>
-                                                <option value="mor">Mor</option>
-                                                <option value="pembe">Pembe</option>
-                                                <option value="gri">Gri</option>
-                                            </select>
+                                    <div class="row">
+                                        <!-- Renkler - Sol Kolon -->
+                                        <div class="col-md-6">
+                                            <label for="colors" class="form-label">
+                                                <i class="fas fa-palette me-2 text-primary"></i>Renkler
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                                                <select multiple class="form-select" id="colors" name="colors[]" size="5">
+                                                    <option value="kirmizi">Kırmızı</option>
+                                                    <option value="mavi">Mavi</option>
+                                                    <option value="siyah">Siyah</option>
+                                                    <option value="beyaz">Beyaz</option>
+                                                    <option value="yesil">Yeşil</option>
+                                                    <option value="sari">Sarı</option>
+                                                    <option value="turuncu">Turuncu</option>
+                                                    <option value="mor">Mor</option>
+                                                    <option value="pembe">Pembe</option>
+                                                    <option value="gri">Gri</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-text small">
+                                                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+                                            </div>
                                         </div>
-                                        <div class="form-text">
-                                            <small>Birden fazla renk seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
-                                        </div>
-                                    </div>
 
-                                    <div class="mb-0">
-                                        <label for="sizes" class="form-label">
-                                            <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                                            <select multiple class="form-select" id="sizes" name="sizes[]" size="4">
-                                                <option value="xs">XS</option>
-                                                <option value="s">S</option>
-                                                <option value="m">M</option>
-                                                <option value="l">L</option>
-                                                <option value="xl">XL</option>
-                                                <option value="xxl">XXL</option>
-                                                <option value="xxxl">XXXL</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-text">
-                                            <small>Birden fazla boyut seçmek için CTRL tuşuna basılı tutarak seçim yapabilirsiniz</small>
+                                        <!-- Boyutlar - Sağ Kolon -->
+                                        <div class="col-md-6 mt-3 mt-md-0">
+                                            <label for="sizes" class="form-label">
+                                                <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                                                <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
+                                                    <option value="xs">XS</option>
+                                                    <option value="s">S</option>
+                                                    <option value="m">M</option>
+                                                    <option value="l">L</option>
+                                                    <option value="xl">XL</option>
+                                                    <option value="xxl">XXL</option>
+                                                    <option value="xxxl">XXXL</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-text small">
+                                                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                         <!-- Sağ Sütun - Varyasyonlar -->
                         <div class="col-lg-6 ps-lg-4">
