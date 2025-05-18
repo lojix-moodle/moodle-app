@@ -39,5 +39,20 @@
             </KEYS>
         </TABLE>
 
+
+        <TABLE NAME="block_depo_yonetimi_logs" COMMENT="Depo işlemleri logları">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+                <FIELD NAME="action" TYPE="char" LENGTH="20" NOTNULL="true"/>
+                <FIELD NAME="details" TYPE="text" NOTNULL="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
     </TABLES>
 </XMLDB>
