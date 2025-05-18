@@ -19,7 +19,7 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
-    $adet = required_param('adet', PARAM_INT);
+    // adet parametresini kaldırdık
     $kategoriid = required_param('kategoriid', PARAM_INT);
 
     // Renk ve boyut verilerini al
@@ -29,11 +29,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $transaction = $DB->start_delegated_transaction();
     try {
+        // Varyasyonlardan toplam stok miktarını hesapla
+        $total_stock = 0;
+        if (!empty($varyasyonlar)) {
+            foreach ($varyasyonlar as $color => $color_sizes) {
+                foreach ($color_sizes as $size => $stok) {
+                    $total_stock += intval($stok);
+                }
+            }
+        }
+
         // Ana ürünü ekle
         $ana_urun = new stdClass();
         $ana_urun->depoid = $depoid;
         $ana_urun->name = $name;
-        $ana_urun->adet = $adet;
+        $ana_urun->adet = $total_stock; // Varyasyonların toplam stok miktarını kullan
         $ana_urun->kategoriid = $kategoriid;
         $ana_urun->is_parent = 1; // Ana ürün olduğunu belirten alan
         $ana_urun->colors = json_encode($colors);
@@ -85,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Başarılı mesajı göster
         \core\notification::success($ana_urun->is_parent && !empty($varyasyonlar)
-            ? 'Ürün ve ' . $total_variants . ' varyasyon başarıyla eklendi.'
+            ? 'Ürün ve ' . $total_variants . ' varyasyon başarıyla eklendi. Toplam stok: ' . $total_stock
             : 'Ürün başarıyla eklendi.');
 
         redirect(new moodle_url('/my', ['depo' => $depoid]));
@@ -428,19 +438,6 @@ echo $OUTPUT->header();
                                 </div>
                                 <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                                 <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="adet" class="form-label">
-                                    <i class="fas fa-hashtag me-2 text-primary"></i>Adet
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
-                                    <input type="number" class="form-control" id="adet" name="adet"
-                                           min="0" placeholder="Ürün adedini girin" required>
-                                </div>
-                                <div class="invalid-feedback">Lütfen geçerli bir adet girin.</div>
-                                <div class="form-text">Depoya eklemek istediğiniz ürünün miktarını girin</div>
                             </div>
 
                             <div class="card bg-light mb-4">
