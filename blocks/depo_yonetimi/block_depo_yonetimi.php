@@ -412,28 +412,37 @@ class block_depo_yonetimi extends block_base {
                 foreach ($kendi_depolari as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
 
+                    // Depo sorumlusu bilgisini al
+                    $sorumlu_ismi = 'Atanmamış';
+                    if (!empty($depo->sorumluid)) {
+                        $sorumlu = $DB->get_record('user', ['id' => $depo->sorumluid]);
+                        if ($sorumlu) {
+                            $sorumlu_ismi = fullname($sorumlu);
+                        }
+                    }
+
                     $html .= '
-                <div class="col">
-                    <div class="card depo-card h-100 shadow-sm border-0">
-                        <div class="card-header bg-transparent border-0 pt-4 pb-0">
-                            <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
-                                <i class="fas fa-warehouse text-primary"></i>
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
-                            <div class="depo-info mb-3">
-                                <div class="d-flex align-items-center text-muted mb-2">
-                                    <i class="fas fa-user me-2"></i>
-                                    <span>Sorumlu: ' . $sorumlu_ismi . '</span>
-                                </div>
-                            </div>
-                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
-                                <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
-                            </a>
+        <div class="col">
+            <div class="card depo-card h-100 shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                    <div class="depo-icon-container bg-primary bg-opacity-10 rounded-circle p-3">
+                        <i class="fas fa-warehouse text-primary"></i>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+                    <div class="depo-info mb-3">
+                        <div class="d-flex align-items-center text-muted mb-2">
+                            <i class="fas fa-user me-2"></i>
+                            <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
                         </div>
                     </div>
-                </div>';
+                    <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
+                        <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>';
                 }
             } else {
                 $html .= '
