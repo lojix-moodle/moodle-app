@@ -272,25 +272,17 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $newdepo->createdby = $USER->id;
 
         try {
-            $DB->start_delegated_transaction();
-            $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
-
-            // Log kaydı oluşturma (siz istemediğiniz için bu kısmı siliyoruz)
-
             $transaction = $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             $DB->commit_delegated_transaction($transaction);
 
-
-
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            // Transaction nesnesini doğrudan geri al
-            $transaction = $DB->get_delegated_transaction();
             $DB->rollback_delegated_transaction($transaction, $e);
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
+
     } else {
         // Hata varsa göster
         foreach ($errors as $key => $error) {
