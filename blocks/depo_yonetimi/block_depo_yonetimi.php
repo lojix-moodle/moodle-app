@@ -40,7 +40,8 @@ class block_depo_yonetimi extends block_base {
     private function generate_boxes_html() {
         global $PAGE, $USER, $OUTPUT, $DB;
 
-        $depolar = $DB->get_records('block_depo_yonetimi_depolar', null, 'timecreated DESC');        $kullanici_depo_eslesme = [
+        $depolar = $DB->get_records('block_depo_yonetimi_depolar');
+        $kullanici_depo_eslesme = [
             2 => 3,
             5 => 1,
         ];
@@ -399,7 +400,8 @@ class block_depo_yonetimi extends block_base {
         // Normal kullanıcılar için sadece kendi depolarını göster
         else {
             // Kullanıcının sorumlu olduğu depoları bul
-            $kendi_depolari = $DB->get_records('block_depo_yonetimi_depolar', ['sorumluid' => $USER->id], 'timecreated DESC');
+            $kendi_depolari = $DB->get_records('block_depo_yonetimi_depolar', ['sorumluid' => $USER->id]);
+
             if (!empty($kendi_depolari)) {
                 foreach ($kendi_depolari as $depo) {
                     $url = new moodle_url($PAGE->url, ['depo' => $depo->id]);
