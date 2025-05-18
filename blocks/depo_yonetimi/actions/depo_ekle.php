@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
 global $CFG, $PAGE, $OUTPUT, $DB, $USER;
+
 require_once($CFG->libdir . '/formslib.php');
 
 require_login();
@@ -272,7 +273,7 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $newdepo->createdby = $USER->id;
 
         try {
-            $transaction = $DB->start_delegated_transaction();
+            $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             $log = new stdClass();
@@ -283,9 +284,11 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $log->timecreated = time();
             $DB->insert_record('block_depo_yonetimi_logs', $log);
 
-            $transaction->allow_commit();
+            $DB->commit_delegated_transaction();
+
+            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            $DB->rollback_delegated_transaction($transaction, 'depo_ekle_islem_hatasi');
+            $DB->rollback_delegated_transaction();
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
