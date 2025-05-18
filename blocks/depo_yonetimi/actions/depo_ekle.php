@@ -155,7 +155,7 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo (new moodle_url('/blocks/depo_yonetimi/index.php'))->out(); ?>"
+                                <a href="<?php echo (new moodle_url('/my '))->out(); ?>"
                                    class="btn btn-outline-secondary ms-auto">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
