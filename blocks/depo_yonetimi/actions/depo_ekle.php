@@ -106,8 +106,9 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <form method="post" action="" class="needs-validation" novalidate>
-                            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+                        <form method="post" action="<?php echo $PAGE->url; ?>" class="needs-validation" novalidate>
+
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
                             <div class="mb-4">
                                 <label for="name" class="form-label">
@@ -283,9 +284,10 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             redirect(
                 new moodle_url('/blocks/depo_yonetimi/index.php'),
                 'Depo başarıyla eklendi.',
-                null,  // null = varsayılan gecikme (Moodle'un kararına bırak)
+                0,  // Hemen yönlendirme
                 \core\output\notification::NOTIFY_SUCCESS
             );
+
             // die() veya başka kod eklemeyin - redirect zaten işlemi sonlandıracak
         } catch (Exception $e) {
             $DB->rollback_delegated_transaction($transaction, $e);
