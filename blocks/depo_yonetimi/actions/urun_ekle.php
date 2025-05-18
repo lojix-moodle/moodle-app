@@ -453,16 +453,20 @@ echo $OUTPUT->header();
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
                                         <select multiple class="form-select" id="colors" name="colors[]" size="5">
-                                            <option value="kirmizi">Kırmızı</option>
-                                            <option value="mavi">Mavi</option>
-                                            <option value="siyah">Siyah</option>
-                                            <option value="beyaz">Beyaz</option>
-                                            <option value="yesil">Yeşil</option>
-                                            <option value="sari">Sarı</option>
-                                            <option value="turuncu">Turuncu</option>
-                                            <option value="mor">Mor</option>
-                                            <option value="pembe">Pembe</option>
-                                            <option value="gri">Gri</option>
+                                            <option value="kirmizi">Beyaz</option>
+                                            <option value="mavi">Siyah</option>
+                                            <option value="siyah">Bej</option>
+                                            <option value="beyaz">Gri</option>
+                                            <option value="yesil">Lacivert</option>
+                                            <option value="sari">Kahverengi</option>
+                                            <option value="turuncu">Pembe</option>
+                                            <option value="mor">Mavi</option>
+                                            <option value="pembe">Haki</option>
+                                            <option value="gri">Mor</option>
+                                            <option value="gri">Vizon</option>
+                                            <option value="gri">Sarı</option>
+                                            <option value="gri">Turuncu</option>
+                                            <option value="gri">Bordo</option>
                                         </select>
                                     </div>
                                     <div class="form-text small">
@@ -478,13 +482,35 @@ echo $OUTPUT->header();
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
                                         <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
-                                            <option value="xs">XS</option>
-                                            <option value="s">S</option>
-                                            <option value="m">M</option>
-                                            <option value="l">L</option>
-                                            <option value="xl">XL</option>
-                                            <option value="xxl">XXL</option>
-                                            <option value="xxxl">XXXL</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="23">24</option>
+                                            <option value="23">25</option>
+                                            <option value="23">26</option>
+                                            <option value="23">27</option>
+                                            <option value="23">28</option>
+                                            <option value="23">29</option>
+                                            <option value="23">30</option>
+                                            <option value="23">31</option>
+                                            <option value="23">32</option>
+                                            <option value="23">33</option>
+                                            <option value="23">34</option>
+                                            <option value="23">35</option>
+                                            <option value="23">36</option>
+                                            <option value="23">37</option>
+                                            <option value="23">38</option>
+                                            <option value="23">39</option>
+                                            <option value="23">40</option>
+                                            <option value="23">41</option>
+                                            <option value="23">42</option>
+                                            <option value="23">43</option>
+                                            <option value="23">44</option>
+                                            <option value="23">45</option>
                                         </select>
                                     </div>
                                     <div class="form-text small">
