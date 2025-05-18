@@ -265,15 +265,15 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
     // Hata yoksa kaydet
     if (empty($errors)) {
-        $newdepo = new stdClass();
-        $newdepo->name = trim($name);
-        $newdepo->sorumluid = $sorumluid;
-        $newdepo->timecreated = time();
-        $newdepo->timemodified = time();
-        $newdepo->createdby = $USER->id;
-
+        $transaction = $DB->start_delegated_transaction(); // Başlatılan transaction'ı bir değişkene atayın
         try {
-            $DB->start_delegated_transaction();
+            $newdepo = new stdClass();
+            $newdepo->name = trim($name);
+            $newdepo->sorumluid = $sorumluid;
+            $newdepo->timecreated = time();
+            $newdepo->timemodified = time();
+            $newdepo->createdby = $USER->id;
+
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             $log = new stdClass();
@@ -284,11 +284,11 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $log->timecreated = time();
             $DB->insert_record('block_depo_yonetimi_logs', $log);
 
-            $DB->commit_delegated_transaction();
+            $transaction->commit(); // Transaction'ı commit edin
 
             redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
-            $DB->rollback_delegated_transaction();
+            $transaction->rollback(); // Transaction'ı rollback edin
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
