@@ -63,13 +63,17 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $transaction = $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
-            $log = new stdClass();
-            $log->depoid = $depoid;
-            $log->userid = $USER->id;
-            $log->action = 'create';
-            $log->details = 'Depo oluşturuldu';
-            $log->timecreated = time();
-            $DB->insert_record('block_depo_yonetimi_logs', $log);
+            // Log tablosunu kontrol et ve varsa kayıt ekle
+            $log_table_exists = $DB->get_manager()->table_exists('block_depo_yonetimi_logs');
+            if ($log_table_exists) {
+                $log = new stdClass();
+                $log->depoid = $depoid;
+                $log->userid = $USER->id;
+                $log->action = 'create';
+                $log->details = 'Depo oluşturuldu';
+                $log->timecreated = time();
+                $DB->insert_record('block_depo_yonetimi_logs', $log);
+            }
 
             // Transaction'ı onaylayıp tamamla
             $DB->commit_delegated_transaction($transaction);
