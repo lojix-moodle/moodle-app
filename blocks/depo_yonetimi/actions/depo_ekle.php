@@ -273,7 +273,7 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
         $newdepo->createdby = $USER->id;
 
         try {
-            $DB->start_delegated_transaction();
+            $transaction = $DB->start_delegated_transaction();
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
 
             $log = new stdClass();
