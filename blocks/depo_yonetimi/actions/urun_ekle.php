@@ -769,7 +769,14 @@ echo $OUTPUT->header();
                     'turuncu': '#fd7e14',
                     'mor': '#6f42c1',
                     'pembe': '#d63384',
-                    'gri': '#6c757d'
+                    'gri': '#6c757d',
+                    'bej': '#E4DAD2',
+                    'lacivert': '#11098A',
+                    'kahverengi': '#8B4513',
+                    'haki': '#8A9A5B',
+                    'vizon': '#A89F91',
+                    'bordo': '#800000'
+
                 };
 
                 return colorMap[colorName] || '#6c757d';
