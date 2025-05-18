@@ -580,14 +580,120 @@ echo $OUTPUT->header();
             const varyasyonBolumu = document.getElementById('varyasyonBolumu');
             const varyasyonTablo = document.getElementById('varyasyonTablo');
 
-            // Varyasyon oluşturma (bu kısım aynı kalır)
+            // Varyasyon oluşturma
             varyasyonOlusturBtn.addEventListener('click', function() {
-                // Mevcut kod burada kalır (değişmez)
+                const selectedColors = Array.from(colorSelect.selectedOptions).map(option => ({
+                    value: option.value,
+                    text: option.text
+                }));
+
+                const selectedSizes = Array.from(sizeSelect.selectedOptions).map(option => ({
+                    value: option.value,
+                    text: option.text
+                }));
+
+                if (selectedColors.length === 0 || selectedSizes.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Eksik Seçim',
+                        text: 'Lütfen en az bir renk ve bir boyut seçin.',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#3e64ff'
+                    });
+                    return;
+                }
+
+                // Varyasyon tablosunu temizle
+                const tableBody = varyasyonTablo.querySelector('tbody');
+                tableBody.innerHTML = '';
+
+                // Her renk ve boyut kombinasyonu için satır ekle
+                selectedColors.forEach((color, colorIdx) => {
+                    selectedSizes.forEach((size, sizeIdx) => {
+                        const row = document.createElement('tr');
+
+                        // Renk hücresi
+                        const colorCell = document.createElement('td');
+                        colorCell.className = 'd-flex align-items-center';
+
+                        // Renk örneği (küçük renkli daire)
+                        const colorBadge = document.createElement('span');
+                        colorBadge.className = 'color-badge';
+                        colorBadge.style.backgroundColor = getColorHex(color.value);
+                        colorBadge.style.color = getContrastColor(color.value);
+
+                        colorCell.appendChild(colorBadge);
+                        colorCell.appendChild(document.createTextNode(color.text));
+
+                        // Boyut hücresi
+                        const sizeCell = document.createElement('td');
+                        sizeCell.textContent = size.text;
+
+                        // Stok miktarı hücresi
+                        const stockCell = document.createElement('td');
+                        const stockInput = document.createElement('input');
+                        stockInput.type = 'number';
+                        stockInput.name = `varyasyon[${color.index}_${size.index}]`;
+                        stockInput.className = 'form-control form-control-sm';
+                        stockInput.min = 0;
+                        stockInput.value = 0;
+                        stockInput.dataset.color = color.value;
+                        stockInput.dataset.size = size.value;
+
+                        stockCell.appendChild(stockInput);
+
+                        row.appendChild(colorCell);
+                        row.appendChild(sizeCell);
+                        row.appendChild(stockCell);
+                        varyasyonTablo.appendChild(row);
+                    });
+                });
             });
 
-            // Form doğrulama ve gönderme öncesi kontrol
+            // Renk kodlarını al
+            function getColorHex(colorName) {
+                const colorMap = {
+                    'kirmizi': '#dc3545',
+                    'mavi': '#0d6efd',
+                    'siyah': '#212529',
+                    'beyaz': '#f8f9fa',
+                    'yesil': '#198754',
+                    'sari': '#ffc107',
+                    'turuncu': '#fd7e14',
+                    'mor': '#6f42c1',
+                    'pembe': '#d63384',
+                    'gri': '#6c757d'
+                };
+
+                return colorMap[colorName] || '#6c757d';
+            }
+
+            // Kontrast rengi hesapla
+            function getContrastColor(colorName) {
+                const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
+                return lightColors.includes(colorName) ? '#212529' : '#ffffff';
+            }
+
+            // Sayfa yüklendiğinde loading overlay'i gizle
+            window.addEventListener('load', function() {
+                loadingOverlay.style.display = 'none';
+            });
+            // Form doğrulama
             Array.prototype.slice.call(forms).forEach(function (form) {
-                // Dinamik doğrulama kodları burada kalır
+                // Dinamik doğrulama - alan değiştiğinde
+                const inputs = form.querySelectorAll('input, select');
+                Array.prototype.slice.call(inputs).forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        // Geçerlilik kontrolü
+                        if (input.checkValidity()) {
+                            input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
+                        } else {
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
+                        }
+                    });
+                });
 
                 // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
@@ -596,7 +702,6 @@ echo $OUTPUT->header();
                         event.stopPropagation();
 
                         // Geçersiz alanları işaretle
-                        const inputs = form.querySelectorAll('input, select');
                         Array.prototype.slice.call(inputs).forEach(function(input) {
                             if (!input.checkValidity()) {
                                 input.classList.add('is-invalid');
@@ -617,37 +722,52 @@ echo $OUTPUT->header();
                             varyasyonTablo.querySelectorAll('tr').length > 0;
 
                         if (hasVariations) {
-                            // Varyasyonların toplamının ana ürün miktarına eşit olup olmadığını kontrol et
-                            let totalVariantStock = 0;
-                            const variantInputs = form.querySelectorAll('input[name^="varyasyon"]');
+                            // Varyasyon girişlerini kontrol et
+                            const varyasyonInputs = varyasyonTablo.querySelectorAll('input[type="number"]');
+                            let varyasyonToplam = 0;
+                            let validVariants = 0;
 
-                            variantInputs.forEach(function(input) {
-                                totalVariantStock += parseInt(input.value) || 0;
+                            varyasyonInputs.forEach(function(input) {
+                                const value = parseInt(input.value);
+                                if (!isNaN(value) && value > 0) {
+                                    varyasyonToplam += value;
+                                    validVariants++;
+                                }
                             });
 
-                            const mainStock = parseInt(document.getElementById('adet').value) || 0;
+                            if (validVariants === 0) {
+                                event.preventDefault();
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Varyasyon Hatası',
+                                    text: 'En az bir varyasyon için stok miktarı girmelisiniz!',
+                                    confirmButtonText: 'Tamam',
+                                    confirmButtonColor: '#3e64ff'
+                                });
+                                return;
+                            }
 
-                            // Form gönderimi öncesi onay
+                            // Onay mesajı göster
+                            event.preventDefault();
                             Swal.fire({
-                                title: 'Ürün ve Varyasyonları Kaydet',
-                                text: `${variantInputs.length} varyasyon için toplam ${totalVariantStock} adet stok eklenecek.`,
                                 icon: 'question',
+                                title: 'Onay',
+                                html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok eklemek üzeresiniz.</p>` +
+                                    `<p>Devam etmek istiyor musunuz?</p>`,
                                 showCancelButton: true,
-                                confirmButtonText: 'Kaydet',
+                                confirmButtonText: 'Evet, Kaydet',
                                 cancelButtonText: 'İptal',
-                                confirmButtonColor: '#3e64ff'
+                                confirmButtonColor: '#3e64ff',
+                                cancelButtonColor: '#6c757d'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // Form geçerli ise yükleme animasyonunu göster ve formu gönder
                                     loadingOverlay.style.display = 'flex';
                                     submitBtn.disabled = true;
                                     form.submit();
                                 }
                             });
-
-                            event.preventDefault();
                         } else {
-                            // Varyasyon yoksa normal ürün olarak kaydet
+                            // Varyasyon yok, normal form gönderimi
                             loadingOverlay.style.display = 'flex';
                             submitBtn.disabled = true;
                         }
@@ -656,13 +776,11 @@ echo $OUTPUT->header();
                     form.classList.add('was-validated');
                 }, false);
             });
-
-            // Diğer yardımcı fonksiyonlar burada kalır (değişmez)
         })();
     </script>
 
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php
 echo $OUTPUT->footer();
