@@ -244,7 +244,7 @@ echo $OUTPUT->header();
 
 <?php
 // Form işleme
-if (isset($_POST['name']) && isset($_POST['sorumluid'])) {
+if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
     require_sesskey();
 
     $name = required_param('name', PARAM_TEXT);
@@ -277,13 +277,16 @@ if (isset($_POST['name']) && isset($_POST['sorumluid'])) {
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
             $DB->commit_delegated_transaction($transaction);
 
-            // Önce tüm çıktıyı temizle
-            ob_clean();
-            // Başlıkları ayarla
-            header('Content-Type: text/html; charset=utf-8');
-            header('Location: ' . $CFG->wwwroot . '/blocks/depo_yonetimi/index.php');
-            echo '<script>window.location.href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/index.php";</script>';
-            die();
+            // ob_clean() satırını kaldırın
+
+            // Moodle'un standart yönlendirme fonksiyonunu kullanın
+            redirect(
+                new moodle_url('/blocks/depo_yonetimi/index.php'),
+                'Depo başarıyla eklendi.',
+                null,  // null = varsayılan gecikme (Moodle'un kararına bırak)
+                \core\output\notification::NOTIFY_SUCCESS
+            );
+            // die() veya başka kod eklemeyin - redirect zaten işlemi sonlandıracak
         } catch (Exception $e) {
             $DB->rollback_delegated_transaction($transaction, $e);
             \core\notification::error('Depo eklenirken bir hata oluştu: ' . $e->getMessage());
@@ -297,3 +300,4 @@ if (isset($_POST['name']) && isset($_POST['sorumluid'])) {
 }
 
 echo $OUTPUT->footer();
+?>
