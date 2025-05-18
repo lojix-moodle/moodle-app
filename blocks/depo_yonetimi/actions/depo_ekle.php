@@ -244,7 +244,7 @@ echo $OUTPUT->header();
 
 <?php
 // Form işleme
-if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
+if (isset($_POST['name']) && isset($_POST['sorumluid'])) {
     require_sesskey();
 
     $name = required_param('name', PARAM_TEXT);
@@ -277,15 +277,16 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
             $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
             $DB->commit_delegated_transaction($transaction);
 
-            // JavaScript yönlendirme ve işlemi sonlandır
-            echo "<script>window.location.href = '".(new moodle_url('/blocks/depo_yonetimi/index.php'))->out()."';</script>";
-            exit(); // PHP işlemini sonlandır - bu satırı ekleyin
+            // Önce tüm çıktıyı temizle
+            ob_clean();
+            // Başlıkları ayarla
+            header('Content-Type: text/html; charset=utf-8');
+            header('Location: ' . $CFG->wwwroot . '/blocks/depo_yonetimi/index.php');
+            echo '<script>window.location.href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/index.php";</script>';
+            die();
         } catch (Exception $e) {
             $DB->rollback_delegated_transaction($transaction, $e);
-            // Hata durumunda yönlendirme için de aynı yöntemi kullanabilirsiniz
-            echo "<script>alert('Depo eklenirken bir hata oluştu: " . addslashes($e->getMessage()) . "');</script>";
-            echo "<script>window.location.href = '".(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'))->out()."';</script>";
-            exit();
+            \core\notification::error('Depo eklenirken bir hata oluştu: ' . $e->getMessage());
         }
     } else {
         // Hata varsa göster
@@ -296,4 +297,3 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 }
 
 echo $OUTPUT->footer();
-?>
