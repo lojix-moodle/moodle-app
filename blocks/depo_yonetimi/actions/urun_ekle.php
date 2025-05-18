@@ -453,20 +453,23 @@ echo $OUTPUT->header();
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
                                         <select multiple class="form-select" id="colors" name="colors[]" size="5">
-                                            <option value="kirmizi">Beyaz</option>
-                                            <option value="mavi">Siyah</option>
-                                            <option value="siyah">Bej</option>
-                                            <option value="beyaz">Gri</option>
-                                            <option value="yesil">Lacivert</option>
-                                            <option value="sari">Kahverengi</option>
-                                            <option value="turuncu">Pembe</option>
-                                            <option value="mor">Mavi</option>
-                                            <option value="pembe">Haki</option>
-                                            <option value="gri">Mor</option>
-                                            <option value="gri">Vizon</option>
-                                            <option value="gri">Sarı</option>
-                                            <option value="gri">Turuncu</option>
-                                            <option value="gri">Bordo</option>
+                                            <option value="beyaz">Beyaz</option>
+                                            <option value="mavi">Mavi</option>
+                                            <option value="siyah">Siyah</option>
+                                            <option value="bej">Bej</option>
+                                            <option value="gri">Gri</option>
+                                            <option value="lacivert">Lacivert</option>
+                                            <option value="kahverengi">Kahverengi</option>
+                                            <option value="pembe">Pembe</option>
+                                            <option value="mor">Mor</option>
+                                            <option value="haki">Haki</option>
+                                            <option value="vizon">Vizon</option>
+                                            <option value="sari">Sarı</option>
+                                            <option value="turuncu">Turuncu</option>
+                                            <option value="kirmizi">Kırmızı</option>
+                                            <option value="yesil">Yeşil</option>
+                                            <option value="bordo">Bordo</option>
+
                                         </select>
                                     </div>
                                     <div class="form-text small">
