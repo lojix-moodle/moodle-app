@@ -1,13 +1,11 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
 global $CFG, $PAGE, $OUTPUT, $DB, $USER;
-
 require_once($CFG->libdir . '/formslib.php');
 
 require_login();
 $context = context_system::instance();
 
-// Yetkiyi kontrol et
 $canManage = false;
 if (has_capability('block/depo_yonetimi:viewall', $context)) {
     $yetki = 'admin';
@@ -20,69 +18,15 @@ if (!$canManage) {
     redirect(new moodle_url('/my'), 'Bu sayfaya erişim yetkiniz bulunmamaktadır.', null, \core\output\notification::NOTIFY_ERROR);
 }
 
-// Ana URL'yi belirle - bu blok ana sayfasıdır
-$indexurl = new moodle_url('/blocks/depo_yonetimi/index.php');
-
-// Sayfa ayarları
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'));
 $PAGE->set_title('Depo Ekle');
 $PAGE->set_heading('Depo Ekle');
 $PAGE->set_pagelayout('admin');
 
-// CSS ve JavaScript dosyalarını yükle
+// Gömülü CSS
 $PAGE->requires->css(new moodle_url('/lib/jquery/themes/base/jquery.ui.all.css'));
 $PAGE->requires->js_call_amd('block_depo_yonetimi/validation', 'init');
-
-// Form işleme
-if (isset($_POST['name']) && isset($_POST['sorumluid']) && confirm_sesskey()) {
-    $name = required_param('name', PARAM_TEXT);
-    $sorumluid = required_param('sorumluid', PARAM_INT);
-
-    // Doğrulama
-    $errors = [];
-
-    if (empty($name)) {
-        $errors['name'] = 'Depo adı zorunludur';
-    } else if ($DB->record_exists('block_depo_yonetimi_depolar', ['name' => $name])) {
-        $errors['name'] = 'Bu isimde bir depo zaten mevcut';
-    }
-
-    if (empty($sorumluid)) {
-        $errors['sorumluid'] = 'Lütfen bir depo sorumlusu seçin';
-    }
-
-    // Hata yoksa kaydet
-    if (empty($errors)) {
-        // Yeni depo nesnesi oluştur
-        $newdepo = new stdClass();
-        $newdepo->name = trim($name);
-        $newdepo->sorumluid = $sorumluid;
-        $newdepo->timecreated = time();
-        $newdepo->timemodified = time();
-        $newdepo->createdby = $USER->id;
-
-        try {
-            // Depoyu kaydet
-            $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
-
-            if ($depoid) {
-                // Başarıyla eklendi, ana sayfaya yönlendir
-                redirect($indexurl, 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
-                exit; // redirect sonrası kod çalışmaya devam etmemesi için
-            } else {
-                \core\notification::error('Depo ekleme başarısız oldu.');
-            }
-        } catch (Exception $e) {
-            \core\notification::error('Depo eklenirken bir hata oluştu: ' . $e->getMessage());
-        }
-    } else {
-        // Hata varsa göster
-        foreach ($errors as $key => $error) {
-            \core\notification::error($error);
-        }
-    }
-}
 
 echo $OUTPUT->header();
 ?>
@@ -161,7 +105,7 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <form method="post" action="" class="needs-validation" id="depoForm" novalidate>
+                        <form method="post" action="" class="needs-validation" novalidate>
                             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
                             <div class="mb-4">
@@ -210,8 +154,8 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo $indexurl->out(false); ?>"
-                                   class="btn btn-outline-secondary ms-auto" id="backBtn">
+                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>"
+                                   class="btn btn-outline-secondary ms-auto">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
                             </div>
@@ -223,62 +167,136 @@ echo $OUTPUT->header();
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Form elemanlarını seç
-            var form = document.getElementById('depoForm');
-            var loadingOverlay = document.getElementById('loadingOverlay');
-            var submitBtn = document.getElementById('submitBtn');
-            var backBtn = document.getElementById('backBtn');
+        (function () {
+            'use strict'
 
-            // Geri butonuna tıklandığında
-            backBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                loadingOverlay.style.display = 'flex';
-                window.location.href = backBtn.getAttribute('href');
-            });
+            // Form doğrulama
+            var forms = document.querySelectorAll('.needs-validation')
+            var loadingOverlay = document.getElementById('loadingOverlay')
+            var submitBtn = document.getElementById('submitBtn')
 
-            // Form gönderildiğinde
-            if (form) {
-                form.addEventListener('submit', function(e) {
+            // Sayfa yüklendiğinde loading overlay'i gizle
+            window.addEventListener('load', function() {
+                loadingOverlay.style.display = 'none'
+            })
+
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                // Dinamik doğrulama - alan değiştiğinde
+                var inputs = form.querySelectorAll('input, select')
+                Array.prototype.slice.call(inputs).forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        // Geçerlilik kontrolü
+                        if (input.checkValidity()) {
+                            input.classList.remove('is-invalid')
+                            input.classList.add('is-valid')
+                        } else {
+                            input.classList.remove('is-valid')
+                            input.classList.add('is-invalid')
+                        }
+                    })
+                })
+
+                // Form gönderildiğinde
+                form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        event.preventDefault()
+                        event.stopPropagation()
 
                         // Geçersiz alanları işaretle
-                        var inputs = form.querySelectorAll('input, select');
-                        inputs.forEach(function(input) {
+                        Array.prototype.slice.call(inputs).forEach(function(input) {
                             if (!input.checkValidity()) {
-                                input.classList.add('is-invalid');
-                            } else {
-                                input.classList.remove('is-invalid');
-                                input.classList.add('is-valid');
+                                input.classList.add('is-invalid')
                             }
-                        });
+                        })
                     } else {
                         // Form geçerli ise yükleme animasyonunu göster
-                        loadingOverlay.style.display = 'flex';
+                        loadingOverlay.style.display = 'flex'
+                        submitBtn.disabled = true
+
+                        // Form verileri
+                        var name = document.getElementById('name').value.trim()
+                        var sorumluid = document.getElementById('sorumluid').value
+
+                        if (name === '' || sorumluid === '') {
+                            event.preventDefault()
+                            loadingOverlay.style.display = 'none'
+                            submitBtn.disabled = false
+                            return false
+                        }
+
+                        // Form post işlemi
+                        var formData = new FormData()
+                        formData.append('name', name)
+                        formData.append('sorumluid', sorumluid)
+                        formData.append('submit', 'true')
+                        formData.append('sesskey', document.querySelector('input[name="sesskey"]').value)
+
+                        // Normal form gönderimi devam edecek
+                        return true
                     }
 
-                    form.classList.add('was-validated');
-                });
-            }
-
-            // Input değişikliklerini dinle
-            var inputs = document.querySelectorAll('input, select');
-            inputs.forEach(function(input) {
-                input.addEventListener('change', function() {
-                    if (input.checkValidity()) {
-                        input.classList.remove('is-invalid');
-                        input.classList.add('is-valid');
-                    } else {
-                        input.classList.remove('is-valid');
-                        input.classList.add('is-invalid');
-                    }
-                });
-            });
-        });
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
     </script>
 
 <?php
+// Form işleme
+if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid']))) {
+    require_sesskey();
+
+    $name = required_param('name', PARAM_TEXT);
+    $sorumluid = required_param('sorumluid', PARAM_INT);
+
+    // Doğrulama
+    $errors = [];
+
+    if (empty($name)) {
+        $errors['name'] = 'Depo adı zorunludur';
+    } else if ($DB->record_exists('block_depo_yonetimi_depolar', ['name' => $name])) {
+        $errors['name'] = 'Bu isimde bir depo zaten mevcut';
+    }
+
+    if (empty($sorumluid)) {
+        $errors['sorumluid'] = 'Lütfen bir depo sorumlusu seçin';
+    }
+
+    // Hata yoksa kaydet
+    if (empty($errors)) {
+        $newdepo = new stdClass();
+        $newdepo->name = trim($name);
+        $newdepo->sorumluid = $sorumluid;
+        $newdepo->timecreated = time();
+        $newdepo->timemodified = time();
+        $newdepo->createdby = $USER->id;
+
+        try {
+            $DB->start_delegated_transaction();
+            $depoid = $DB->insert_record('block_depo_yonetimi_depolar', $newdepo);
+
+            $log = new stdClass();
+            $log->depoid = $depoid;
+            $log->userid = $USER->id;
+            $log->action = 'create';
+            $log->details = 'Depo oluşturuldu';
+            $log->timecreated = time();
+            $DB->insert_record('block_depo_yonetimi_logs', $log);
+
+            $DB->commit_delegated_transaction();
+
+            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+        } catch (Exception $e) {
+            $DB->rollback_delegated_transaction();
+            redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+        }
+    } else {
+        // Hata varsa göster
+        foreach ($errors as $key => $error) {
+            \core\notification::error($error);
+        }
+    }
+}
+
 echo $OUTPUT->footer();
 ?>
