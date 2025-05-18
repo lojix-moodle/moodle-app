@@ -193,6 +193,7 @@ class block_depo_yonetimi extends block_base {
                                         <th class="ps-4">Ürün Adı</th>
                                         <th>Kategori</th>
                                         <th class="text-center">Adet</th>
+                                        <th class="text-center">Stok Miktarı</th>
                                         <th class="text-end pe-4">İşlemler</th>
                                     </tr>
                                 </thead>
@@ -201,14 +202,14 @@ class block_depo_yonetimi extends block_base {
         if (empty($urunler)) {
             $html .= '
                                     <tr>
-                                        <td colspan="4" class="text-center py-5">
-                                            <div class="empty-state">
-                                                <i class="fas fa-box-open text-muted mb-3" style="font-size: 3rem;"></i>
-                                                <h4>Henüz ürün bulunmuyor</h4>
-                                                <p class="text-muted">Bu depoya ürün eklemek için "Yeni Ürün Ekle" butonunu kullanabilirsiniz.</p>
-                                            </div>
-                                        </td>
-                                    </tr>';
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-box-open text-muted mb-3" style="font-size: 3rem;"></i>
+                                            <h4>Henüz ürün bulunmuyor</h4>
+                                            <p class="text-muted">Bu depoya ürün eklemek için "Yeni Ürün Ekle" butonunu kullanabilirsiniz.</p>
+                                        </div>
+                                    </td>
+                                </tr>';
         } else {
             foreach ($urunler as $urun) {
                 $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
@@ -228,8 +229,14 @@ class block_depo_yonetimi extends block_base {
                                         <td class="text-center align-middle">
                                             <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
                     $urun->adet . ' adet
-                                            </span>
+                                            </span>                                   
                                         </td>
+                                         <td class="text-center align-middle">
+                                    <span class="badge bg-info rounded-pill px-3 py-2">' .
+                                        $urun->stok_miktari . ' adet
+                                    </span>
+                                </td>
+                                        
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">
                                                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
