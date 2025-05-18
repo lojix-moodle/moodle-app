@@ -155,7 +155,7 @@ echo $OUTPUT->header();
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="fas fa-save me-2"></i>Depoyu Kaydet
                                 </button>
-                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/index.php'); ?>"
+                                <a href="<?php echo (new moodle_url('/blocks/depo_yonetimi/index.php'))->out(); ?>"
                                    class="btn btn-outline-secondary ms-auto">
                                     <i class="fas fa-arrow-left me-2"></i>Geri
                                 </a>
@@ -278,9 +278,9 @@ if (isset($_POST['submit']) || (isset($_POST['name']) && isset($_POST['sorumluid
 
             // Log kaydı kaldırıldı
 
+            // Başarılı kayıt sonrası yönlendirme - delay parametresi 0 olarak ayarlandı
             $DB->commit_delegated_transaction($transaction);
-
-            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
+            redirect(new moodle_url('/blocks/depo_yonetimi/index.php'), 'Depo başarıyla eklendi.', 0, \core\output\notification::NOTIFY_SUCCESS);
         } catch (Exception $e) {
             $DB->rollback_delegated_transaction($transaction, $e);
             redirect(new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php'), 'Depo eklenirken bir hata oluştu: ' . $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
