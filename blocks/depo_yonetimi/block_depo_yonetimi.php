@@ -235,7 +235,7 @@ class block_depo_yonetimi extends block_base {
                                                                             
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">
-                                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_duzenle.php', [
+                                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', [
                                             'depoid' => $depoid,
                                             'urunid' => $urun->id
                                         ]) . '" class="btn btn-sm btn-outline-success">
