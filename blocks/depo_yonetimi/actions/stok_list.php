@@ -420,15 +420,15 @@ echo $OUTPUT->header();
     </div>
 
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <i class="fas fa-box-open text-white me-2"></i>
                 <h5 class="mb-0"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h5>
-                <div class="ms-auto">
-                    <button id="varyasyonOlustur" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus me-1"></i> Geri
-                    </button>
             </div>
+                <button id="backButton" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                </button>
+
         </div>
         <div class="card-body">
             <h4 class="section-title">Varyasyon Listesi</h4>
