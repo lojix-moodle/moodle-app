@@ -439,8 +439,8 @@ echo $OUTPUT->header();
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th width="20%">Varyasyon</th>
-                            <th width="80%">Stok Miktarı</th>
+                            <th width="40%">Varyasyon</th>
+                            <th width="60%">Stok Miktarı</th>
                         </tr>
                         </thead>
                         <tbody id="varyasyonTablo">
@@ -599,7 +599,7 @@ echo $OUTPUT->header();
                 // Renk + Boyut hücresi
                 const variantCell = document.createElement('td');
                 variantCell.className = 'd-flex align-items-center';
-                variantCell.style.width = '20%';
+                variantCell.style.width = '40%';
 
                 // Renk göstergesi
                 const colorBadge = document.createElement('span');
@@ -624,7 +624,7 @@ echo $OUTPUT->header();
                     mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
                     stockInput.innerText = mevcutVaryasyonlar[variant.color.value][variant.size.value];
                 }
-                stockCell.style.width = '80%';
+                stockCell.style.width = '60%';
 
                 stockCell.appendChild(stockInput);
 
