@@ -23,15 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // adet parametresini kaldırdık
     $kategoriid = required_param('kategoriid', PARAM_INT);
 
-    // Renk ve boyut verilerini al
-    // Renk ve boyut verilerini al
+    // Renk ve boyut verilerini al ve temizle
     $colors = optional_param_array('colors', [], PARAM_RAW);
     $colors = clean_array($colors, PARAM_TEXT);
 
     $sizes = optional_param_array('sizes', [], PARAM_RAW);
     $sizes = clean_array($sizes, PARAM_TEXT);
+
     $varyasyonlar = optional_param_array('varyasyon', [], PARAM_RAW);
     $varyasyonlar = clean_array($varyasyonlar, PARAM_TEXT);
+
     $transaction = $DB->start_delegated_transaction();
     try {
         // Varyasyonlardan toplam stok miktarını hesapla
