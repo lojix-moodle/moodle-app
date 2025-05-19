@@ -4,9 +4,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../../../config.php');
-global $DB, $USER, $PAGE, $OUTPUT, $CFG;
 require_login();
-
+global $DB, $PAGE, $OUTPUT, $USER ,$CFG;
 
 $depoid = optional_param('depoid', 0, PARAM_INT);
 $urunid = optional_param('urunid', 0, PARAM_INT);
@@ -38,8 +37,8 @@ if ($depoid) {
 
     // Yetkili olmayanlar sadece kendi depolarını görebilir
     if (!$is_admin) {
-        $user_depo = $DB->get_field('block_depo_yonetimi_depolar', 'id', ['sorumluid' => $USER->id, 'id' => $depoid]);
-        if (!$user_depo) {
+        $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
+        if (!$user_depo || $user_depo != $depoid) {
             print_error('Bu depoya erişim izniniz yok.');
         }
     }
@@ -48,9 +47,19 @@ if ($depoid) {
 // Ürün bilgilerini al (eğer belirtildiyse)
 $urun = null;
 if ($urunid) {
-    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid], '*', MUST_EXIST);
-    if ($urun->depoid != $depoid) {
+    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid], '*');
+    if (!$urun) {
+        print_error('Ürün bulunamadı.');
+    }
+
+    if ($depoid && $urun->depoid != $depoid) {
         print_error('Bu ürün belirtilen depoya ait değil.');
+    }
+
+    // Depoid belirlenmemişse, ürünün depo ID'sini kullan
+    if (!$depoid) {
+        $depoid = $urun->depoid;
+        $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
     }
 }
 
@@ -78,8 +87,8 @@ $total_hareketler = $DB->count_records_sql($count_sql, $params);
 $offset = $page * $perpage;
 
 // Hareketleri al
-$sql = "SELECT l.*, u.name AS urun_adi, d.name AS depo_adi, 
-               usr.firstname, usr.lastname, usr.email
+$sql = "SELECT l.*, u.name AS urun_adi, d.name AS depo_adi,
+               usr.firstname, usr.lastname
         FROM {block_depo_yonetimi_stok_log} l
         JOIN {block_depo_yonetimi_urunler} u ON l.urunid = u.id
         JOIN {block_depo_yonetimi_depolar} d ON l.depoid = d.id
@@ -90,27 +99,33 @@ $sql = "SELECT l.*, u.name AS urun_adi, d.name AS depo_adi,
 $hareketler = $DB->get_records_sql($sql, $params, $offset, $perpage);
 
 // Renk ve boyut bilgilerini göstermek için yardımcı fonksiyon
-function get_string_from_value($value, $type) {
+function get_hareket_string_from_value($value, $type) {
     if ($type == 'color') {
         $colors = [
-            'kirmizi' => 'Kırmızı',
-            'mavi' => 'Mavi',
             'siyah' => 'Siyah',
             'beyaz' => 'Beyaz',
+            'kirmizi' => 'Kırmızı',
+            'mavi' => 'Mavi',
             'yesil' => 'Yeşil',
             'sari' => 'Sarı',
             'turuncu' => 'Turuncu',
             'mor' => 'Mor',
             'pembe' => 'Pembe',
             'gri' => 'Gri',
-            'bej' => 'Bej',
-            'lacivert' => 'Lacivert',
             'kahverengi' => 'Kahverengi',
-            'haki' => 'Haki',
-            'vizon' => 'Vizon',
             'bordo' => 'Bordo'
         ];
         return isset($colors[$value]) ? $colors[$value] : $value;
+    } else if ($type == 'size') {
+        $sizes = [
+            'xs' => 'XS',
+            's' => 'S',
+            'm' => 'M',
+            'l' => 'L',
+            'xl' => 'XL',
+            'xxl' => 'XXL'
+        ];
+        return isset($sizes[$value]) ? $sizes[$value] : $value;
     }
     return $value;
 }
@@ -119,7 +134,38 @@ echo $OUTPUT->header();
 ?>
 
     <style>
-        /* CSS kısmını ekleyin - stok_list.php'den kopyalayabilirsiniz */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner-container {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .stock-action-tag {
             display: inline-block;
             padding: 0.35em 0.65em;
@@ -158,6 +204,28 @@ echo $OUTPUT->header();
         .stock-difference.decrease {
             color: #dc3545;
         }
+
+        .color-sample {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .siyah { background-color: #000; }
+        .beyaz { background-color: #fff; border: 1px solid #ddd; }
+        .kirmizi { background-color: #dc3545; }
+        .mavi { background-color: #0d6efd; }
+        .yesil { background-color: #198754; }
+        .sari { background-color: #ffc107; }
+        .turuncu { background-color: #fd7e14; }
+        .mor { background-color: #6f42c1; }
+        .pembe { background-color: #d63384; }
+        .gri { background-color: #6c757d; }
+        .kahverengi { background-color: #8b4513; }
+        .bordo { background-color: #800000; }
     </style>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -172,77 +240,67 @@ echo $OUTPUT->header();
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-history text-primary me-2"></i>
-                    <h5 class="mb-0">
-                        <?php if ($urunid): ?>
-                            <?php echo htmlspecialchars($urun->name); ?> Ürünü Stok Hareketleri
-                        <?php elseif ($depoid): ?>
-                            <?php echo htmlspecialchars($depo->name); ?> Deposu Stok Hareketleri
-                        <?php else: ?>
-                            Tüm Stok Hareketleri
-                        <?php endif; ?>
-                    </h5>
+                    <h3 class="mb-0">
+                        <i class="fas fa-history text-primary me-2"></i>
+                        Stok Hareketleri
+                    </h3>
                 </div>
 
-                <?php if ($depoid): ?>
-                    <a href="<?php echo new moodle_url('/my/index.php', ['depo' => $depoid]); ?>" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Depoya Dön
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo new moodle_url('/my/index.php'); ?>" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Ana Sayfaya Dön
-                    </a>
-                <?php endif; ?>
+                <div>
+                    <?php if ($depoid && $urunid): ?>
+                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-outline-secondary">
+                            <i class="fas fa-box"></i> Stok Sayfasına Dön
+                        </a>
+                    <?php elseif ($depoid): ?>
+                        <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>" class="btn btn-outline-secondary">
+                            <i class="fas fa-warehouse"></i> Depoya Dön
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Ana Sayfaya Dön
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="card-body">
                 <form method="get" action="" class="row g-3">
-                    <?php if (!$depoid): ?>
-                        <div class="col-md-4">
-                            <label for="depoid" class="form-label">Depo</label>
-                            <select name="depoid" id="depoid" class="form-select">
-                                <option value="">Tüm Depolar</option>
-                                <?php
-                                $depolar = $DB->get_records('block_depo_yonetimi_depolar', null, 'name ASC');
-                                foreach ($depolar as $d) {
-                                    $selected = ($d->id == $depoid) ? 'selected' : '';
-                                    echo "<option value=\"{$d->id}\" {$selected}>{$d->name}</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    <?php else: ?>
-                        <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
-                    <?php endif; ?>
+                    <div class="col-md-4">
+                        <label for="depoid" class="form-label">Depo</label>
+                        <select name="depoid" id="depoid" class="form-select">
+                            <option value="">Tüm Depolar</option>
+                            <?php
+                            $tum_depolar = $DB->get_records('block_depo_yonetimi_depolar', null, 'name ASC');
+                            foreach ($tum_depolar as $d) {
+                                $selected = ($depoid == $d->id) ? 'selected' : '';
+                                echo "<option value='{$d->id}' $selected>{$d->name}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
 
-                    <?php if (!$urunid): ?>
-                        <div class="col-md-4">
-                            <label for="urunid" class="form-label">Ürün</label>
-                            <select name="urunid" id="urunid" class="form-select">
-                                <option value="">Tüm Ürünler</option>
-                                <?php
-                                $where = $depoid ? ['depoid' => $depoid] : [];
-                                $urunler = $DB->get_records('block_depo_yonetimi_urunler', $where, 'name ASC');
-                                foreach ($urunler as $u) {
-                                    $selected = ($u->id == $urunid) ? 'selected' : '';
-                                    echo "<option value=\"{$u->id}\" {$selected}>{$u->name}</option>";
+                    <div class="col-md-4">
+                        <label for="urunid" class="form-label">Ürün</label>
+                        <select name="urunid" id="urunid" class="form-select">
+                            <option value="">Tüm Ürünler</option>
+                            <?php
+                            if ($depoid) {
+                                $depo_urunleri = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid], 'name ASC');
+                                foreach ($depo_urunleri as $u) {
+                                    $selected = ($urunid == $u->id) ? 'selected' : '';
+                                    echo "<option value='{$u->id}' $selected>{$u->name}</option>";
                                 }
-                                ?>
-                            </select>
-                        </div>
-                    <?php else: ?>
-                        <input type="hidden" name="urunid" value="<?php echo $urunid; ?>">
-                    <?php endif; ?>
+                            } elseif ($urunid) {
+                                echo "<option value='{$urun->id}' selected>{$urun->name}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
 
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-filter me-1"></i> Filtrele
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrele
                         </button>
-                        <?php if ($depoid || $urunid): ?>
-                            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php'); ?>" class="btn btn-outline-secondary ms-2">
-                                <i class="fas fa-times me-1"></i> Filtreleri Temizle
-                            </a>
-                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -253,19 +311,20 @@ echo $OUTPUT->header();
             <div class="card-body">
                 <?php if (empty($hareketler)): ?>
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i> Seçilen kriterlere uygun stok hareketi bulunamadı.
+                        <i class="fas fa-info-circle me-2"></i>
+                        Kayıtlı stok hareketi bulunamadı.
                     </div>
                 <?php else: ?>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
                             <tr>
-                                <th>Tarih/Saat</th>
+                                <th>Tarih</th>
                                 <th>Depo</th>
                                 <th>Ürün</th>
                                 <th>Varyasyon</th>
                                 <th>İşlem</th>
-                                <th>Değişim</th>
+                                <th>Miktar Değişimi</th>
                                 <th>İşlemi Yapan</th>
                                 <th>Açıklama</th>
                             </tr>
@@ -274,25 +333,18 @@ echo $OUTPUT->header();
                             <?php foreach ($hareketler as $hareket): ?>
                                 <tr>
                                     <td><?php echo date('d.m.Y H:i', $hareket->islem_tarihi); ?></td>
+                                    <td><?php echo $hareket->depo_adi; ?></td>
+                                    <td><?php echo $hareket->urun_adi; ?></td>
                                     <td>
-                                        <span class="badge bg-light text-dark border">
-                                            <?php echo htmlspecialchars($hareket->depo_adi); ?>
-                                        </span>
-                                    </td>
-                                    <td><?php echo htmlspecialchars($hareket->urun_adi); ?></td>
-                                    <td>
-                                        <?php if ($hareket->color || $hareket->size): ?>
-                                            <?php if ($hareket->color): ?>
-                                                <span class="badge bg-secondary">
-                                                    <?php echo get_string_from_value($hareket->color, 'color'); ?>
-                                                </span>
-                                            <?php endif; ?>
-
-                                            <?php if ($hareket->size): ?>
-                                                <span class="badge bg-light text-dark">
-                                                    <?php echo $hareket->size; ?>
-                                                </span>
-                                            <?php endif; ?>
+                                        <?php if ($hareket->color && $hareket->size): ?>
+                                            <span class="color-sample <?php echo $hareket->color; ?>"></span>
+                                            <?php echo get_hareket_string_from_value($hareket->color, 'color') . ' / ' .
+                                                get_hareket_string_from_value($hareket->size, 'size'); ?>
+                                        <?php elseif ($hareket->color): ?>
+                                            <span class="color-sample <?php echo $hareket->color; ?>"></span>
+                                            <?php echo get_hareket_string_from_value($hareket->color, 'color'); ?>
+                                        <?php elseif ($hareket->size): ?>
+                                            <?php echo get_hareket_string_from_value($hareket->size, 'size'); ?>
                                         <?php else: ?>
                                             <span class="text-muted">-</span>
                                         <?php endif; ?>
@@ -300,29 +352,34 @@ echo $OUTPUT->header();
                                     <td>
                                         <span class="stock-action-tag <?php echo $hareket->islem_turu; ?>">
                                             <?php
-                                            if ($hareket->islem_turu == 'ekleme') echo 'Ekleme';
-                                            elseif ($hareket->islem_turu == 'azaltma') echo 'Azaltma';
-                                            else echo 'Güncelleme';
+                                            $islem_metni = '';
+                                            switch ($hareket->islem_turu) {
+                                                case 'ekleme':
+                                                    $islem_metni = 'Ekleme';
+                                                    break;
+                                                case 'azaltma':
+                                                    $islem_metni = 'Azaltma';
+                                                    break;
+                                                case 'guncelleme':
+                                                    $islem_metni = 'Güncelleme';
+                                                    break;
+                                                default:
+                                                    $islem_metni = ucfirst($hareket->islem_turu);
+                                            }
+                                            echo $islem_metni;
                                             ?>
                                         </span>
                                     </td>
                                     <td>
                                         <?php
                                         $fark = $hareket->yeni_miktar - $hareket->eski_miktar;
-                                        $fark_class = $fark > 0 ? 'increase' : ($fark < 0 ? 'decrease' : '');
-                                        $fark_isaret = $fark > 0 ? '+' : '';
+                                        $class = ($fark > 0) ? 'increase' : (($fark < 0) ? 'decrease' : '');
+                                        $isaret = ($fark > 0) ? '+' : '';
+                                        echo "<span class='stock-difference {$class}'>{$hareket->eski_miktar} → {$hareket->yeni_miktar} ({$isaret}{$fark})</span>";
                                         ?>
-                                        <span class="stock-difference <?php echo $fark_class; ?>">
-                                            <?php echo $hareket->eski_miktar; ?> → <?php echo $hareket->yeni_miktar; ?>
-                                            (<?php echo $fark_isaret . $fark; ?>)
-                                        </span>
                                     </td>
-                                    <td>
-                                        <?php echo fullname($hareket); ?>
-                                    </td>
-                                    <td>
-                                        <?php echo !empty($hareket->aciklama) ? htmlspecialchars($hareket->aciklama) : '<span class="text-muted">-</span>'; ?>
-                                    </td>
+                                    <td><?php echo $hareket->firstname . ' ' . $hareket->lastname; ?></td>
+                                    <td><?php echo $hareket->aciklama ?: '<span class="text-muted">-</span>'; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
@@ -331,11 +388,9 @@ echo $OUTPUT->header();
 
                     <!-- Sayfalama -->
                     <?php
-                    $baseurl = new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', [
-                        'depoid' => $depoid,
-                        'urunid' => $urunid
-                    ]);
-                    echo $OUTPUT->paging_bar($total_hareketler, $page, $perpage, $baseurl);
+                    if ($total_hareketler > $perpage) {
+                        echo $OUTPUT->paging_bar($total_hareketler, $page, $perpage, $PAGE->url);
+                    }
                     ?>
                 <?php endif; ?>
             </div>
@@ -343,49 +398,28 @@ echo $OUTPUT->header();
     </div>
 
     <script>
-        // AJAX filtresi için
         document.addEventListener('DOMContentLoaded', function() {
             const depoSelect = document.getElementById('depoid');
             const urunSelect = document.getElementById('urunid');
 
             if (depoSelect) {
                 depoSelect.addEventListener('change', function() {
+                    // Depo değiştiğinde ürün listesini güncelle
                     const depoid = this.value;
+                    urunSelect.innerHTML = '<option value="">Tüm Ürünler</option>';
 
                     if (depoid) {
-                        // Depo seçildiğinde ürünleri filtrele
+                        // AJAX isteği ile ürünleri getir
                         fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/get_urunler.php?depoid=' + depoid)
                             .then(response => response.json())
                             .then(data => {
-                                // Ürün seçeneğini temizle
-                                urunSelect.innerHTML = '<option value="">Tüm Ürünler</option>';
-
-                                // Yeni ürünleri ekle
                                 data.forEach(urun => {
                                     const option = document.createElement('option');
                                     option.value = urun.id;
                                     option.textContent = urun.name;
                                     urunSelect.appendChild(option);
                                 });
-                            })
-                            .catch(error => console.error('Ürünler yüklenirken hata:', error));
-                    } else {
-                        // Depo seçilmediğinde tüm ürünleri göster
-                        fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/get_urunler.php')
-                            .then(response => response.json())
-                            .then(data => {
-                                // Ürün seçeneğini temizle
-                                urunSelect.innerHTML = '<option value="">Tüm Ürünler</option>';
-
-                                // Tüm ürünleri ekle
-                                data.forEach(urun => {
-                                    const option = document.createElement('option');
-                                    option.value = urun.id;
-                                    option.textContent = urun.name;
-                                    urunSelect.appendChild(option);
-                                });
-                            })
-                            .catch(error => console.error('Ürünler yüklenirken hata:', error));
+                            });
                     }
                 });
             }

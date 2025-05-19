@@ -143,17 +143,19 @@ class block_depo_yonetimi extends block_base {
                                 <i class="fas fa-box-open mr-1"></i> ' . count($urunler) . ' Ürün
                             </p>
                         </div>
-                        <div class="d-flex gap-2">
+                          
+                          <div class="d-flex gap-2">
                             <a href="' . $PAGE->url->out(false) . '" class="btn btn-outline-secondary rounded-pill">
                                 <i class="fas fa-arrow-left"></i> Geri Dön
                             </a>
-                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid]) . '" class="btn btn-outline-info rounded-pill">
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid]) . '" class="btn btn-outline-info rounded-pill">
                                 <i class="fas fa-history"></i> Stok Hareketleri
                             </a>
                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]) . '" class="btn btn-primary rounded-pill">
                                 <i class="fas fa-plus"></i> Yeni Ürün Ekle
                             </a>
                         </div>
+                          
                     </div>
                 </div>
 
@@ -325,24 +327,24 @@ class block_depo_yonetimi extends block_base {
 
         if ($yetki === 'admin') {
             $html .= '
-                <div class="dashboard-actions d-flex gap-2 flex-wrap">
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
-                       class="btn btn-primary rounded-pill d-flex align-items-center">
-                        <i class="fas fa-plus me-2"></i> Depo Ekle
-                    </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '"
-                       class="btn btn-outline-primary rounded-pill d-flex align-items-center">
-                        <i class="fas fa-tags me-2"></i> Kategoriler
-                    </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php') . '"
-                       class="btn btn-outline-primary rounded-pill d-flex align-items-center">
-                     <i class="fas fa-boxes me-2"></i> Stoklar
-                   </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php') . '"
-                      class="btn btn-outline-primary rounded-pill d-flex align-items-center">
-                    <i class="fas fa-history me-2"></i> Stok Hareketleri
-                  </a>
-                </div>';
+                        <div class="dashboard-actions d-flex gap-2 flex-wrap">
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
+                               class="btn btn-primary rounded-pill d-flex align-items-center">
+                                <i class="fas fa-plus me-2"></i> Depo Ekle
+                            </a>
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '"
+                               class="btn btn-outline-primary rounded-pill d-flex align-items-center">
+                                <i class="fas fa-tags me-2"></i> Kategoriler
+                            </a>
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php') . '"
+                               class="btn btn-outline-primary rounded-pill d-flex align-items-center">
+                               <i class="fas fa-boxes me-2"></i> Stoklar
+                            </a>
+                            <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php') . '"
+                               class="btn btn-outline-info rounded-pill d-flex align-items-center">
+                               <i class="fas fa-history me-2"></i> Stok Hareketleri
+                            </a>
+                        </div>';
         }
 
         $html .= '
