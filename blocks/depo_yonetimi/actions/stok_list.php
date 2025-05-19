@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../lib.php'); // stok_hareketi_kaydet fonksiyonunu içe aktar
 require_login();
 global $DB, $PAGE, $OUTPUT, $USER;
 
@@ -36,6 +37,86 @@ if (!$urun) {
     print_error('Ürün bulunamadı.');
 }
 
+// Form gönderildiğinde işle
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
+    // Ana stok miktarını güncelle
+    $eski_miktar = $urun->adet;
+    $yeni_miktar = required_param('adet', PARAM_INT);
+
+    // Stoku güncelle
+    $urun->adet = $yeni_miktar;
+
+    // Stok hareketi türünü belirle
+    if ($yeni_miktar > $eski_miktar) {
+        $islem_turu = 'ekleme';
+    } elseif ($yeni_miktar < $eski_miktar) {
+        $islem_turu = 'azaltma';
+    } else {
+        $islem_turu = 'guncelleme';
+    }
+
+    // Stok hareketini kaydet (ana ürün için)
+    if ($yeni_miktar != $eski_miktar) {
+        stok_hareketi_kaydet(
+            $depoid,
+            $urunid,
+            null, // renk
+            null, // boyut
+            $eski_miktar,
+            $yeni_miktar,
+            $islem_turu,
+            'Ana stok güncellemesi'
+        );
+    }
+
+    // Varyasyon stoklarını güncelle
+    $varyasyonlar = [];
+    if (isset($_POST['varyasyonlar']) && is_array($_POST['varyasyonlar'])) {
+        foreach ($_POST['varyasyonlar'] as $color => $sizes) {
+            foreach ($sizes as $size => $yeni_miktar) {
+                // Eski miktarı bul
+                $eski_miktar = 0;
+                if (isset($mevcut_varyasyonlar[$color][$size])) {
+                    $eski_miktar = $mevcut_varyasyonlar[$color][$size];
+                }
+
+                // Varyasyon değerini kaydet
+                $varyasyonlar[$color][$size] = $yeni_miktar;
+
+                // Stok hareketi türünü belirle
+                if ($yeni_miktar > $eski_miktar) {
+                    $islem_turu = 'ekleme';
+                } elseif ($yeni_miktar < $eski_miktar) {
+                    $islem_turu = 'azaltma';
+                } else {
+                    $islem_turu = 'guncelleme';
+                }
+
+                // Stok değişimi varsa kaydet
+                if ($yeni_miktar != $eski_miktar) {
+                    stok_hareketi_kaydet(
+                        $depoid,
+                        $urunid,
+                        $color,
+                        $size,
+                        $eski_miktar,
+                        $yeni_miktar,
+                        $islem_turu,
+                        'Varyasyon stok güncellemesi'
+                    );
+                }
+            }
+        }
+    }
+
+    // Ürünü güncelle
+    $urun->varyasyonlar = json_encode($varyasyonlar);
+    $DB->update_record('block_depo_yonetimi_urunler', $urun);
+
+    \core\notification::success('Stok başarıyla güncellendi.');
+    redirect($PAGE->url);
+}
+
 // Mevcut renk ve boyut bilgilerini al
 $mevcut_renkler = [];
 $mevcut_boyutlar = [];
@@ -61,21 +142,17 @@ $mevcut_varyasyonlar = !empty($urun->varyasyonlar) ? json_decode($urun->varyasyo
 function get_string_from_value($value, $type) {
     if ($type == 'color') {
         $colors = [
-            'kirmizi' => 'Kırmızı',
-            'mavi' => 'Mavi',
             'siyah' => 'Siyah',
             'beyaz' => 'Beyaz',
+            'kirmizi' => 'Kırmızı',
+            'mavi' => 'Mavi',
             'yesil' => 'Yeşil',
             'sari' => 'Sarı',
             'turuncu' => 'Turuncu',
             'mor' => 'Mor',
             'pembe' => 'Pembe',
             'gri' => 'Gri',
-            'bej' => 'Bej',
-            'lacivert' => 'Lacivert',
             'kahverengi' => 'Kahverengi',
-            'haki' => 'Haki',
-            'vizon' => 'Vizon',
             'bordo' => 'Bordo'
         ];
         return isset($colors[$value]) ? $colors[$value] : $value;
@@ -86,8 +163,7 @@ function get_string_from_value($value, $type) {
             'm' => 'M',
             'l' => 'L',
             'xl' => 'XL',
-            'xxl' => 'XXL',
-            'xxxl' => 'XXXL'
+            'xxl' => 'XXL'
         ];
         return isset($sizes[$value]) ? $sizes[$value] : $value;
     }
@@ -97,724 +173,174 @@ function get_string_from_value($value, $type) {
 echo $OUTPUT->header();
 ?>
 
-<style>
-    :root {
-        --primary: #3e64ff;
-        --primary-light: rgba(62, 100, 255, 0.1);
-        --secondary: #6c757d;
-        --success: #28a745;
-        --info: #17a2b8;
-        --warning: #ffc107;
-        --danger: #dc3545;
-        --light: #f8f9fa;
-        --dark: #343a40;
-        --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10);
-        --shadow-lg: 0 1rem 2rem rgba(0, 0, 0, 0.12);
-        --border-radius: 0.5rem;
-        --transition: all 0.2s ease-in-out;
-    }
-
-    body {
-        background-color: #f9fafb;
-    }
-
-    .card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        overflow: hidden;
-    }
-
-    .card:hover {
-        box-shadow: var(--shadow-lg);
-    }
-
-    .card-header {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        padding: 1.25rem 1.5rem;
-        background: linear-gradient(to right, var(--primary), #5a77ff);
-    }
-
-    .card-header h5 {
-        font-weight: 600;
-        margin-bottom: 0;
-        color: white;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-control, .form-select {
-        border-color: #e2e8f0;
-        padding: 0.65rem 1rem;
-        border-radius: 0.4rem;
-        box-shadow: none;
-        transition: var(--transition);
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.15);
-    }
-
-    .input-group-text {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        color: #64748b;
-    }
-
-    .btn {
-        font-weight: 500;
-        padding: 0.6rem 1.2rem;
-        border-radius: 0.4rem;
-        transition: all 0.25s ease;
-    }
-
-    .btn-primary {
-        background: linear-gradient(to right, var(--primary), #5a77ff);
-        border: none;
-        box-shadow: 0 4px 12px rgba(62, 100, 255, 0.25);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(62, 100, 255, 0.35);
-    }
-
-    .btn-success {
-        background: linear-gradient(to right, #28a745, #48c76a);
-        border: none;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
-    }
-
-    .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.35);
-    }
-
-    .btn-outline-secondary {
-        border-color: #dde1e7;
-        color: #64748b;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #f8fafc;
-        color: #334155;
-        border-color: #cbd5e1;
-    }
-
-    .section-title {
-        position: relative;
-        color: #334155;
-        font-weight: 600;
-        padding-bottom: 0.75rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .section-title:after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        height: 3px;
-        width: 40px;
-        background: var(--primary);
-        border-radius: 3px;
-    }
-
-    .badge {
-        padding: 0.45em 0.8em;
-        font-weight: 500;
-    }
-
-    .loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.85);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(3px);
-    }
-
-    .spinner-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: white;
-        padding: 2rem;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-    }
-
-    .spinner {
-        width: 3rem;
-        height: 3rem;
-        border: 4px solid rgba(62, 100, 255, 0.1);
-        border-left: 4px solid var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    .form-text {
-        color: #64748b !important;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    table.table {
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: 0 0 0 1px #e5e7eb;
-    }
-
-    .table thead th {
-        background-color: #f8fafc;
-        font-weight: 600;
-        color: #334155;
-        border-top: none;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .table tbody td {
-        vertical-align: middle;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .depo-info-bar {
-        background-color: #f8fafc;
-        border-radius: var(--border-radius);
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-    }
-
-    .depo-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary), #5a77ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        color: white;
-        font-size: 1.2rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 991.98px) {
-        .card {
-            margin-bottom: 1.5rem;
+    <style>
+        /* CSS kodu buraya */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
-    }
-</style>
 
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner-container">
-        <div class="spinner"></div>
-        <p class="mt-3 mb-0">İşleminiz Yapılıyor...</p>
-    </div>
-</div>
+        .spinner-container {
+            text-align: center;
+        }
 
-<div class="container-fluid py-4">
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    <div class="mb-4" style="display: none">
-        <label for="name" class="form-label">
-            <i class="fas fa-box me-2 text-primary"></i>Ürün Adı
-        </label>
-        <div class="input-group">
-            <span class="input-group-text"><i class="fas fa-tag"></i></span>
-            <input type="text" class="form-control" id="name" name="name"
-                   value="<?php echo htmlspecialchars($urun->name); ?>"
-                   placeholder="Ürün adını girin" required>
-        </div>
-        <div class="invalid-feedback">Lütfen ürün adını girin.</div>
-        <div class="form-text">Depodaki ürünün adını girin</div>
-    </div>
+        .color-sample {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
 
-    <!-- Renkler ve Boyutlar -->
-    <div class="row mb-4" style="display: none">
-        <!-- Renkler - Sol Kolon -->
-        <div class="mb-4">
-            <label for="colors" class="form-label">
-                <i class="fas fa-palette me-2 text-primary"></i>Renkler
-            </label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                <select multiple class="form-select" id="colors" name="colors[]" size="5">
-                    <?php
-                    $renkler = [
-                        'beyaz' => 'Beyaz',
-                        'mavi' => 'Mavi',
-                        'siyah' => 'Siyah',
-                        'bej' => 'Bej',
-                        'gri' => 'Gri',
-                        'lacivert' => 'Lacivert',
-                        'kahverengi' => 'Kahverengi',
-                        'pembe' => 'Pembe',
-                        'mor' => 'Mor',
-                        'haki' => 'Haki',
-                        'vizon' => 'Vizon',
-                        'sari' => 'Sarı',
-                        'turuncu' => 'Turuncu',
-                        'kirmizi' => 'Kırmızı',
-                        'yesil' => 'Yeşil',
-                        'bordo' => 'Bordo'
-                    ];
+        .siyah { background-color: #000; }
+        .beyaz { background-color: #fff; border: 1px solid #ddd; }
+        .kirmizi { background-color: #dc3545; }
+        .mavi { background-color: #0d6efd; }
+        .yesil { background-color: #198754; }
+        .sari { background-color: #ffc107; }
+        .turuncu { background-color: #fd7e14; }
+        .mor { background-color: #6f42c1; }
+        .pembe { background-color: #d63384; }
+        .gri { background-color: #6c757d; }
+        .kahverengi { background-color: #8b4513; }
+        .bordo { background-color: #800000; }
+    </style>
 
-                    foreach ($renkler as $value => $label):
-                        $selected = in_array($value, $mevcut_renkler) ? 'selected' : '';
-                        ?>
-                        <option value="<?php echo $value; ?>" <?php echo $selected; ?>><?php echo $label; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-text small">
-                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-            </div>
-        </div>
-
-        <!-- Boyutlar - Sağ Kolon -->
-        <div class="mb-4">
-            <label for="sizes" class="form-label">
-                <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
-            </label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
-                    <?php
-                    $boyutlar = range(17, 45);
-                    foreach ($boyutlar as $boyut):
-                        $selected = in_array($boyut, $mevcut_boyutlar) ? 'selected' : '';
-                        ?>
-                        <option value="<?php echo $boyut; ?>" <?php echo $selected; ?>><?php echo $boyut; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-text small">
-                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-            </div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p class="mt-3 mb-0">İşleminiz Yapılıyor...</p>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-box-open text-white me-2"></i>
-                <h5 class="mb-0"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h5>
-            </div>
-            <a href="<?php echo new moodle_url('/my/index.php', ['depo' => $depoid]); ?>" class="btn btn-sm btn-outline-white">
-                <i class="fas fa-arrow-left me-1"></i> Geri Dön
-            </a>
-
-        </div>
-        <div class="card-body">
-            <h4 class="section-title">Varyasyon Listesi</h4>
-
-            <div id="varyasyonBolumu" class="mt-4 <?php echo (!empty($mevcut_varyasyonlar)) ? '' : 'd-none'; ?>">
-                <div class="alert alert-info d-flex <?php echo (!empty($mevcut_varyasyonlar)) ? 'd-none' : ''; ?>">
-                    <i class="fas fa-info-circle me-3 fs-5"></i>
-                    <div>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın</div>
+    <div class="container-fluid py-4">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="<?php echo new moodle_url('/my'); ?>">Ana Sayfa</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>"><?php echo $depo->name; ?></a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><?php echo $urun->name; ?> - Stok</li>
+                        </ol>
+                    </nav>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>Varyasyon</th>
-                            <th width="40%" style="text-align: center">Stok Miktarı</th>
-                        </tr>
-                        </thead>
-                        <tbody id="varyasyonTablo">
-                        <!-- JavaScript ile dinamik oluşturulacak -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Sayfalama Bilgisi -->
-                <div id="pageInfo" class="text-center text-muted mt-2"></div>
-
-                <!-- Sayfalama Kontrolleri -->
-                <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
-                    <button id="prevPage" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-chevron-left me-1"></i> Önceki
-                    </button>
-                    <button id="nextPage" class="btn btn-sm btn-outline-primary">
-                        Sonraki <i class="fas fa-chevron-right ms-1"></i>
-                    </button>
+                <div>
+                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-outline-info">
+                        <i class="fas fa-history"></i> Stok Hareketleri
+                    </a>
+                    <a href="<?php echo new moodle_url('/my', ['depo' => $depoid]); ?>" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
                 </div>
             </div>
 
+            <div class="card-body">
+                <h3 class="mb-4">
+                    <i class="fas fa-box-open text-primary me-2"></i>
+                    <?php echo htmlspecialchars($urun->name); ?> - Stok Bilgisi
+                </h3>
+
+                <form action="" method="POST" id="stokForm">
+                    <?php echo html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey())); ?>
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Ana Stok</h5>
+                        <div class="mb-3 row">
+                            <label for="adet" class="col-sm-2 col-form-label">Adet:</label>
+                            <div class="col-sm-10">
+                                <input type="number" class="form-control" id="adet" name="adet" value="<?php echo $urun->adet; ?>" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (!empty($mevcut_renkler) && !empty($mevcut_boyutlar)): ?>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Varyasyonlar</h5>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Renk</th>
+                                        <?php foreach ($mevcut_boyutlar as $boyut): ?>
+                                            <th><?php echo get_string_from_value($boyut, 'size'); ?></th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($mevcut_renkler as $renk): ?>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <span class="color-sample <?php echo $renk; ?>"></span>
+                                                    <?php echo get_string_from_value($renk, 'color'); ?>
+                                                </div>
+                                            </td>
+                                            <?php foreach ($mevcut_boyutlar as $boyut): ?>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm"
+                                                           name="varyasyonlar[<?php echo $renk; ?>][<?php echo $boyut; ?>]"
+                                                           value="<?php echo isset($mevcut_varyasyonlar[$renk][$boyut]) ? $mevcut_varyasyonlar[$renk][$boyut] : 0; ?>"
+                                                           min="0">
+                                                </td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save me-2"></i>Stok Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    (function () {
-        'use strict';
-
-        // Form doğrulama
-        const forms = document.querySelectorAll('.needs-validation');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Renk ve boyut seçimleri
-        const colorSelect = document.getElementById('colors');
-        const sizeSelect = document.getElementById('sizes');
-        const varyasyonOlusturBtn = document.getElementById('varyasyonOlustur');
-        const varyasyonBolumu = document.getElementById('varyasyonBolumu');
-        const varyasyonTablo = document.getElementById('varyasyonTablo');
-
-        // Sayfalama değişkenleri
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let allVariants = [];
-
-        // Mevcut varyasyonları JSON'dan al
-        const mevcutVaryasyonlar = <?php echo !empty($urun->varyasyonlar) ? $urun->varyasyonlar : '{}'; ?>;
-
-        // Sayfa yüklendiğinde mevcut varyasyonları göster
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
+            const form = document.getElementById('stokForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            form.addEventListener('submit', function() {
+                loadingOverlay.style.display = 'flex';
+                submitBtn.disabled = true;
             });
-
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
-            });
-
-            if (selectedColors.length > 0 && selectedSizes.length > 0) {
-                // Varyasyonları oluştur
-                allVariants = [];
-                selectedColors.forEach(color => {
-                    selectedSizes.forEach(size => {
-                        allVariants.push({
-                            color: color,
-                            size: size
-                        });
-                    });
-                });
-
-                // Varyasyonları göster
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
         });
-
-        // Varyasyon oluşturma
-        varyasyonOlusturBtn.addEventListener('click', function() {
-            // Seçilen renkler ve boyutları al
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
-            });
-
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
-            });
-
-            // Hiçbir seçim yapılmadıysa uyarı ver
-            if (selectedColors.length === 0 || selectedSizes.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Eksik Seçim',
-                    text: 'Lütfen en az bir renk ve bir boyut seçin.',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#3e64ff'
-                });
-                return;
-            }
-
-            // Varyasyon bölümünü göster
-            varyasyonBolumu.classList.remove('d-none');
-            // Uyarı mesajını gizle
-            const uyariMesaji = varyasyonBolumu.querySelector('.alert-info');
-            if (uyariMesaji) {
-                uyariMesaji.classList.add('d-none');
-            }
-
-            // Tüm varyasyonları oluştur ve saklayalım
-            allVariants = [];
-            selectedColors.forEach(color => {
-                selectedSizes.forEach(size => {
-                    allVariants.push({
-                        color: color,
-                        size: size
-                    });
-                });
-            });
-
-            // Sayfalama değişkenlerini sıfırla
-            currentPage = 1;
-
-            // Varyasyonları sayfayla göster
-            displayVariantsByPage();
-
-            // Sayfalama kontrollerini güncelle
-            updatePaginationControls();
-        });
-
-        // Belirli bir sayfadaki varyasyonları göster
-        function displayVariantsByPage() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, allVariants.length);
-            const pageVariants = allVariants.slice(startIndex, endIndex);
-
-            // Tabloyu temizle
-            varyasyonTablo.innerHTML = '';
-
-            // Seçili sayfadaki varyasyonları ekle
-            pageVariants.forEach(variant => {
-                const row = document.createElement('tr');
-
-                // Renk + Boyut hücresi
-                const variantCell = document.createElement('td');
-                variantCell.className = 'd-flex align-items-center';
-
-                // Renk göstergesi
-                const colorBadge = document.createElement('span');
-                colorBadge.className = 'badge me-2';
-                colorBadge.style.backgroundColor = getColorHex(variant.color.value);
-                colorBadge.style.color = getContrastColor(variant.color.value);
-                colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
-
-                variantCell.appendChild(colorBadge);
-                variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
-
-                // Stok miktarı hücresi
-                const stockCell = document.createElement('td');
-                const stockInput = document.createElement('span');
-
-                // Mevcut varyasyon değerini kontrol et ve ata
-                stockInput.innerText = 0; // Varsayılan değer
-
-                // Mevcut varyasyon verisinden değeri al
-                if (mevcutVaryasyonlar &&
-                    mevcutVaryasyonlar[variant.color.value] &&
-                    mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
-                    stockInput.innerText = mevcutVaryasyonlar[variant.color.value][variant.size.value];
-                }
-
-                stockCell.style.textAlign= 'center';
-                stockCell.appendChild(stockInput);
-
-                row.appendChild(variantCell);
-                row.appendChild(stockCell);
-                varyasyonTablo.appendChild(row);
-            });
-
-            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${Math.ceil(allVariants.length / itemsPerPage)}`;
-        }
-
-        // Sayfalama kontrollerini güncelle
-        function updatePaginationControls() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-
-            // Önceki sayfa butonunu güncelle
-            prevPageBtn.disabled = currentPage <= 1;
-
-            // Sonraki sayfa butonunu güncelle
-            nextPageBtn.disabled = currentPage >= totalPages;
-
-            // Sayfa bilgisini güncelle
-            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
-        }
-
-        // Önceki sayfa butonuna tıklama
-        document.getElementById('prevPage').addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
-
-        // Sonraki sayfa butonuna tıklama
-        document.getElementById('nextPage').addEventListener('click', function() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
-
-        // Renk kodlarını al
-        function getColorHex(colorName) {
-            const colorMap = {
-                'kirmizi': '#dc3545',
-                'mavi': '#0d6efd',
-                'siyah': '#212529',
-                'beyaz': '#f8f9fa',
-                'yesil': '#198754',
-                'sari': '#ffc107',
-                'turuncu': '#fd7e14',
-                'mor': '#6f42c1',
-                'pembe': '#d63384',
-                'gri': '#6c757d',
-                'bej': '#E4DAD2',
-                'lacivert': '#11098A',
-                'kahverengi': '#8B4513',
-                'haki': '#8A9A5B',
-                'vizon': '#A89F91',
-                'bordo': '#800000'
-            };
-
-            return colorMap[colorName] || '#6c757d';
-        }
-
-        // Kontrast rengi hesapla
-        function getContrastColor(colorName) {
-            const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe', 'bej'];
-            return lightColors.includes(colorName) ? '#212529' : '#ffffff';
-        }
-
-        // Sayfa yüklendiğinde loading overlay'i gizle
-        window.addEventListener('load', function() {
-            loadingOverlay.style.display = 'none';
-        });
-
-        // Form doğrulama
-        Array.prototype.slice.call(forms).forEach(function (form) {
-            // Dinamik doğrulama - alan değiştiğinde
-            const inputs = form.querySelectorAll('input, select');
-            Array.prototype.slice.call(inputs).forEach(function(input) {
-                input.addEventListener('change', function() {
-                    // Geçerlilik kontrolü
-                    if (input.checkValidity()) {
-                        input.classList.remove('is-invalid');
-                        input.classList.add('is-valid');
-                    } else {
-                        input.classList.remove('is-valid');
-                        input.classList.add('is-invalid');
-                    }
-                });
-            });
-
-            // Form gönderildiğinde
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    // Geçersiz alanları işaretle
-                    Array.prototype.slice.call(inputs).forEach(function(input) {
-                        if (!input.checkValidity()) {
-                            input.classList.add('is-invalid');
-                        }
-                    });
-
-                    // Hata mesajı göster
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Form Hatası',
-                        text: 'Lütfen zorunlu alanları doldurun!',
-                        confirmButtonText: 'Tamam',
-                        confirmButtonColor: '#3e64ff'
-                    });
-                } else {
-                    // Varyasyonlar var mı kontrol et
-                    const hasVariations = !varyasyonBolumu.classList.contains('d-none') &&
-                        varyasyonTablo.querySelectorAll('tr').length > 0;
-
-                    if (hasVariations) {
-                        // Varyasyon girişlerini kontrol et
-                        const varyasyonInputs = varyasyonTablo.querySelectorAll('input[type="number"]');
-                        let varyasyonToplam = 0;
-                        let validVariants = 0;
-
-                        varyasyonInputs.forEach(function(input) {
-                            const value = parseInt(input.value);
-                            if (!isNaN(value) && value > 0) {
-                                varyasyonToplam += value;
-                                validVariants++;
-                            }
-                        });
-
-                        if (validVariants === 0) {
-                            event.preventDefault();
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Varyasyon Hatası',
-                                text: 'En az bir varyasyon için stok miktarı girmelisiniz!',
-                                confirmButtonText: 'Tamam',
-                                confirmButtonColor: '#3e64ff'
-                            });
-                            return;
-                        }
-
-                        // Onay mesajı göster
-                        event.preventDefault();
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Onay',
-                            html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok güncellemek üzeresiniz.</p>` +
-                                `<p>Devam etmek istiyor musunuz?</p>`,
-                            showCancelButton: true,
-                            confirmButtonText: 'Evet, Güncelle',
-                            cancelButtonText: 'İptal',
-                            confirmButtonColor: '#3e64ff',
-                            cancelButtonColor: '#6c757d'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                loadingOverlay.style.display = 'flex';
-                                submitBtn.disabled = true;
-                                form.submit();
-                            }
-                        });
-                    } else {
-                        // Varyasyon yok, normal form gönderimi
-                        loadingOverlay.style.display = 'flex';
-                        submitBtn.disabled = true;
-                    }
-                }
-
-                form.classList.add('was-validated');
-            }, false);
-        });
-    })();
-</script>
-
-<!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    </script>
 
 <?php
 echo $OUTPUT->footer();
 ?>
-

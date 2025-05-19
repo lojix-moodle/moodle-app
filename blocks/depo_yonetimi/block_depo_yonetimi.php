@@ -147,6 +147,9 @@ class block_depo_yonetimi extends block_base {
                             <a href="' . $PAGE->url->out(false) . '" class="btn btn-outline-secondary rounded-pill">
                                 <i class="fas fa-arrow-left"></i> Geri Dön
                             </a>
+                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid]) . '" class="btn btn-outline-info rounded-pill">
+                                <i class="fas fa-history"></i> Stok Hareketleri
+                            </a>
                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]) . '" class="btn btn-primary rounded-pill">
                                 <i class="fas fa-plus"></i> Yeni Ürün Ekle
                             </a>
@@ -335,6 +338,10 @@ class block_depo_yonetimi extends block_base {
                        class="btn btn-outline-primary rounded-pill d-flex align-items-center">
                      <i class="fas fa-boxes me-2"></i> Stoklar
                    </a>
+                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php') . '"
+                      class="btn btn-outline-primary rounded-pill d-flex align-items-center">
+                    <i class="fas fa-history me-2"></i> Stok Hareketleri
+                  </a>
                 </div>';
         }
 
