@@ -612,23 +612,18 @@ echo $OUTPUT->header();
 
                 // Stok miktarı hücresi
                 const stockCell = document.createElement('td');
-                const stockInput = document.createElement('input');
-                stockInput.type = 'number';
-                stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
-                stockInput.className = 'form-control form-control-sm';
-                stockInput.min = 0;
+                const stockInput = document.createElement('span');
 
                 // Mevcut varyasyon değerini kontrol et ve ata
-                stockInput.value = 0; // Varsayılan değer
+                stockInput.innerText = 0; // Varsayılan değer
 
                 // Mevcut varyasyon verisinden değeri al
                 if (mevcutVaryasyonlar &&
                     mevcutVaryasyonlar[variant.color.value] &&
                     mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
-                    stockInput.value = mevcutVaryasyonlar[variant.color.value][variant.size.value];
+                    stockInput.innerText = mevcutVaryasyonlar[variant.color.value][variant.size.value];
                 }
 
-                stockInput.required = true;
 
                 stockCell.appendChild(stockInput);
 
