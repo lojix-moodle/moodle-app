@@ -14,7 +14,7 @@ $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', ['d
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Stoklar');
 $PAGE->set_heading('Stoklar');
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('admin');
 
 // Yetki kontrolü
 $context = context_system::instance();
@@ -425,9 +425,9 @@ echo $OUTPUT->header();
                 <i class="fas fa-box-open text-white me-2"></i>
                 <h5 class="mb-0"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h5>
             </div>
-                <a href="<?php new moodle_url('/my') ?>" class="btn btn-sm btn-outline-white">
-                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
-                </a>
+            <a href="<?php echo new moodle_url('/my/index.php', ['depo' => $depoid]); ?>" class="btn btn-sm btn-outline-white">
+                <i class="fas fa-arrow-left me-1"></i> Geri Dön
+            </a>
 
         </div>
         <div class="card-body">
