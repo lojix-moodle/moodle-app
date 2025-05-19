@@ -40,7 +40,7 @@ if ($kategori_id) {
 
 // Arama filtresini ekle
 if ($arama) {
-    $conditions[] = $DB->sql_like('name', ':name', false);
+    $conditions[] = $DB->sql_like('u.name', ':name', false); // 'u.name' olarak düzeltildi
     $params['name'] = '%' . $DB->sql_like_escape($arama) . '%';
 }
 
@@ -61,10 +61,12 @@ foreach ($conditions as $field => $value) {
             $conditions_sql[] = "u.$field $in_sql";
             $params = array_merge($params, $in_params);
         }
-    } else {
+    } else if (is_string($field) && strpos($field, '.') === false) {
         $paramname = 'param' . count($params);
         $conditions_sql[] = "u.$field = :$paramname";
         $params[$paramname] = $value;
+    } else {
+        $conditions_sql[] = $field;
     }
 }
 
@@ -116,7 +118,7 @@ echo $OUTPUT->header();
         }
         .stock-tag {
             display: inline-block;
-            padding: 0.25em 0.6em;
+            padding: 0.25em 0.8em;
             font-size: 0.85em;
             font-weight: 700;
             border-radius: 0.25rem;
@@ -132,10 +134,16 @@ echo $OUTPUT->header();
     </style>
 
     <div class="container">
-        <h2 class="mb-4">
-            <i class="fas fa-boxes me-2 text-primary"></i>Stok Durumu
-            <small class="text-muted d-block mt-1">Tüm ürün varyasyonlarının stok bilgileri</small>
-        </h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                <i class="fas fa-boxes me-2 text-primary"></i>Stok Durumu
+                <small class="text-muted d-block mt-1">Tüm ürün varyasyonlarının stok bilgileri</small>
+            </h2>
+
+            <a href="<?php echo new moodle_url('/my'); ?>" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
+            </a>
+        </div>
 
         <!-- Filtre Bölümü -->
         <div class="card mb-4 shadow-sm">
@@ -311,9 +319,10 @@ function get_string_from_value($value, $type) {
  * Diziyi temizler ve güvenli hale getirir
  *
  * @param array $array Temizlenecek dizi
+ * @param int $paramtype PARAM_ sabiti
  * @return array Temizlenmiş dizi
  */
-function clean_array($array) {
+function clean_array($array, $paramtype = PARAM_TEXT) {
     $result = [];
 
     if (!is_array($array)) {
@@ -323,10 +332,10 @@ function clean_array($array) {
     foreach ($array as $key => $value) {
         if (is_string($value)) {
             // String değerleri güvenli hale getir
-            $result[$key] = clean_param($value, PARAM_TEXT);
+            $result[$key] = clean_param($value, $paramtype);
         } else if (is_array($value)) {
             // İç içe diziler için fonksiyonu tekrar çağır
-            $result[$key] = clean_array($value);
+            $result[$key] = clean_array($value, $paramtype);
         } else {
             $result[$key] = $value;
         }
