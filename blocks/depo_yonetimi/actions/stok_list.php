@@ -423,33 +423,11 @@ echo $OUTPUT->header();
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <i class="fas fa-box-open text-white me-2"></i>
-                <h5 class="mb-0">Varyasyon Listesi</h5>
+                <h5 class="mb-0"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h5>
             </div>
         </div>
         <div class="card-body">
-            <h4 class="section-title"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h4>
-
-            <div class="alert alert-primary d-flex align-items-center mb-4">
-                <i class="fas fa-info-circle fs-5 me-3"></i>
-                <div>
-                    Seçtiğiniz renk ve boyut kombinasyonlarıyla varyasyonlar oluşturabilirsiniz.
-                    Varyasyonlar, aynı ürünün farklı versiyonlarını yönetmenize olanak tanır.
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="d-grid mb-3">
-                        <button type="button" id="varyasyonOlustur" class="btn btn-success d-flex justify-content-center align-items-center" title="Seçili renk ve boyutlar için varyasyonlar oluştur">
-                            <i class="fas fa-cubes me-2"></i>Varyasyon Oluştur
-                        </button>
-                    </div>
-
-                    <div class="text-center text-muted">
-                        <small>Önce renk ve boyut seçimi yapmanız gerekiyor</small>
-                    </div>
-                </div>
-            </div>
+            <h4 class="section-title">Varyasyon Listesi</h4>
 
             <div id="varyasyonBolumu" class="mt-4 <?php echo (!empty($mevcut_varyasyonlar)) ? '' : 'd-none'; ?>">
                 <div class="alert alert-info d-flex <?php echo (!empty($mevcut_varyasyonlar)) ? 'd-none' : ''; ?>">
