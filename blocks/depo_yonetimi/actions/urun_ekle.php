@@ -15,6 +15,7 @@ $PAGE->set_title('Ürün Ekle');
 $PAGE->set_heading('Ürün Ekle');
 
 // Depo bilgisini al
+
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
@@ -27,6 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $colors = optional_param_array('colors', [], PARAM_TEXT);
     $sizes = optional_param_array('sizes', [], PARAM_TEXT);
     $varyasyonlar = optional_param_array('varyasyon', [], PARAM_TEXT);
+
+    print_r($_POST);
+    die();
 
     $transaction = $DB->start_delegated_transaction();
     try {
