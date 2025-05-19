@@ -38,8 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
-    $ana_urun->timecreated = time();
-    $ana_urun->timemodified = time();
 
     // Ana ürünü ekle ve ID'sini al
     $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
