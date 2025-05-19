@@ -338,16 +338,7 @@ echo $OUTPUT->header();
 </div>
 
 <div class="container-fluid py-4">
-    <!-- Depo Bilgi Başlığı -->
-    <div class="depo-info-bar mb-4">
-        <div class="depo-icon">
-            <i class="fas fa-warehouse"></i>
-        </div>
-        <div>
-            <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($depo->name); ?></h6>
-            <small class="text-muted"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</small>
-        </div>
-    </div>
+
 
     <div class="mb-4" style="display: none">
         <label for="name" class="form-label">
@@ -432,11 +423,11 @@ echo $OUTPUT->header();
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <i class="fas fa-box-open text-white me-2"></i>
-                <h5 class="mb-0">Stoklar</h5>
+                <h5 class="mb-0">Varyasyon Listesi</h5>
             </div>
         </div>
         <div class="card-body">
-            <h4 class="section-title">Varyasyon Yönetimi</h4>
+            <h4 class="section-title"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h4>
 
             <div class="alert alert-primary d-flex align-items-center mb-4">
                 <i class="fas fa-info-circle fs-5 me-3"></i>
