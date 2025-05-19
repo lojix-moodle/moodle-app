@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //    $sizes = required_param('sizes', PARAM_TEXT);
 //    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
     $colors = optional_param('colors', [], PARAM_TEXT);
-    $sizes = optional_param('sizes', [], PARAM_TEXT);
-    $varyasyonlar = optional_param('varyasyon', [], PARAM_TEXT);
+    $sizes = optional_param('sizes', []);
+    $varyasyonlar = optional_param('varyasyon', []);
 
 //    $colors=clean_param($colors, PARAM_TEXT);
 //    $sizes=clean_param($sizes, PARAM_TEXT);
