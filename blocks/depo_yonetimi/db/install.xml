@@ -23,7 +23,15 @@
                 <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="adet" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="stok_miktari" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
-
+                <FIELD NAME="is_parent" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Ana ürün mü, varyasyon mu"/>
+                <FIELD NAME="parent_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Varyasyon ise ana ürün ID'si"/>
+                <FIELD NAME="color" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Varyasyon renk değeri"/>
+                <FIELD NAME="size" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Varyasyon boyut değeri"/>
+                <FIELD NAME="colors" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Ana ürünün renk seçenekleri (JSON)"/>
+                <FIELD NAME="sizes" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Ana ürünün boyut seçenekleri (JSON)"/>
+                <FIELD NAME="varyasyonlar" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Ana ürünün varyasyon bilgileri (JSON)"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" />
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" />
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

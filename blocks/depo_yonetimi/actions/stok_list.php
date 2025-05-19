@@ -47,7 +47,14 @@ if ($arama) {
 
 // Sadece yetkilisi olduğu depolar için sorgu (admin değilse)
 if (!$is_admin) {
-    $conditions['depoid'] = $DB->get_fieldset_select('block_depo_yonetimi_depolar', 'id', 'sorumluid = :userid', ['userid' => $USER->id]);
+    $depolar = $DB->get_fieldset_select('block_depo_yonetimi_depolar', 'id', 'sorumluid = :userid', ['userid' => $USER->id]);
+
+    // Düzeltme: Eğer $depolar boş değilse, clean_array() ile temizlenmelidir
+    if (!empty($depolar)) {
+        $depolar = clean_array($depolar, PARAM_INT);
+    }
+
+    $conditions['depoid'] = $depolar;
     if (empty($conditions['depoid'])) {
         $conditions['depoid'] = 0; // Hiçbir depo yoksa, hiçbir sonuç getirme
     }
