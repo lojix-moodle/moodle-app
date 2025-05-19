@@ -14,7 +14,7 @@ $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', ['d
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Stoklar');
 $PAGE->set_heading('Stoklar');
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('dashboard');
 
 // Yetki kontrolü
 $context = context_system::instance();
