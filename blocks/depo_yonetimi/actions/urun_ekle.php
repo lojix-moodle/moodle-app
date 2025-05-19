@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //    $colors = required_param('colors', PARAM_TEXT);
 //    $sizes = required_param('sizes', PARAM_TEXT);
 //    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
-    $colors = optional_param('colors', [], PARAM_TEXT);
+    $colors = optional_param('colors', []);
     $sizes = optional_param('sizes', []);
     $varyasyonlar = optional_param('varyasyon', []);
 
