@@ -216,22 +216,32 @@ class block_depo_yonetimi extends block_base {
                 $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
                 $html .= '
-                                    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
-                                        <td class="ps-4 align-middle">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-box text-primary me-2"></i>
-                                                <strong>' . htmlspecialchars($urun->name) . '</strong>
-                                            </div>
-                                        </td>
-                                        <td class="align-middle">
-                                            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
-                                        </td>
-                                        <td class="text-center align-middle">
-                                            <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
-                    $urun->adet . ' adet
-                                            </span>                                   
-                                        </td>
-                                        
+                    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
+                        <td class="ps-4 align-middle">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-box text-primary me-2"></i>
+                                <strong>' . htmlspecialchars($urun->name) . '</strong>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
+                        </td>
+                        <td class="align-middle">
+                            ' . (!empty($urun->colors) && $urun->colors !== '0' ? htmlspecialchars($urun->colors) : '-') . '
+                        </td>
+                        <td class="align-middle">
+                            ' . (!empty($urun->sizes) && $urun->sizes !== '0' ? htmlspecialchars($urun->sizes) : '-') . '
+                        </td>
+                        <td class="align-middle">
+                            ' . (!empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0' ? htmlspecialchars($urun->varyasyonlar) : '-') . '
+                        </td>
+                        <td class="text-center align-middle">
+                            <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
+                                        $urun->adet . ' adet
+                            </span>
+                        </td>
+                        <td class="text-end pe-4 align-middle">
+                            <!-- İşlemler kısmı aynı kalacak -->
                                                                             
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">
