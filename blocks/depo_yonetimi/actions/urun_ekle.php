@@ -21,53 +21,30 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
-    // adet parametresini kaldırdık
     $kategoriid = required_param('kategoriid', PARAM_INT);
-//    print_r($_POST);
-//    die();
+    $colors = optional_param_array('colors', array(), PARAM_TEXT);
+    $sizes = optional_param_array('sizes', array(), PARAM_TEXT);
+    $varyasyonlar = optional_param_array('varyasyon', array(), PARAM_TEXT);
 
-    // Renk ve boyut verilerini al ve temizle - clean_array() kullanarak düzeltildi
-//    $colors = required_param('colors', PARAM_TEXT);
-//    $sizes = required_param('sizes', PARAM_TEXT);
-//    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
-    $colors = optional_param_array('colors', [], PARAM_TEXT);
-    $sizes = optional_param_array('sizes', [], PARAM_TEXT);
-    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_TEXT);
+    $ana_urun = new stdClass();
+    $ana_urun->depoid = $depoid;
+    $ana_urun->name = $name;
+    $ana_urun->kategoriid = $kategoriid;
+    $ana_urun->colors = json_encode($colors);
+    $ana_urun->sizes = json_encode($sizes);
+    $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+    $ana_urun->timecreated = time();
+    $ana_urun->timemodified = time();
 
-//    $colors=clean_param($colors, PARAM_TEXT);
-//    $sizes=clean_param($sizes, PARAM_TEXT);
-//    $varyasyonlar=clean_param($varyasyonlar, PARAM_TEXT);
+    // Ana ürünü ekle ve ID'sini al
+    $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
 
-    $transaction = $DB->start_delegated_transaction();
-    try {
+    // Başarılı mesajı göster
+    \core\notification::success('Ürün başarıyla eklendi.');
 
-        // Ana ürünü ekle
-        $ana_urun = new stdClass();
-        $ana_urun->depoid = $depoid;
-        $ana_urun->name = $name;
-        $ana_urun->kategoriid = $kategoriid;
-        $ana_urun->colors = json_encode($colors);
-        $ana_urun->sizes = json_encode($sizes);
-        $ana_urun->varyasyonlar = json_encode($varyasyonlar);
-        $ana_urun->timecreated = time();
-        $ana_urun->timemodified = time();
+    redirect(new moodle_url('/my', ['depo' => $depoid]));
 
-        // Ana ürünü ekle ve ID'sini al
-        $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
 
-        $DB->commit_delegated_transaction($transaction);
-
-        // Başarılı mesajı göster
-        \core\notification::success($ana_urun->is_parent && !empty($varyasyonlar)
-            ? 'Ürün ve varyasyon başarıyla eklendi.'
-            : 'Ürün başarıyla eklendi.');
-
-        redirect(new moodle_url('/my', ['depo' => $depoid]));
-
-    } catch (Exception $e) {
-        $DB->rollback_delegated_transaction($transaction);
-        \core\notification::error('Ürün eklenirken hata oluştu: ' . $e->getMessage());
-    }
 }
 
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
