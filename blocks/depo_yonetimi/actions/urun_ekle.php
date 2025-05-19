@@ -22,7 +22,7 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    
+
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
