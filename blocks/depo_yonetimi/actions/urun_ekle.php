@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     // adet parametresini kaldırdık
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    print_r($_POST);
-    die();
+//    print_r($_POST);
+//    die();
 
     // Renk ve boyut verilerini al ve temizle - clean_array() kullanarak düzeltildi
-    $colors = optional_param_array('colors', [], PARAM_TEXT);
-    $sizes = optional_param_array('sizes', [], PARAM_TEXT);
-    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_TEXT);
+    $colors = required_param('colors', PARAM_TEXT);
+    $sizes = required_param('sizes', PARAM_TEXT);
+    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
 
 
     $transaction = $DB->start_delegated_transaction();
