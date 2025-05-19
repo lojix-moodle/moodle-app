@@ -425,9 +425,9 @@ echo $OUTPUT->header();
                 <i class="fas fa-box-open text-white me-2"></i>
                 <h5 class="mb-0"><?php echo htmlspecialchars($urun->name); ?> Adlı Ürüne Ait Stoklar</h5>
             </div>
-                <button id="backButton" class="btn btn-sm btn-outline-danger">
+                <a href="<?php new moodle_url('/my') ?>" class="btn btn-sm btn-outline-white">
                     <i class="fas fa-arrow-left me-1"></i> Geri Dön
-                </button>
+                </a>
 
         </div>
         <div class="card-body">
