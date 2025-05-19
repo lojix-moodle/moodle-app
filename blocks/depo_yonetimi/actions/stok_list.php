@@ -440,7 +440,7 @@ echo $OUTPUT->header();
                         <thead>
                         <tr>
                             <th>Varyasyon</th>
-                            <th width="40%">Stok Miktarı</th>
+                            <th width="40%" style="text-align: center">Stok Miktarı</th>
                         </tr>
                         </thead>
                         <tbody id="varyasyonTablo">
