@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $sizes = optional_param_array('sizes', [], PARAM_RAW);
     $sizes = clean_array($sizes, PARAM_TEXT);
-    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_CLEAN);
-
+    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_RAW);
+    $varyasyonlar = clean_array($varyasyonlar, PARAM_TEXT);
     $transaction = $DB->start_delegated_transaction();
     try {
         // Varyasyonlardan toplam stok miktarını hesapla
