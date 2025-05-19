@@ -27,10 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //    die();
 
     // Renk ve boyut verilerini al ve temizle - clean_array() kullanarak düzeltildi
-    $colors = required_param('colors', PARAM_TEXT);
-    $sizes = required_param('sizes', PARAM_TEXT);
-    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
+//    $colors = required_param('colors', PARAM_TEXT);
+//    $sizes = required_param('sizes', PARAM_TEXT);
+//    $varyasyonlar = required_param('varyasyon', PARAM_TEXT);
+    $colors = optional_param_array('colors', [], PARAM_TEXT);
+    $sizes = optional_param_array('sizes', [], PARAM_TEXT);
+    $varyasyonlar = optional_param_array('varyasyon', [], PARAM_TEXT);
 
+//    $colors=clean_param($colors, PARAM_TEXT);
+//    $sizes=clean_param($sizes, PARAM_TEXT);
+//    $varyasyonlar=clean_param($varyasyonlar, PARAM_TEXT);
 
     $transaction = $DB->start_delegated_transaction();
     try {
