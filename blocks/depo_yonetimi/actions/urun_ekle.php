@@ -22,9 +22,14 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $colors = optional_param_array('colors', false, PARAM_CLEAN);
-    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
-    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
+    
+    $colors = $_POST['colors'];
+    $sizes = $_POST['sizes'];
+    $varyasyonlar = $_POST['varyasyon'];
+
+//    $colors = optional_param_array('colors', false, PARAM_CLEAN);
+//    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
+//    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
 
     $ana_urun = new stdClass();
     $ana_urun->depoid = $depoid;
