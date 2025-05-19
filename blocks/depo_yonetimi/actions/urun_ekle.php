@@ -34,23 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $transaction = $DB->start_delegated_transaction();
     try {
-        // Varyasyonlardan toplam stok miktarını hesapla
-        $total_stock = 0;
-        if (!empty($varyasyonlar)) {
-            foreach ($varyasyonlar as $color => $color_sizes) {
-                foreach ($color_sizes as $size => $stok) {
-                    $total_stock += intval($stok);
-                }
-            }
-        }
 
         // Ana ürünü ekle
         $ana_urun = new stdClass();
         $ana_urun->depoid = $depoid;
         $ana_urun->name = $name;
-        $ana_urun->adet = $total_stock; // Varyasyonların toplam stok miktarını kullan
         $ana_urun->kategoriid = $kategoriid;
-        $ana_urun->is_parent = 1; // Ana ürün olduğunu belirten alan
         $ana_urun->colors = json_encode($colors);
         $ana_urun->sizes = json_encode($sizes);
         $ana_urun->varyasyonlar = json_encode($varyasyonlar);
@@ -60,47 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Ana ürünü ekle ve ID'sini al
         $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
 
-        // Varyasyonları ekle (eğer varsa)
-        if (!empty($varyasyonlar) && !empty($colors) && !empty($sizes)) {
-            $total_variants = 0;
-
-            foreach ($colors as $color) {
-                foreach ($sizes as $size) {
-                    // Bu renk ve boyut kombinasyonu için varyasyon var mı kontrol et
-                    if (isset($varyasyonlar[$color]) && isset($varyasyonlar[$color][$size])) {
-                        $stok_miktari = intval($varyasyonlar[$color][$size]);
-
-                        // Stok miktarı 0'dan büyükse varyasyonu ekle
-                        if ($stok_miktari > 0) {
-                            // Renk ve boyut adlarını al
-                            $color_text = get_string_from_value($color, 'color');
-                            $size_text = get_string_from_value($size, 'size');
-
-                            $varyasyon = new stdClass();
-                            $varyasyon->depoid = $depoid;
-                            $varyasyon->name = $name . ' - ' . $color_text . ' / ' . $size_text;
-                            $varyasyon->adet = $stok_miktari;
-                            $varyasyon->kategoriid = $kategoriid;
-                            $varyasyon->parent_id = $ana_urun_id; // Ana ürün bağlantısı
-                            $varyasyon->is_parent = 0; // Varyasyon olduğunu belirt
-                            $varyasyon->color = $color;
-                            $varyasyon->size = $size;
-                            $varyasyon->timecreated = time();
-                            $varyasyon->timemodified = time();
-
-                            $DB->insert_record('block_depo_yonetimi_urunler', $varyasyon);
-                            $total_variants++;
-                        }
-                    }
-                }
-            }
-        }
-
         $DB->commit_delegated_transaction($transaction);
 
         // Başarılı mesajı göster
         \core\notification::success($ana_urun->is_parent && !empty($varyasyonlar)
-            ? 'Ürün ve ' . $total_variants . ' varyasyon başarıyla eklendi. Toplam stok: ' . $total_stock
+            ? 'Ürün ve varyasyon başarıyla eklendi.'
             : 'Ürün başarıyla eklendi.');
 
         redirect(new moodle_url('/my', ['depo' => $depoid]));
