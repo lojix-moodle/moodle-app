@@ -453,10 +453,17 @@ echo $OUTPUT->header();
                 <div id="pageInfo" class="text-center text-muted mt-2"></div>
 
                 <!-- Sayfalama Kontrolleri -->
+                // Sayfalama Kontrolleri bölümüne geri tuşu ekleyelim
                 <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
                     <button id="prevPage" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-chevron-left me-1"></i> Önceki
                     </button>
+
+                    <!-- Geri dönüş butonu -->
+                    <button id="backButton" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                    </button>
+
                     <button id="nextPage" class="btn btn-sm btn-outline-primary">
                         Sonraki <i class="fas fa-chevron-right ms-1"></i>
                     </button>
