@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun = new stdClass();
     $ana_urun->depoid = $depoid;
     $ana_urun->name = $name;
+    $ana_urun->adet = 1;
     $ana_urun->kategoriid = $kategoriid;
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
