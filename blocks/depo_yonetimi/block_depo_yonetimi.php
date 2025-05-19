@@ -193,9 +193,6 @@ class block_depo_yonetimi extends block_base {
                                     <tr>
                                         <th class="ps-4">Ürün Adı</th>
                                         <th>Kategori</th>
-                                          <th>Renkler</th>
-                                            <th>Bedenler</th>
-                                            <th>Varyasyonlar</th>
                                         <th class="text-center">Adet</th>
                                         <th class="text-end pe-4">İşlemler</th>
                                     </tr>
@@ -219,53 +216,48 @@ class block_depo_yonetimi extends block_base {
                 $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
                 $html .= '
-        <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
-            <td class="ps-4 align-middle">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-box text-primary me-2"></i>
-                    <strong>' . htmlspecialchars($urun->name) . '</strong>
-                </div>
-            </td>
-            <td class="align-middle">
-                <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
-            </td>
-            <td class="align-middle">
-                ' . (!empty($urun->colors) && $urun->colors !== '0' ? htmlspecialchars($urun->colors) : '-') . '
-            </td>
-            <td class="align-middle">
-                ' . (!empty($urun->sizes) && $urun->sizes !== '0' ? htmlspecialchars($urun->sizes) : '-') . '
-            </td>
-            <td class="align-middle">
-                ' . (!empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0' ? htmlspecialchars($urun->varyasyonlar) : '-') . '
-            </td>
-            <td class="text-center align-middle">
-                <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
+                                    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
+                                        <td class="ps-4 align-middle">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-box text-primary me-2"></i>
+                                                <strong>' . htmlspecialchars($urun->name) . '</strong>
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
                     $urun->adet . ' adet
-                </span>
-            </td>
-            <td class="text-end pe-4 align-middle">
-                <div class="btn-group">
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_duzenle.php', [
-                        'depoid' => $depoid,
-                        'urunid' => $urun->id
-                    ]) . '" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-cube"></i>
-                    </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
+                                            </span>                                   
+                                        </td>
+                                        
+                                                                            
+                                        <td class="text-end pe-4 align-middle">
+                                            <div class="btn-group">
+                                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_duzenle.php', [
+                                            'depoid' => $depoid,
+                                            'urunid' => $urun->id
+                                        ]) . '" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-cube"></i>
+                                            </a>
+                                                                                
+                                            
+                                                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                         'depoid' => $depoid,
                         'urunid' => $urun->id
                     ]) . '" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                         'depoid' => $depoid,
                         'urunid' => $urun->id
                     ]) . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'Bu ürünü silmek istediğinize emin misiniz?\');">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            </td>
-        </tr>';
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>';
             }
         }
 
