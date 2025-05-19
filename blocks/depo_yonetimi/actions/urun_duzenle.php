@@ -82,6 +82,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Toplam adet hesaplama
+    $toplam_adet = 0;
+    if (!empty($varyasyonlar)) {
+        foreach ($varyasyonlar as $renk => $boyutlar) {
+            foreach ($boyutlar as $boyut => $miktar) {
+                $toplam_adet += (int)$miktar;
+            }
+        }
+    }
+
     $urun->adet = $toplam_adet;
 
     $DB->update_record('block_depo_yonetimi_urunler', $urun);

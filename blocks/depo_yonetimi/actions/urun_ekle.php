@@ -27,6 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
 
+    // Toplam adet hesaplama
+    $toplam_adet = 0;
+    if (!empty($varyasyonlar)) {
+        foreach ($varyasyonlar as $renk => $boyutlar) {
+            foreach ($boyutlar as $boyut => $miktar) {
+                $toplam_adet += (int)$miktar;
+            }
+        }
+    }
+
+
+
 //    $colors = optional_param_array('colors', false, PARAM_CLEAN);
 //    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
 //    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
@@ -34,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun = new stdClass();
     $ana_urun->depoid = $depoid;
     $ana_urun->name = $name;
-    $ana_urun->adet = 1;
+    $ana_urun->adet = $toplam_adet;
     $ana_urun->kategoriid = $kategoriid;
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
