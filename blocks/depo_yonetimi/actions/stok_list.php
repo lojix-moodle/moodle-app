@@ -349,6 +349,85 @@ echo $OUTPUT->header();
         </div>
     </div>
 
+    <div class="mb-4" style="display: none">
+        <label for="name" class="form-label">
+            <i class="fas fa-box me-2 text-primary"></i>Ürün Adı
+        </label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+            <input type="text" class="form-control" id="name" name="name"
+                   value="<?php echo htmlspecialchars($urun->name); ?>"
+                   placeholder="Ürün adını girin" required>
+        </div>
+        <div class="invalid-feedback">Lütfen ürün adını girin.</div>
+        <div class="form-text">Depodaki ürünün adını girin</div>
+    </div>
+
+    <!-- Renkler ve Boyutlar -->
+    <div class="row mb-4" style="display: none">
+        <!-- Renkler - Sol Kolon -->
+        <div class="mb-4">
+            <label for="colors" class="form-label">
+                <i class="fas fa-palette me-2 text-primary"></i>Renkler
+            </label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                <select multiple class="form-select" id="colors" name="colors[]" size="5">
+                    <?php
+                    $renkler = [
+                        'beyaz' => 'Beyaz',
+                        'mavi' => 'Mavi',
+                        'siyah' => 'Siyah',
+                        'bej' => 'Bej',
+                        'gri' => 'Gri',
+                        'lacivert' => 'Lacivert',
+                        'kahverengi' => 'Kahverengi',
+                        'pembe' => 'Pembe',
+                        'mor' => 'Mor',
+                        'haki' => 'Haki',
+                        'vizon' => 'Vizon',
+                        'sari' => 'Sarı',
+                        'turuncu' => 'Turuncu',
+                        'kirmizi' => 'Kırmızı',
+                        'yesil' => 'Yeşil',
+                        'bordo' => 'Bordo'
+                    ];
+
+                    foreach ($renkler as $value => $label):
+                        $selected = in_array($value, $mevcut_renkler) ? 'selected' : '';
+                        ?>
+                        <option value="<?php echo $value; ?>" <?php echo $selected; ?>><?php echo $label; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-text small">
+                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+            </div>
+        </div>
+
+        <!-- Boyutlar - Sağ Kolon -->
+        <div class="mb-4">
+            <label for="sizes" class="form-label">
+                <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
+            </label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
+                    <?php
+                    $boyutlar = range(17, 45);
+                    foreach ($boyutlar as $boyut):
+                        $selected = in_array($boyut, $mevcut_boyutlar) ? 'selected' : '';
+                        ?>
+                        <option value="<?php echo $boyut; ?>" <?php echo $selected; ?>><?php echo $boyut; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-text small">
+                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <div class="d-flex align-items-center">
