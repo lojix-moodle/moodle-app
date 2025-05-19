@@ -12,8 +12,18 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Kategori Ekle');
 $PAGE->set_heading('Kategori Ekle');
 
+// Sunucu tarafında eklemeden önce aynı isimde kategori kontrolü
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     $kategori_adi = required_param('name', PARAM_TEXT);
+
+    // Aynı isimde kategori var mı diye kontrol et
+    $mevcut_kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['name' => $kategori_adi]);
+
+    if ($mevcut_kategori) {
+        // Aynı isimde kategori zaten var, hata mesajı göster
+        \core\notification::error('Bu isimde bir kategori zaten mevcut. Lütfen farklı bir isim girin.');
+        redirect(new moodle_url('/blocks/depo_yonetimi/actions/kategori_ekle.php'));
+    }
 
     $kategori = new stdClass();
     $kategori->name = $kategori_adi;
@@ -142,27 +152,45 @@ echo $OUTPUT->header();
             var forms = document.querySelectorAll('.needs-validation')
             var loadingOverlay = document.getElementById('loadingOverlay')
             var submitBtn = document.getElementById('submitBtn')
+            var nameInput = document.getElementById('name')
 
             // Sayfa yüklendiğinde loading overlay'i gizle
             window.addEventListener('load', function() {
                 loadingOverlay.style.display = 'none'
             })
 
+            // Kategori adı için AJAX ile kontrol yapma
+            nameInput.addEventListener('blur', function() {
+                var kategoriAdi = nameInput.value.trim();
+
+                if (kategoriAdi !== '') {
+                    // AJAX isteği gönder
+                    fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/check_kategori.php?name=' + encodeURIComponent(kategoriAdi))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                nameInput.setCustomValidity('Bu isimde bir kategori zaten mevcut.');
+                                nameInput.classList.remove('is-valid');
+                                nameInput.classList.add('is-invalid');
+                                // Özel hata mesajını göster
+                                var invalidFeedback = nameInput.parentNode.parentNode.querySelector('.invalid-feedback');
+                                invalidFeedback.textContent = 'Bu isimde bir kategori zaten mevcut. Lütfen farklı bir isim girin.';
+                            } else {
+                                nameInput.setCustomValidity('');
+                                if (nameInput.checkValidity()) {
+                                    nameInput.classList.remove('is-invalid');
+                                    nameInput.classList.add('is-valid');
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Kategori kontrolü sırasında hata:', error);
+                        });
+                }
+            });
+
             Array.prototype.slice.call(forms).forEach(function (form) {
-                // Dinamik doğrulama - alan değiştiğinde
-                var inputs = form.querySelectorAll('input, select')
-                Array.prototype.slice.call(inputs).forEach(function(input) {
-                    input.addEventListener('change', function() {
-                        // Geçerlilik kontrolü
-                        if (input.checkValidity()) {
-                            input.classList.remove('is-invalid')
-                            input.classList.add('is-valid')
-                        } else {
-                            input.classList.remove('is-valid')
-                            input.classList.add('is-invalid')
-                        }
-                    })
-                })
+                // Mevcut kod...
 
                 // Form gönderildiğinde
                 form.addEventListener('submit', function (event) {
@@ -177,12 +205,34 @@ echo $OUTPUT->header();
                             }
                         })
                     } else {
-                        // Form geçerli ise yükleme animasyonunu göster
-                        loadingOverlay.style.display = 'flex'
-                        submitBtn.disabled = true
+                        // Form geçerli ise, kategori adını bir kez daha kontrol et
+                        event.preventDefault();
+
+                        fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/check_kategori.php?name=' + encodeURIComponent(nameInput.value.trim()))
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.exists) {
+                                    nameInput.setCustomValidity('Bu isimde bir kategori zaten mevcut.');
+                                    nameInput.classList.remove('is-valid');
+                                    nameInput.classList.add('is-invalid');
+                                    var invalidFeedback = nameInput.parentNode.parentNode.querySelector('.invalid-feedback');
+                                    invalidFeedback.textContent = 'Bu isimde bir kategori zaten mevcut. Lütfen farklı bir isim girin.';
+                                    form.classList.add('was-validated');
+                                } else {
+                                    // Form geçerli ve kategori adı benzersiz ise yükleme animasyonunu göster
+                                    loadingOverlay.style.display = 'flex';
+                                    submitBtn.disabled = true;
+                                    form.submit();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Kategori kontrolü sırasında hata:', error);
+                                // Hata durumunda formun gönderilmesine izin ver
+                                form.submit();
+                            });
                     }
 
-                    form.classList.add('was-validated')
+                    form.classList.add('was-validated');
                 }, false)
             })
         })()
