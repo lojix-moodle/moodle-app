@@ -98,10 +98,29 @@ $talepid = optional_param('talepid', 0, PARAM_INT);
 
 if ($islem && $talepid) {
     if ($islem === 'onayla' || $islem === 'reddet') {
-        $talep = $DB->get_record('block_depo_yonetimi_talepler', ['id' => $talepid]);
+        $sql = "SELECT t.*, u.name AS urun_adi
+        FROM {block_depo_yonetimi_talepler} t
+        LEFT JOIN {block_depo_yonetimi_urunler} u ON t.urunid = u.id
+        WHERE t.id = :talepid
+        LIMIT 1";
+
+        $params = ['talepid' => $talepid];
+
+        $talep = $DB->get_record_sql($sql, $params);
         if ($talep) {
             $talep->durum = ($islem === 'onayla') ? 1 : 2;
             $DB->update_record('block_depo_yonetimi_talepler', $talep);
+
+            if ($islem === 'onayla')
+            {
+                $requested_by_warehouse = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $talep->urunid]);
+                $requested_by_warehouse_variants = json_decode($requested_by_warehouse->varyasyonlar, true);
+                $requested_by_warehouse_variants[$talep->renk][$talep->beden] += $talep->adet;
+
+                $responding_warehouse = $DB->get_record('block_depo_yonetimi_urunler', ['name' => $talep->urun_adi]);
+                $responding_warehouse_variants = json_decode($responding_warehouse->varyasyonlar, true);
+                $responding_warehouse_variants[$talep->renk][$talep->beden] -= $talep->adet;
+            }
 
             // Başarı mesajı
             $mesaj = ($islem === 'onayla') ? 'Talep başarıyla onaylandı.' : 'Talep reddedildi.';
