@@ -46,23 +46,7 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="block_depo_yonetimi_hareketler" COMMENT="Stok hareketleri">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
-                <FIELD NAME="urunid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Ürün ID'si" />
-                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Depo ID'si" />
-                <FIELD NAME="miktar" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Giriş/çıkış miktarı" />
-                <FIELD NAME="hareket_tipi" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Giriş veya Çıkış" />
-                <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Hareket açıklaması" />
-                <FIELD NAME="islem_tarihi" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
-                <FIELD NAME="kullanici_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="İşlemi yapan kullanıcı" />
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="urunid_fk" TYPE="foreign" FIELDS="urunid" REFTABLE="block_depo_yonetimi_urunler" REFFIELDS="id"/>
-                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id"/>
-            </KEYS>
-        </TABLE>
+
 
 
     </TABLES>
