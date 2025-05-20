@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
+    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
@@ -73,6 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $urun->colors = json_encode($colors);
     $urun->sizes = json_encode($sizes);
     $urun->varyasyonlar = json_encode($varyasyonlar);
+    $urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekle
+
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -441,6 +444,21 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                             <div class="form-text">Depodaki ürünün adını girin</div>
+                        </div>
+
+                        <!-- Minimum Stok Seviyesi -->
+                        <div class="mb-4">
+                            <label for="min_stok_seviyesi" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
+                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
+                                       value="<?php echo htmlspecialchars($urun->min_stok_seviyesi); ?>"
+                                       placeholder="Minimum stok miktarı" min="0" required>
+                            </div>
+                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
+                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
