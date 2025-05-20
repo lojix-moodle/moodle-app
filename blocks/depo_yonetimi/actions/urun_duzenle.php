@@ -60,7 +60,6 @@ if (!empty($urun->sizes)) {
 }
 
 $mevcut_varyasyonlar = !empty($urun->varyasyonlar) ? json_decode($urun->varyasyonlar, true) : [];
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
 
@@ -72,17 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
 
-    $urun = new stdClass();
-    $urun->depoid = $depoid;
-    $urun->name = $name;
-    $urun->kategoriid = $kategoriid;
-    $urun->colors = json_encode($colors);
-    $urun->sizes = json_encode($sizes);
-    $urun->varyasyonlar = json_encode($varyasyonlar);
-    $urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekle
+    // Mevcut ürünün ID'sini koruyarak güncelleyelim
+    $guncellenecekUrun = new stdClass();
+    $guncellenecekUrun->id = $urunid; // Mevcut ürünün ID'sini koruyoruz
+    $guncellenecekUrun->depoid = $depoid;
+    $guncellenecekUrun->name = $name;
+    $guncellenecekUrun->kategoriid = $kategoriid;
+    $guncellenecekUrun->colors = json_encode($colors);
+    $guncellenecekUrun->sizes = json_encode($sizes);
+    $guncellenecekUrun->varyasyonlar = json_encode($varyasyonlar);
+    $guncellenecekUrun->min_stok_seviyesi = $min_stok_seviyesi;
 
-
-    // Toplam adet hesaplama
+    // Toplam adet hesaplama (tekrarlanan kod bloğu düzeltildi)
     $toplam_adet = 0;
     if (!empty($varyasyonlar)) {
         foreach ($varyasyonlar as $renk => $boyutlar) {
@@ -92,22 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Toplam adet hesaplama
-    $toplam_adet = 0;
-    if (!empty($varyasyonlar)) {
-        foreach ($varyasyonlar as $renk => $boyutlar) {
-            foreach ($boyutlar as $boyut => $miktar) {
-                $toplam_adet += (int)$miktar;
-            }
-        }
-    }
+    $guncellenecekUrun->adet = $toplam_adet;
 
-    $urun->adet = $toplam_adet;
-
-    $DB->insert_record('block_depo_yonetimi_urunler', $urun);
+    // insert_record yerine update_record kullanıyoruz
+    $DB->update_record('block_depo_yonetimi_urunler', $guncellenecekUrun);
     redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', null, \core\output\notification::NOTIFY_SUCCESS);
 }
-
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
 function get_string_from_value($value, $type) {
     if ($type == 'color') {
