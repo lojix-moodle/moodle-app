@@ -20,7 +20,19 @@ $beden   = required_param('beden', PARAM_TEXT);
 $adet   = required_param('aciklama', PARAM_TEXT);
 
 // 2. Yetki kontrolü
-require_capability('block/depo_yonetimi:viewall', context_system::instance());
+$context = context_system::instance();
+$is_admin = has_capability('block/depo_yonetimi:viewall', $context);
+$is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
+
+if (!$is_admin) {
+//    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
+//    if (!$user_depo || $user_depo != $depoid) {
+    if (!$is_depo_user)
+    {
+        throw new moodle_exception('Erişim izniniz yok.');
+    }
+//    }
+}
 
 // 3. Depo var mı kontrol et
 if (!$DB->record_exists('block_depo_yonetimi_depolar', ['id' => $depoid])) {
