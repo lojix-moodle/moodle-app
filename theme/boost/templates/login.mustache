@@ -322,6 +322,14 @@
             margin: 20px 0;
         }
     }
+
+    /* Hata mesajları için stil */
+    .form-error-message {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+        padding-left: 45px;
+    }
 </style>
 
 <div id="page-wrapper">
@@ -348,13 +356,33 @@
             <div id="register-form">
                 <form method="post" action="/login/signup.php" id="register-form-element">
                     <div class="form-group">
-                        <input type="text" id="fullname" name="fullname" class="form-input" placeholder=" " required>
+                        <input type="text" id="firstname" name="firstname" class="form-input" placeholder=" " required>
                         <i class="input-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
                             </svg>
                         </i>
-                        <label for="fullname">Ad Soyad</label>
+                        <label for="firstname">İsim</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="lastname" name="lastname" class="form-input" placeholder=" " required>
+                        <i class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                            </svg>
+                        </i>
+                        <label for="lastname">Soyisim</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="username" name="username" class="form-input" placeholder=" " required>
+                        <i class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                            </svg>
+                        </i>
+                        <label for="username">Kullanıcı Adı</label>
                     </div>
 
                     <div class="form-group">
@@ -368,24 +396,22 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="password" id="newpassword" name="newpassword" class="form-input" placeholder=" " required>
+                        <input type="password" id="password" name="password" class="form-input" placeholder=" " required>
                         <i class="input-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
                             </svg>
                         </i>
-                        <label for="newpassword">Şifre</label>
+                        <label for="password">Şifre</label>
                     </div>
 
-                    <div class="form-group">
-                        <input type="password" id="confirmpassword" name="confirmpassword" class="form-input" placeholder=" " required>
-                        <i class="input-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-                            </svg>
-                        </i>
-                        <label for="confirmpassword">Şifre Tekrar</label>
-                    </div>
+                    <!-- Moodle session key ekliyoruz -->
+                    <input type="hidden" name="sesskey" id="sesskey">
+
+                    <!-- Moodle signup form hidden fields -->
+                    <input type="hidden" name="mform_isexpanded_id_createuserandpass" value="1">
+                    <input type="hidden" name="mform_isexpanded_id_supplyinfo" value="1">
+                    <input type="hidden" name="submitbutton" value="Hesap Oluştur">
 
                     <button type="submit" class="submit-btn">
                         <span class="btn-text">Kayıt Ol</span>
@@ -405,6 +431,11 @@
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const tabIndicator = document.querySelector('.active-tab-indicator');
+
+        // Session key değerini al ve form içine yerleştir
+        if (M && M.cfg && M.cfg.sesskey) {
+            document.getElementById('sesskey').value = M.cfg.sesskey;
+        }
 
         // Process any existing Moodle login form
         function processMoodleForm() {
@@ -547,16 +578,36 @@
             }, 300);
         });
 
+        // Form validation
+        const registerFormElement = document.getElementById('register-form-element');
+        if (registerFormElement) {
+            registerFormElement.addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+
+                // Form validation
+                let hasError = false;
+
+                // Form submit handling
+                if (!hasError) {
+                    this.classList.add('submitting');
+                    // Formun normal şekilde gönderilmesine izin ver
+                } else {
+                    e.preventDefault();
+                }
+            });
+        }
+
         // Add form submission animations
         const forms = document.querySelectorAll('form');
         forms.forEach(function(form) {
             form.addEventListener('submit', function(e) {
                 const submitBtn = this.querySelector('.submit-btn');
-                if (submitBtn) {
+                if (submitBtn && !this.classList.contains('submitting')) {
                     e.preventDefault();
                     this.classList.add('submitting');
 
-                    setTimeout(function() {
+                    // Gerçek formu gönder
+                    setTimeout(() => {
                         form.submit();
                     }, 800);
                 }
