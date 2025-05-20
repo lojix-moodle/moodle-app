@@ -24,7 +24,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
     }
 
     // Stok hareketleri tablosunu ekle - yeni sürüm numarası
-    if ($oldversion < 2025051932) {
+    if ($oldversion < 2025052038) {
         // Stok hareketleri tablosu
         $table = new xmldb_table('block_depo_yonetimi_stok_hareketleri');
 
@@ -56,7 +56,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         }
 
         // Güncelleme noktasını kaydet
-        upgrade_block_savepoint(true, 2025051932, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2025052038, 'depo_yonetimi');
     }
 
     return true;
