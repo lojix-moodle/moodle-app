@@ -25,3 +25,13 @@ $string['depo_sil_error'] = 'Depo silinirken hata oluştu.';
 $string['depo_listele'] = 'Depo Listele';
 $string['depo_listele_success'] = 'Depolar başarıyla listelendi.';
 $string['depo_listele_error'] = 'Depolar listelenirken hata oluştu.';
+
+$string['stok_hareketleri'] = 'Stok Hareketleri';
+$string['stok_hareketi_ekle'] = 'Stok Hareketi Ekle';
+$string['stok_artirma'] = 'Stok Artırma';
+$string['stok_azaltma'] = 'Stok Azaltma';
+$string['onceki_miktar'] = 'Önceki Miktar';
+$string['yeni_miktar'] = 'Yeni Miktar';
+$string['islem_tarihi'] = 'İşlem Tarihi';
+$string['islem_yapan'] = 'İşlemi Yapan';
+$string['aciklama'] = 'Açıklama';

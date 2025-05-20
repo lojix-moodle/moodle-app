@@ -19,13 +19,27 @@ $PAGE->set_heading('Ürün Ekle');
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
+// Form gönderildiğinde
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_sesskey();
+
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
+    $min_stok_seviyesi = required_param('min_stok_seviyesi', PARAM_INT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
+
+    // Ana ürün nesnesini oluştur
+    $ana_urun = new stdClass();
+    $ana_urun->depoid = $depoid;
+    $ana_urun->name = $name;
+    $ana_urun->kategoriid = $kategoriid;
+    $ana_urun->colors = json_encode($colors);
+    $ana_urun->sizes = json_encode($sizes);
+    $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+    $ana_urun->min_stok_seviyesi = $min_stok_seviyesi;
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -37,30 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
-
-//    $colors = optional_param_array('colors', false, PARAM_CLEAN);
-//    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
-//    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
-
-    $ana_urun = new stdClass();
-    $ana_urun->depoid = $depoid;
-    $ana_urun->name = $name;
     $ana_urun->adet = $toplam_adet;
-    $ana_urun->kategoriid = $kategoriid;
-    $ana_urun->colors = json_encode($colors);
-    $ana_urun->sizes = json_encode($sizes);
-    $ana_urun->varyasyonlar = json_encode($varyasyonlar);
 
-    // Ana ürünü ekle ve ID'sini al
-    $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
+    // Veritabanına ürünü kaydet
+    $urunid = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
 
-    // Başarılı mesajı göster
-    \core\notification::success('Ürün başarıyla eklendi.');
-
-    redirect(new moodle_url('/my', ['depo' => $depoid]));
-
-
+    // Başarılı mesajı ve yönlendirme
+    redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla eklendi.', null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
@@ -398,6 +395,20 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                             <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
+                        </div>
+
+                        <!-- Minimum Stok Seviyesi -->
+                        <div class="mb-4">
+                            <label for="min_stok_seviyesi" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
+                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
+                                       value="5" placeholder="Minimum stok miktarı" min="0" required>
+                            </div>
+                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
+                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->

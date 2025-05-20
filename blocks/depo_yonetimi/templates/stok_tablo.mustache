@@ -40,9 +40,16 @@
                             {{/size}}
                         </td>
                         <td class="text-center">
-                            <span class="stock-tag {{stok_class}}">
-                                {{adet}} adet <i class="fas fa-circle-notch ms-1"></i>
-                            </span>
+                        <span class="stock-tag {{stok_class}}">
+                            {{adet}} adet <i class="fas fa-circle-notch ms-1"></i>
+                        </span>
+                                                {{#stok_kritik}}
+                                                    <div class="mt-1">
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Kritik Seviye
+                                </span>
+                                </div>
+                            {{/stok_kritik}}
                         </td>
                         <td class="text-end">
                             <a href="{{duzenle_url}}" class="btn btn-sm btn-outline-primary">

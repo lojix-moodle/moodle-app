@@ -9,6 +9,8 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $depoid = required_param('depoid', PARAM_INT);
 $urunid = required_param('urunid', PARAM_INT);
+$min_stok_seviyesi = required_param('min_stok_seviyesi', PARAM_INT);
+
 
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urunid]));
 $PAGE->set_context(context_system::instance());
@@ -61,16 +63,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
+    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 5, PARAM_INT); // Varsayılan değer olarak 5 kullanıldı
+
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
 
+    $urun = new stdClass();
+    $urun->depoid = $depoid;
     $urun->name = $name;
     $urun->kategoriid = $kategoriid;
     $urun->colors = json_encode($colors);
     $urun->sizes = json_encode($sizes);
     $urun->varyasyonlar = json_encode($varyasyonlar);
+    $urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekle
+
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -94,8 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $urun->adet = $toplam_adet;
 
-    $DB->update_record('block_depo_yonetimi_urunler', $urun);
-
+    $DB->insert_record('block_depo_yonetimi_urunler', $urun);
     redirect(new moodle_url('/my', ['depo' => $depoid]), 'Ürün başarıyla güncellendi.', null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
@@ -442,7 +449,22 @@ echo $OUTPUT->header();
                             <div class="form-text">Depodaki ürünün adını girin</div>
                         </div>
 
-                        <!-- Renkler ve Boyutlar -->
+                        <!-- Minimum Stok Seviyesi -->
+                        <div class="mb-4">
+                            <label for="min_stok_seviyesi" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
+                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
+                                       value="<?php echo htmlspecialchars($urun->min_stok_seviyesi); ?>"
+                                       placeholder="Minimum stok miktarı" min="0" required>
+                            </div>
+                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
+                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
+                        </div>
+
+                        <!-- Renkler ve Boyutlar (Yan Yana) -->
                         <div class="row mb-4">
                             <!-- Renkler - Sol Kolon -->
                             <div class="mb-4">
@@ -453,7 +475,8 @@ echo $OUTPUT->header();
                                     <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
                                     <select multiple class="form-select" id="colors" name="colors[]" size="5">
                                         <?php
-                                        $renkler = [
+                                        $seciliRenkler = json_decode($urun->colors, true);
+                                        $tumRenkler = [
                                             'beyaz' => 'Beyaz',
                                             'mavi' => 'Mavi',
                                             'siyah' => 'Siyah',
@@ -472,8 +495,8 @@ echo $OUTPUT->header();
                                             'bordo' => 'Bordo'
                                         ];
 
-                                        foreach ($renkler as $value => $label):
-                                            $selected = in_array($value, $mevcut_renkler) ? 'selected' : '';
+                                        foreach ($tumRenkler as $value => $label):
+                                            $selected = is_array($seciliRenkler) && in_array($value, $seciliRenkler) ? 'selected' : '';
                                             ?>
                                             <option value="<?php echo $value; ?>" <?php echo $selected; ?>><?php echo $label; ?></option>
                                         <?php endforeach; ?>
@@ -493,9 +516,11 @@ echo $OUTPUT->header();
                                     <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
                                     <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
                                         <?php
-                                        $boyutlar = range(17, 45);
-                                        foreach ($boyutlar as $boyut):
-                                            $selected = in_array($boyut, $mevcut_boyutlar) ? 'selected' : '';
+                                        $seciliBoyutlar = json_decode($urun->sizes, true);
+                                        $tumBoyutlar = range(17, 45);
+
+                                        foreach ($tumBoyutlar as $boyut):
+                                            $selected = is_array($seciliBoyutlar) && in_array($boyut, $seciliBoyutlar) ? 'selected' : '';
                                             ?>
                                             <option value="<?php echo $boyut; ?>" <?php echo $selected; ?>><?php echo $boyut; ?></option>
                                         <?php endforeach; ?>
