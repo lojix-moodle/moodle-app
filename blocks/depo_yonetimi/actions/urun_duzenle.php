@@ -9,6 +9,8 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $depoid = required_param('depoid', PARAM_INT);
 $urunid = required_param('urunid', PARAM_INT);
+$min_stok_seviyesi = required_param('min_stok_seviyesi', PARAM_INT);
+
 
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urunid]));
 $PAGE->set_context(context_system::instance());
@@ -18,14 +20,14 @@ $PAGE->set_pagelayout('admin');
 
 // Yetki kontrolü
 $context = context_system::instance();
-$yetki = '';
-if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
-    $yetki = 'admin';
-} elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
-$yetki = 'depoyetkilisi';
+$is_admin = has_capability('block/depo_yonetimi:viewall', $context);
+$is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
 
-if ($yetki !== 'admin' OR $yetki !== 'depoyetkilisi') {
-    print_error('Erişim izniniz yok.');
+if (!$is_admin) {
+    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
+    if (!$user_depo || $user_depo != $depoid) {
+        print_error('Erişim izniniz yok.');
+    }
 }
 
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
