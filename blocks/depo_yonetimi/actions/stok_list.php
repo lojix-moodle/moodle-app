@@ -214,7 +214,8 @@ echo $OUTPUT->header();
                         <thead>
                         <tr>
                             <th>Varyasyon</th>
-                            <th width="40%" style="text-align: center">Stok Miktarı</th>
+                            <th width="30%" style="text-align: center">Stok Miktarı</th>
+                            <th width="40%" style="text-align: center">İşlemler</th>
                         </tr>
                         </thead>
                         <tbody id="varyasyonTablo">
@@ -358,6 +359,7 @@ echo $OUTPUT->header();
         });
 
         // Belirli bir sayfadaki varyasyonları göster
+        // Belirli bir sayfadaki varyasyonları göster
         function displayVariantsByPage() {
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, allVariants.length);
@@ -388,25 +390,84 @@ echo $OUTPUT->header();
                 const stockCell = document.createElement('td');
                 const stockInput = document.createElement('span');
 
-                // Mevcut varyasyon değerini kontrol et ve ata
-                stockInput.innerText = 0; // Varsayılan değer
-
                 // Mevcut varyasyon verisinden değeri al
+                stockInput.innerText = 0; // Varsayılan değer
                 if (mevcutVaryasyonlar &&
                     mevcutVaryasyonlar[variant.color.value] &&
                     mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
                     stockInput.innerText = mevcutVaryasyonlar[variant.color.value][variant.size.value];
                 }
 
-                stockCell.style.textAlign= 'center';
+                stockCell.style.textAlign = 'center';
                 stockCell.appendChild(stockInput);
+
+                // İşlemler hücresi
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'd-flex justify-content-center gap-2';
+
+                // Ürün Talep Et butonu
+                const requestBtn = document.createElement('button');
+                requestBtn.className = 'btn btn-sm btn-primary';
+                requestBtn.innerHTML = '<i class="fas fa-shopping-cart me-1"></i> Ürün Talep Et';
+                requestBtn.addEventListener('click', function() {
+                    requestProduct(variant.color.value, variant.size.value, variant.color.text, variant.size.text);
+                });
+
+                // Ürün Aktar butonu
+                const transferBtn = document.createElement('button');
+                transferBtn.className = 'btn btn-sm btn-success';
+                transferBtn.innerHTML = '<i class="fas fa-exchange-alt me-1"></i> Ürün Aktar';
+                transferBtn.addEventListener('click', function() {
+                    transferProduct(variant.color.value, variant.size.value, variant.color.text, variant.size.text);
+                });
+
+                actionsCell.appendChild(requestBtn);
+                actionsCell.appendChild(transferBtn);
 
                 row.appendChild(variantCell);
                 row.appendChild(stockCell);
+                row.appendChild(actionsCell);
                 varyasyonTablo.appendChild(row);
             });
 
             document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${Math.ceil(allVariants.length / itemsPerPage)}`;
+        }
+
+
+        // Ürün talep işlevi
+        function requestProduct(colorValue, sizeValue, colorText, sizeText) {
+            Swal.fire({
+                title: 'Ürün Talebi',
+                text: `${colorText} / ${sizeText} varyasyonu için ürün talebinde bulunmak istiyor musunuz?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Talep Et',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#3e64ff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Talep sayfasına yönlendir
+                    window.location.href = `<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_talep.php'); ?>?urunid=<?php echo $urunid; ?>&depoid=<?php echo $depoid; ?>&renk=${colorValue}&beden=${sizeValue}`;
+                }
+            });
+        }
+
+// Ürün aktarma işlevi
+        function transferProduct(colorValue, sizeValue, colorText, sizeText) {
+            Swal.fire({
+                title: 'Ürün Aktarımı',
+                text: `${colorText} / ${sizeText} varyasyonunu başka bir depoya aktarmak istiyor musunuz?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Aktar',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#198754'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aktarma sayfasına yönlendir
+                    window.location.href = `<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_aktar.php'); ?>?urunid=<?php echo $urunid; ?>&depoid=<?php echo $depoid; ?>&renk=${colorValue}&beden=${sizeValue}`;
+                }
+            });
         }
 
         // Sayfalama kontrollerini güncelle
