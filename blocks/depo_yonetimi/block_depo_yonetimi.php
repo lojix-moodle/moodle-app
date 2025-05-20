@@ -59,7 +59,7 @@ class block_depo_yonetimi extends block_base {
         // Depo detayı görüntüleniyorsa
         if ($depoid) {
 //            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
-            if ($yetki === 'admin' OR $yetki['depoyetkilisi']) {
+            if ($yetki === 'admin' OR $yetki === 'depoyetkilisi') {
                 return $this->render_depo_detay($depoid);
             } else {
                 return $this->render_access_denied('Bu depoya erişim izniniz yok.');
