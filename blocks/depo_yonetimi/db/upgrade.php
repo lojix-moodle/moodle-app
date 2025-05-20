@@ -5,7 +5,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025051948) {
+    if ($oldversion < 2025052051) {
         $table = new xmldb_table('block_depo_yonetimi_talepler');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
@@ -21,7 +21,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         }
 
         // Güncelleme noktasını kaydet
-        upgrade_block_savepoint(true, 2025051948, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2025052051, 'depo_yonetimi');
     }
 
     return true;
