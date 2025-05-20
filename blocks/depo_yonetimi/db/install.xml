@@ -52,6 +52,8 @@
                 <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="urunid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="stok" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" />
+                <FIELD NAME="renk" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" />
+                <FIELD NAME="beden" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="adet" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
