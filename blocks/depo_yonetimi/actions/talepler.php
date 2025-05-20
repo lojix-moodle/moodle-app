@@ -79,6 +79,10 @@ $sql = "SELECT t.*, u.name as urun_adi, d.name as depo_adi
 
 $talep_records = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
 
+$sorumlu_depo = $DB->get_record('block_depo_yonetimi_depolar', ['sorumluid' => $USER->id]);
+
+$sorumluDepoUrunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $sorumlu_depo->id]);
+
 // Durum işleme
 $islem = optional_param('islem', '', PARAM_TEXT);
 $talepid = optional_param('talepid', 0, PARAM_INT);
@@ -189,9 +193,9 @@ echo $OUTPUT->header();
                             <th>ID</th>
                             <th>Ürün</th>
                             <th>Depo</th>
-                            <th>Renk</th>
-                            <th>Beden</th>
-                            <th>Adet</th>
+                            <th>Renk / Beden</th>
+                            <th>Talep</th>
+                            <th>Aktarabilirsin</th>
                             <th>Durum</th>
                             <th>İşlemler</th>
                         </tr>
@@ -205,10 +209,22 @@ echo $OUTPUT->header();
                                     <td><?php echo format_string($talep->depo_adi); ?></td>
                                     <td>
                                         <span class="color-badge me-1" style="background-color: <?php echo getColorHex($talep->renk); ?>">&nbsp;</span>
-                                        <?php echo format_string($talep->renk); ?>
+                                        <?php echo format_string($talep->renk); ?> / <?php echo format_string($talep->beden); ?>
                                     </td>
-                                    <td><?php echo format_string($talep->beden); ?></td>
                                     <td><?php echo $talep->adet; ?></td>
+                                    <td>
+                                        <?php
+                                        foreach ($sorumluDepoUrunler as $item)
+                                        {
+                                            if ($item->name === $talep->urun_adi)
+                                            {
+                                                echo '<pre>';
+                                                print_r($item);
+                                                die();
+                                            }
+                                        }
+                                        ?>
+                                    </td>
                                     <td>
                                         <?php
                                         $durum_text = '';
