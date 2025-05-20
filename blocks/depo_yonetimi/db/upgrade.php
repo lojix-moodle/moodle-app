@@ -46,14 +46,14 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-
-        // Minimum stok seviyesi alanını ekle
-        $table = new xmldb_table('block_depo_yonetimi_urunler');
-        $field = new xmldb_field('min_stok_seviyesi', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
+//
+//        // Minimum stok seviyesi alanını ekle
+//        $table = new xmldb_table('block_depo_yonetimi_urunler');
+//        $field = new xmldb_field('min_stok_seviyesi', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+//
+//        if (!$dbman->field_exists($table, $field)) {
+//            $dbman->add_field($table, $field);
+//        }
 
         // Güncelleme noktasını kaydet
         upgrade_block_savepoint(true, 2025052038, 'depo_yonetimi');
