@@ -227,9 +227,23 @@ echo $OUTPUT->header();
                                         {
                                             if ($item->name === $talep->urun_adi)
                                             {
-                                                echo '<pre>';
-                                                print_r($item);
-                                                die();
+                                                $renk = $talep->renk;
+                                                $beden = $talep->beden;
+                                                $varyasyonlar = json_decode($item->varyasyonlar, true);
+                                                if (isset($varyasyonlar[$renk])) {
+                                                    if (isset($varyasyonlar[$renk][$beden])) {
+                                                        $adet = (int) $varyasyonlar[$renk][$beden];
+                                                        if ($adet > $talep->adet) {
+                                                            echo "Evet";
+                                                        } else {
+                                                            echo "Hayır";
+                                                        }
+                                                    } else {
+                                                        echo "Hayır (Beden yok)";
+                                                    }
+                                                } else {
+                                                    echo "Hayır (Renk yok)";
+                                                }
                                             }
                                         }
                                         ?>
