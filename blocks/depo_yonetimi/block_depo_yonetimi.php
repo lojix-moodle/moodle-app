@@ -336,10 +336,7 @@ class block_depo_yonetimi extends block_base {
                        class="btn btn-outline-primary rounded-pill d-flex align-items-center">
                         <i class="fas fa-tags me-2"></i> Kategoriler
                     </a>
-                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php') . '"
-                       class="btn btn-outline-primary rounded-pill d-flex align-items-center">
-                     <i class="fas fa-boxes me-2"></i> Stoklar
-                   </a>
+                    
                 </div>';
         }
 
