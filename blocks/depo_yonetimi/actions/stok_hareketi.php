@@ -36,7 +36,8 @@ if (!$urun) {
 $min_stok = isset($urun->min_stok_seviyesi) ? $urun->min_stok_seviyesi : 0;
 
 // Stok hareketleri tablosu kontrolü - table_exists hatasını önlemek için get_manager() kullan
-$stok_hareketi_tablo_var = $DB->get_manager()->table_exists('block_depo_yonetimi_stok_hareketleri');
+$table = new xmldb_table('block_depo_yonetimi_stok_hareketleri');
+$stok_hareketi_tablo_var = $DB->get_manager()->table_exists($table);
 
 // Form gönderildiğinde
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
