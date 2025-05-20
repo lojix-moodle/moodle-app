@@ -446,16 +446,28 @@ echo $OUTPUT->header();
                 title: 'Ürün Talebi',
                 text: `${colorText} / ${sizeText} varyasyonu için ürün talebinde bulunmak istiyor musunuz?`,
                 icon: 'question',
+                input: 'text',
+                inputPlaceholder: 'Açıklama girin (isteğe bağlı)',
                 showCancelButton: true,
                 confirmButtonText: 'Evet, Talep Et',
                 cancelButtonText: 'İptal',
-                confirmButtonColor: '#3e64ff'
+                confirmButtonColor: '#3e64ff',
+                inputValidator: (value) => {
+                    // Eğer zorunlu olmasını isterseniz şu satırı aktif edebilirsiniz:
+                    // if (!value) return 'Lütfen bir açıklama girin!';
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Talep sayfasına yönlendir
-                    window.location.href = `<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_talep.php'); ?>?urunid=<?php echo $urunid; ?>&depoid=<?php echo $depoid; ?>&renk=${colorValue}&beden=${sizeValue}`;
+                    const aciklama = encodeURIComponent(result.value || ''); // Boş olabilir
+                    // PHP tarafındaki değerleri JS'e geçirmeniz gerektiğini unutmayın
+                    const urunid = "<?php echo $urunid; ?>";
+                    const depoid = "<?php echo $depoid; ?>";
+
+                    // Yönlendirme
+                    window.location.href = `/blocks/depo_yonetimi/actions/urun_talep.php?urunid=${urunid}&depoid=${depoid}&renk=${colorValue}&beden=${sizeValue}&aciklama=${aciklama}`;
                 }
             });
+
         }
 
 // Ürün aktarma işlevi
