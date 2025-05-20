@@ -98,6 +98,29 @@ if ($islem && $talepid) {
     }
 }
 
+function getColorHex($colorName) {
+    $colorMap = [
+        'kirmizi' => '#dc3545',
+        'mavi' => '#0d6efd',
+        'siyah' => '#212529',
+        'beyaz' => '#f8f9fa',
+        'yesil' => '#198754',
+        'sari' => '#ffc107',
+        'turuncu' => '#fd7e14',
+        'mor' => '#6f42c1',
+        'pembe' => '#d63384',
+        'gri' => '#6c757d',
+        'bej' => '#E4DAD2',
+        'lacivert' => '#11098A',
+        'kahverengi' => '#8B4513',
+        'haki' => '#8A9A5B',
+        'vizon' => '#A89F91',
+        'bordo' => '#800000'
+    ];
+
+    return $colorMap[$colorName] || '#6c757d';
+}
+
 echo $OUTPUT->header();
 ?>
 
@@ -248,31 +271,6 @@ echo $OUTPUT->header();
             </div>
         </div>
     </div>
-
-    <script>
-        function getColorHex(colorName) {
-            const colorMap = {
-                'kirmizi': '#dc3545',
-                'mavi': '#0d6efd',
-                'siyah': '#212529',
-                'beyaz': '#f8f9fa',
-                'yesil': '#198754',
-                'sari': '#ffc107',
-                'turuncu': '#fd7e14',
-                'mor': '#6f42c1',
-                'pembe': '#d63384',
-                'gri': '#6c757d',
-                'bej': '#E4DAD2',
-                'lacivert': '#11098A',
-                'kahverengi': '#8B4513',
-                'haki': '#8A9A5B',
-                'vizon': '#A89F91',
-                'bordo': '#800000'
-            };
-
-            return colorMap[colorName] || '#6c757d';
-        }
-    </script>
 
     <style>
         .color-badge {
