@@ -19,8 +19,16 @@ try {
     $PAGE->set_heading('Ürün Sil');
 
     // Yetki kontrolü
-    if (!has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
-        throw new moodle_exception('Erişim izniniz yok.');
+    $context = context_system::instance();
+    $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
+    $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
+
+    if (!$is_admin) {
+        if (!$is_depo_user)
+        {
+            throw new moodle_exception('Erişim izniniz yok.');
+        }
+
     }
 
     // Ürün var mı kontrol et
