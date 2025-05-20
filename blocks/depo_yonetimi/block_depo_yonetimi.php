@@ -397,19 +397,46 @@ class block_depo_yonetimi extends block_base {
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
-                            <div class="depo-info mb-3">
-                                <div class="d-flex align-items-center text-muted mb-2">
-                                    <i class="fas fa-user me-2"></i>
-                                    <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
-                                </div>
-                            </div>
-                            <a href="' . $url . '" class="btn btn-outline-primary mt-auto">
-                                <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
-                            </a>
-                        </div>
-                    </div>
+                        // Admin kullanıcı kartları için değişiklik
+// "Ürünleri Görüntüle" butonunun bulunduğu kısmı değiştir:
+
+<div class="card-body d-flex flex-column">
+    <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+    <div class="depo-info mb-3">
+        <div class="d-flex align-items-center text-muted mb-2">
+            <i class="fas fa-user me-2"></i>
+            <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
+        </div>
+    </div>
+    <div class="d-grid gap-2">
+        <a href="' . $url . '" class="btn btn-outline-primary">
+            <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
+        </a>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri_tablosu.php', ['depoid' => $depo->id]) . '" class="btn btn-outline-secondary">
+            <i class="fas fa-exchange-alt me-2"></i>Stok Hareketleri
+        </a>
+    </div>
+</div>
+
+// Normal kullanıcılar için olan depo kartlarında da benzer değişiklik:
+
+<div class="card-body d-flex flex-column">
+    <h3 class="card-title h5 mb-3">' . htmlspecialchars($depo->name) . '</h3>
+    <div class="depo-info mb-3">
+        <div class="d-flex align-items-center text-muted mb-2">
+            <i class="fas fa-user me-2"></i>
+            <span>Sorumlu: ' . htmlspecialchars($sorumlu_ismi) . '</span>
+        </div>
+    </div>
+    <div class="d-grid gap-2">
+        <a href="' . $url . '" class="btn btn-outline-primary">
+            <i class="fas fa-boxes me-2"></i>Ürünleri Görüntüle
+        </a>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri_tablosu.php', ['depoid' => $depo->id]) . '" class="btn btn-outline-secondary">
+            <i class="fas fa-exchange-alt me-2"></i>Stok Hareketleri
+        </a>
+    </div>
+</div>
                 </div>';
                 }
             }
