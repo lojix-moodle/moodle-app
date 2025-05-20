@@ -1,52 +1,209 @@
 {{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-}}
-{{!
     @template theme_boost/columns1
-
     Boost 1 column layout template.
-
-    Context variables required for this template:
-    * sitename - The name of the site
-    * output - The core renderer for the page
-    * bodyattributes - attributes for the body tag as a string of html attributes
-
-    Example context (json):
-    {
-        "sitename": "Moodle",
-        "output": {
-            "doctype": "<!DOCTYPE html>",
-            "page_title": "Test page",
-            "favicon": "favicon.ico",
-            "main_content": "<h1>Headings make html validators happier</h1>"
-         },
-         "bodyattributes":""
-    }
 }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
 {{> core/local/toast/wrapper}}
 
-<div id="page-wrapper" class="d-print-block">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #d8e1ff 0%, #d5c5ec 100%);
+        margin: 0;
+        padding: 0;
+    }
+
+    #page-wrapper {
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    #page {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    #page-content {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-header {
+        background: linear-gradient(135deg, #b090e9 0%, #9fc5ff 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+        transform: rotate(45deg);
+        animation: shimmer 8s linear infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) rotate(45deg); }
+    }
+
+    .system-title {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -1px;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .system-description {
+        font-size: 18px;
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.9;
+    }
+
+    .content-area {
+        padding: 40px;
+    }
+
+    .feature-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #b090e9 0%, #9fc5ff 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .feature-icon i {
+        color: white;
+        font-size: 24px;
+    }
+
+    .feature-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .feature-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .auth-buttons {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+        gap: 15px;
+    }
+
+    .auth-button {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .primary-button {
+        background: linear-gradient(135deg, #b090e9 0%, #9fc5ff 100%);
+        color: white;
+        box-shadow: 0 5px 15px rgba(169, 137, 233, 0.3);
+    }
+
+    .primary-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(169, 137, 233, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .secondary-button {
+        background: white;
+        color: #9f7de8;
+        border: 1px solid #d8e1ff;
+    }
+
+    .secondary-button:hover {
+        background: #f8f9ff;
+        color: #9f7de8;
+        transform: translateY(-3px);
+        text-decoration: none;
+    }
+
+    .button-icon {
+        margin-right: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .welcome-header {
+            padding: 30px 20px;
+        }
+
+        .system-title {
+            font-size: 32px;
+        }
+
+        .content-area {
+            padding: 30px 20px;
+        }
+    }
+</style>
+
+<div id="page-wrapper">
     {{{ output.standard_top_of_body_html }}}
 
-    <div id="page" class="container-fluid d-print-block">
-        <div id="page-content" class="row pb-3 d-print-block">
+    <div id="page" class="container-fluid">
+        <div id="page-content" class="row">
             <div id="region-main-box" class="col-12">
                 <div id="region-main">
                     {{{ output.course_content_header }}}
@@ -54,16 +211,50 @@
                         {{> core/activity_header }}
                     {{/headercontent}}
 
-                    <!-- Giriş Yapmadan Gösterilecek Özel Kutu -->
-                    <div class="custom-welcome-box p-4 mb-4 rounded bg-light text-center">
-                        <h1>Depo Yönetim Sistemine Hoş Geldiniz</h1>
-                        <p>Lütfen giriş yapınız veya kayıt olunuz.</p>
-                        <a href="/login/index.php" class="btn btn-primary m-2">Giriş Yap</a>
-                        <a href="/login/signup.php" class="btn btn-outline-secondary m-2">Kayıt Ol</a>
-                    </div>
+                    <!-- Özelleştirilmiş Ana Sayfa İçeriği -->
+                    {{^isloggedin}}
+                        <div class="welcome-header">
+                            <h1 class="system-title">Lojix Depo Yönetim Sistemi</h1>
+                            <p class="system-description">Stok takibi, envanter yönetimi ve depo operasyonlarınızı tek bir platformda yönetin.</p>
 
+                            <div class="auth-buttons">
+                                <a href="/login/index.php" class="auth-button primary-button">
+                                    <i class="fas fa-sign-in-alt button-icon"></i> Giriş Yap
+                                </a>
+                                <a href="/login/signup.php" class="auth-button secondary-button">
+                                    <i class="fas fa-user-plus button-icon"></i> Kayıt Ol
+                                </a>
+                            </div>
+                        </div>
 
+                        <div class="content-area">
+                            <div class="feature-cards">
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-warehouse"></i>
+                                    </div>
+                                    <h3 class="feature-title">Depo Yönetimi</h3>
+                                    <p class="feature-description">Birden fazla depoyu tek bir arayüzden kolayca yönetin, stok durumlarını takip edin.</p>
+                                </div>
 
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-boxes"></i>
+                                    </div>
+                                    <h3 class="feature-title">Stok Takibi</h3>
+                                    <p class="feature-description">Ürünlerinizin stok seviyelerini gerçek zamanlı olarak izleyin, stok uyarıları alın.</p>
+                                </div>
+
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <h3 class="feature-title">Raporlama</h3>
+                                    <p class="feature-description">Detaylı raporlar ile envanter performansınızı analiz edin, verimliliği artırın.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {{/isloggedin}}
 
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
@@ -80,8 +271,8 @@
 </body>
 </html>
 {{#js}}
-M.util.js_pending('theme_boost/loader');
-require(['theme_boost/loader'], function() {
+    M.util.js_pending('theme_boost/loader');
+    require(['theme_boost/loader'], function() {
     M.util.js_complete('theme_boost/loader');
-});
+    });
 {{/js}}
