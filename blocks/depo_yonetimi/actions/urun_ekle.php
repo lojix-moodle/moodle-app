@@ -18,6 +18,8 @@ $PAGE->set_heading('Ürün Ekle');
 
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
+$min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
+
 
 // Form gönderildiğinde
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
