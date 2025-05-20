@@ -23,7 +23,7 @@ $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
 $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
 
-if (!$is_admin OR $is_depo_user) {
+if (!$is_admin OR !$is_depo_user) {
 //    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
 //    if (!$user_depo || $user_depo != $depoid) {
     echo '            <div class="depo-access-denied">
