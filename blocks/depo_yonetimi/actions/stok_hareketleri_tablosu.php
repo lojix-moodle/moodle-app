@@ -1,6 +1,9 @@
 <?php
+
+global $DB, $PAGE, $OUTPUT ,$CFG;
 require_once(__DIR__ . '/../../../config.php');
-require_once($CFG->dirroot . '/blocks/depo_yonetimi/locallib.php');
+
+require_once($CFG->dirroot . '/blocks/depo_yonetimi/block_depo_yonetimi.php');
 
 $depoid = required_param('depoid', PARAM_INT);
 
