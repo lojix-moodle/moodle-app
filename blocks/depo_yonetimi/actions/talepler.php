@@ -109,7 +109,6 @@ if ($islem && $talepid) {
         $talep = $DB->get_record_sql($sql, $params);
         if ($talep) {
             $talep->durum = ($islem === 'onayla') ? 1 : 2;
-            $DB->update_record('block_depo_yonetimi_talepler', $talep);
 
             if ($islem === 'onayla')
             {
@@ -121,6 +120,8 @@ if ($islem && $talepid) {
                 $responding_warehouse_variants = json_decode($responding_warehouse->varyasyonlar, true);
                 $responding_warehouse_variants[$talep->renk][$talep->beden] -= $talep->adet;
             }
+
+            $DB->update_record('block_depo_yonetimi_talepler', $talep);
 
             // Başarı mesajı
             $mesaj = ($islem === 'onayla') ? 'Talep başarıyla onaylandı.' : 'Talep reddedildi.';
