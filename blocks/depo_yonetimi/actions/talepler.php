@@ -19,7 +19,16 @@ $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css'));
 $PAGE->requires->js_call_amd('block_depo_yonetimi/talepler', 'init');
 
 // Yetki kontrolü
-require_capability('block/depo_yonetimi:viewall', context_system::instance());
+$context = context_system::instance();
+$is_admin = has_capability('block/depo_yonetimi:viewall', $context);
+$is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
+
+if (!$is_admin) {
+    if (!$is_depo_user)
+    {
+        throw new moodle_exception('Erişim izniniz yok.');
+    }
+}
 
 // Filtre parametrelerini al
 $filtre_depoid = optional_param('depoid', 0, PARAM_INT);
