@@ -9,8 +9,6 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $depoid = required_param('depoid', PARAM_INT);
 $urunid = required_param('urunid', PARAM_INT);
-$min_stok_seviyesi = required_param('min_stok_seviyesi', PARAM_INT);
-
 
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', ['depoid' => $depoid, 'urunid' => $urunid]));
 $PAGE->set_context(context_system::instance());
@@ -23,7 +21,7 @@ $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
 $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
 
-if (!$is_admin) {
+if (!$is_admin OR !$is_depo_user) {
     $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
     if (!$user_depo || $user_depo != $depoid) {
         print_error('Erişim izniniz yok.');
@@ -63,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
@@ -76,8 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $urun->colors = json_encode($colors);
     $urun->sizes = json_encode($sizes);
     $urun->varyasyonlar = json_encode($varyasyonlar);
-    $urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekle
-
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -446,21 +441,6 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                             <div class="form-text">Depodaki ürünün adını girin</div>
-                        </div>
-
-                        <!-- Minimum Stok Seviyesi -->
-                        <div class="mb-4">
-                            <label for="min_stok_seviyesi" class="form-label">
-                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
-                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
-                                       value="<?php echo htmlspecialchars($urun->min_stok_seviyesi); ?>"
-                                       placeholder="Minimum stok miktarı" min="0" required>
-                            </div>
-                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
-                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
