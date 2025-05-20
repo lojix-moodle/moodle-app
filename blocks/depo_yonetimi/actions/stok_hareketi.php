@@ -32,13 +32,11 @@ if (!$urun) {
     print_error('Ürün bulunamadı.');
 }
 
-// Minimum stok seviyesini al
-$min_stok = $urun->min_stok_seviyesi ?? 0;
+// Minimum stok seviyesini al - varsayılan olarak 0 kullan
+$min_stok = isset($urun->min_stok_seviyesi) ? $urun->min_stok_seviyesi : 0;
 
-// Varyasyon bilgilerini al
-$renkler = json_decode($urun->colors, true);
-$bedenler = json_decode($urun->sizes, true);
-$varyasyonlar = json_decode($urun->varyasyonlar, true);
+// Stok hareketleri tablosu kontrolü - table_exists hatasını önlemek için get_manager() kullan
+$stok_hareketi_tablo_var = $DB->get_manager()->table_exists('block_depo_yonetimi_stok_hareketleri');
 
 // Form gönderildiğinde
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,16 +48,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $islemtipi = required_param('islemtipi', PARAM_ALPHA);
     $aciklama = optional_param('aciklama', '', PARAM_TEXT);
 
-    // Miktar değerini işlem tipine göre ayarla (giriş: pozitif, çıkış: negatif)
-    if ($islemtipi == 'cikis') {
-        $miktar = -$miktar;
+    // Varyasyon bilgilerini al
+    $varyasyonlar = json_decode($urun->varyasyonlar, true);
+    if (!is_array($varyasyonlar)) {
+        $varyasyonlar = [];
+    }
+
+    // Renk için varyasyon varsa al, yoksa oluştur
+    if (!isset($varyasyonlar[$renk])) {
+        $varyasyonlar[$renk] = [];
+    }
+
+    // Beden için varyasyon varsa al, yoksa 0 olarak başlat
+    if (!isset($varyasyonlar[$renk][$beden])) {
+        $varyasyonlar[$renk][$beden] = 0;
     }
 
     // Mevcut varyasyon stok miktarını al
-    $mevcut_miktar = $varyasyonlar[$renk][$beden] ?? 0;
+    $mevcut_miktar = $varyasyonlar[$renk][$beden];
+
+    // Miktar değerini işlem tipine göre ayarla (giriş: pozitif, çıkış: negatif)
+    $islem_miktari = $miktar;
+    if ($islemtipi == 'cikis') {
+        $islem_miktari = -$miktar;
+    }
 
     // Yeni miktar hesapla
-    $yeni_miktar = $mevcut_miktar + $miktar;
+    $yeni_miktar = $mevcut_miktar + $islem_miktari;
 
     // Negatif stok kontrolü
     if ($yeni_miktar < 0) {
@@ -69,7 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             null,
             \core\output\notification::NOTIFY_ERROR
         );
-        exit;
     }
 
     // Varyasyon güncelle
@@ -90,19 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update->adet = $toplam_stok;
     $DB->update_record('block_depo_yonetimi_urunler', $update);
 
-    // Stok hareketi kaydı
-    $hareket = new stdClass();
-    $hareket->urunid = $urunid;
-    $hareket->renk = $renk;
-    $hareket->beden = $beden;
-    $hareket->miktar = $miktar;
-    $hareket->aciklama = $aciklama;
-    $hareket->islemtipi = $islemtipi;
-    $hareket->userid = $USER->id;
-    $hareket->tarih = time();
-    $DB->insert_record('block_depo_yonetimi_stok_hareketleri', $hareket);
+    // Stok hareketi tablosu varsa yeni hareketi kaydet
+    if ($stok_hareketi_tablo_var) {
+        $hareket = new stdClass();
+        $hareket->urunid = $urunid;
+        $hareket->renk = $renk;
+        $hareket->beden = $beden;
+        $hareket->miktar = $islem_miktari;
+        $hareket->aciklama = $aciklama;
+        $hareket->islemtipi = $islemtipi;
+        $hareket->userid = $USER->id;
+        $hareket->tarih = time();
+        $DB->insert_record('block_depo_yonetimi_stok_hareketleri', $hareket);
+    }
 
-    // Minimum stok kontrolü
+    // Minimum stok kontrolü ve uyarı
     $uyari_mesaji = '';
     if ($yeni_miktar < $min_stok) {
         $uyari_mesaji = "Uyarı: $renk renk, $beden beden için stok miktarı minimum seviyenin altına düştü! ($yeni_miktar adet kaldı)";
@@ -121,6 +137,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     }
 }
+
+// Varyasyon bilgilerini al
+$renkler = json_decode($urun->colors, true);
+$bedenler = json_decode($urun->sizes, true);
+$varyasyonlar = json_decode($urun->varyasyonlar, true);
+
+if (!is_array($renkler)) $renkler = [];
+if (!is_array($bedenler)) $bedenler = [];
+if (!is_array($varyasyonlar)) $varyasyonlar = [];
 
 echo $OUTPUT->header();
 ?>
@@ -147,97 +172,64 @@ echo $OUTPUT->header();
                 <form id="stokForm" method="post" class="needs-validation" novalidate>
                     <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
-                    <div class="row">
-                        <!-- İşlem Tipi -->
-                        <div class="col-md-6 mb-3">
-                            <label for="islemtipi" class="form-label">
-                                <i class="fas fa-directions me-2 text-primary"></i>İşlem Tipi
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-exchange-alt"></i></span>
-                                <select class="form-select" id="islemtipi" name="islemtipi" required>
-                                    <option value="" selected disabled>İşlem seçin</option>
-                                    <option value="giris">Stok Girişi</option>
-                                    <option value="cikis">Stok Çıkışı</option>
-                                </select>
-                            </div>
-                            <div class="invalid-feedback">Lütfen işlem tipini seçin.</div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="renk" class="form-label">Renk</label>
+                            <select class="form-select" id="renk" name="renk" required>
+                                <option value="">Renk Seçin</option>
+                                <?php foreach ($renkler as $renk): ?>
+                                    <option value="<?php echo $renk; ?>"><?php echo get_string_from_value($renk, 'color'); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="invalid-feedback">Lütfen renk seçin.</div>
                         </div>
-
-                        <!-- Renk Seçimi -->
-                        <div class="col-md-6 mb-3">
-                            <label for="renk" class="form-label">
-                                <i class="fas fa-palette me-2 text-primary"></i>Renk
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                <select class="form-select" id="renk" name="renk" required>
-                                    <option value="" selected disabled>Renk seçin</option>
-                                    <?php foreach ($renkler as $renk): ?>
-                                        <option value="<?php echo $renk; ?>"><?php echo get_string_from_value($renk, 'color'); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="invalid-feedback">Lütfen bir renk seçin.</div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Beden Seçimi -->
-                        <div class="col-md-6 mb-3">
-                            <label for="beden" class="form-label">
-                                <i class="fas fa-ruler-combined me-2 text-primary"></i>Beden
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-tshirt"></i></span>
-                                <select class="form-select" id="beden" name="beden" required>
-                                    <option value="" selected disabled>Beden seçin</option>
-                                    <?php foreach ($bedenler as $beden): ?>
-                                        <option value="<?php echo $beden; ?>"><?php echo $beden; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="invalid-feedback">Lütfen bir beden seçin.</div>
-                        </div>
-
-                        <!-- Miktar -->
-                        <div class="col-md-6 mb-3">
-                            <label for="miktar" class="form-label">
-                                <i class="fas fa-sort-numeric-up me-2 text-primary"></i>Miktar
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                                <input type="number" class="form-control" id="miktar" name="miktar" min="1" required>
-                            </div>
-                            <div class="invalid-feedback">Geçerli bir miktar girin.</div>
+                        <div class="col-md-6">
+                            <label for="beden" class="form-label">Beden</label>
+                            <select class="form-select" id="beden" name="beden" required>
+                                <option value="">Beden Seçin</option>
+                                <?php foreach ($bedenler as $beden): ?>
+                                    <option value="<?php echo $beden; ?>"><?php echo get_string_from_value($beden, 'size'); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="invalid-feedback">Lütfen beden seçin.</div>
                         </div>
                     </div>
 
                     <!-- Mevcut Stok Bilgisi -->
                     <div id="mevcutStokBilgisi" class="alert alert-info d-flex align-items-center mb-3" style="display: none;">
-                        <i class="fas fa-info-circle me-3 fs-4"></i>
-                        <div>
-                            <strong>Mevcut Stok:</strong> <span id="mevcutStokDeger">0</span> adet
+                        <i class="fas fa-info-circle me-3 fs-5"></i>
+                        <div>Mevcut stok miktarı: <span id="mevcutStokDeger">0</span></div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="islemtipi" class="form-label">İşlem Tipi</label>
+                            <select class="form-select" id="islemtipi" name="islemtipi" required>
+                                <option value="">İşlem Seçin</option>
+                                <option value="giris">Stok Girişi</option>
+                                <option value="cikis">Stok Çıkışı</option>
+                            </select>
+                            <div class="invalid-feedback">Lütfen işlem tipini seçin.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="miktar" class="form-label">Miktar</label>
+                            <input type="number" class="form-control" id="miktar" name="miktar" min="1" required>
+                            <div class="invalid-feedback">Lütfen geçerli bir miktar girin.</div>
                         </div>
                     </div>
 
                     <!-- Minimum Stok Uyarısı -->
                     <div id="minStokUyarisi" class="alert alert-warning d-flex align-items-center mb-3" style="display: none;">
-                        <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                        <i class="fas fa-exclamation-triangle me-3 fs-5"></i>
                         <div>
-                            <strong>Uyarı:</strong> Bu işlem sonucunda stok miktarı minimum seviyenin (<span id="minStokDeger"><?php echo $min_stok; ?></span>) altına düşecek!
+                            <strong>Uyarı:</strong> Bu işlem sonucunda stok miktarı minimum seviyenin (<?php echo $min_stok; ?>) altına düşecek!
                         </div>
                     </div>
 
                     <!-- Açıklama -->
                     <div class="mb-3">
-                        <label for="aciklama" class="form-label">
-                            <i class="fas fa-comment-alt me-2 text-primary"></i>Açıklama (İsteğe bağlı)
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-pen"></i></span>
-                            <textarea class="form-control" id="aciklama" name="aciklama" rows="2" placeholder="İşlem ile ilgili açıklama ekleyebilirsiniz"></textarea>
-                        </div>
+                        <label for="aciklama" class="form-label">Açıklama</label>
+                        <textarea class="form-control" id="aciklama" name="aciklama" rows="3" placeholder="Opsiyonel açıklama"></textarea>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
@@ -265,6 +257,7 @@ echo $OUTPUT->header();
             const stokForm = document.getElementById('stokForm');
             const minStokSeviyesi = <?php echo $min_stok; ?>;
             const loadingOverlay = document.getElementById('loadingOverlay');
+            const minStokUyarisi = document.getElementById('minStokUyarisi');
 
             // Renk ve beden seçildiğinde stok bilgisini göster
             function updateStokBilgisi() {
@@ -278,7 +271,6 @@ echo $OUTPUT->header();
 
                     // Stok çıkışı için maksimum değeri ayarla
                     if (islemTipi.value === 'cikis') {
-                        miktar.max = stokMiktari;
                         miktar.setAttribute('max', stokMiktari);
                     } else {
                         miktar.removeAttribute('max');
@@ -308,12 +300,12 @@ echo $OUTPUT->header();
                     const kalanStok = stokMiktari - yeniMiktar;
 
                     if (kalanStok < minStokSeviyesi) {
-                        document.getElementById('minStokUyarisi').style.display = 'flex';
+                        minStokUyarisi.style.display = 'flex';
                     } else {
-                        document.getElementById('minStokUyarisi').style.display = 'none';
+                        minStokUyarisi.style.display = 'none';
                     }
                 } else {
-                    document.getElementById('minStokUyarisi').style.display = 'none';
+                    minStokUyarisi.style.display = 'none';
                 }
             }
 
@@ -364,9 +356,6 @@ echo $OUTPUT->header();
         });
     </script>
 
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <?php
 // get_string_from_value fonksiyonu - renk ve boyut görüntü adları için
 function get_string_from_value($value, $type) {
@@ -390,6 +379,17 @@ function get_string_from_value($value, $type) {
             'bordo' => 'Bordo'
         ];
         return isset($colors[$value]) ? $colors[$value] : $value;
+    } else if ($type == 'size') {
+        $sizes = [
+            'xs' => 'XS',
+            's' => 'S',
+            'm' => 'M',
+            'l' => 'L',
+            'xl' => 'XL',
+            'xxl' => 'XXL',
+            'xxxl' => 'XXXL'
+        ];
+        return isset($sizes[$value]) ? $sizes[$value] : $value;
     }
     return $value;
 }
