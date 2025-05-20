@@ -1,0 +1,230 @@
+:root {
+    --primary: #3e64ff;
+    --primary-light: rgba(62, 100, 255, 0.1);
+    --secondary: #6c757d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 1rem 2rem rgba(0, 0, 0, 0.12);
+    --border-radius: 0.5rem;
+    --transition: all 0.2s ease-in-out;
+}
+
+body {
+    background-color: #f9fafb;
+}
+
+.card {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(to right, var(--primary), #5a77ff);
+}
+
+.card-header h5 {
+    font-weight: 600;
+    margin-bottom: 0;
+    color: white;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-color: #e2e8f0;
+    padding: 0.65rem 1rem;
+    border-radius: 0.4rem;
+    box-shadow: none;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.15);
+}
+
+.input-group-text {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+.btn {
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.4rem;
+    transition: all 0.25s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, var(--primary), #5a77ff);
+    border: none;
+    box-shadow: 0 4px 12px rgba(62, 100, 255, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(62, 100, 255, 0.35);
+}
+
+.btn-success {
+    background: linear-gradient(to right, #28a745, #48c76a);
+    border: none;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.35);
+}
+
+.btn-outline-secondary {
+    border-color: #dde1e7;
+    color: #64748b;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8fafc;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
+.section-title {
+    position: relative;
+    color: #334155;
+    font-weight: 600;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 40px;
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+.badge {
+    padding: 0.45em 0.8em;
+    font-weight: 500;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba(62, 100, 255, 0.1);
+    border-left: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.form-text {
+    color: #64748b !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+table.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #334155;
+    border-top: none;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.depo-info-bar {
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+}
+
+.depo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), #5a77ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .card {
+        margin-bottom: 1.5rem;
+    }
+}
