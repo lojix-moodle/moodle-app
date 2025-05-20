@@ -124,11 +124,13 @@ if ($islem && $talepid) {
                 $requested_by_warehouse = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $talep->urunid]);
                 $requested_by_warehouse_variants = json_decode($requested_by_warehouse->varyasyonlar, true);
                 $requested_by_warehouse_variants[$talep->renk][$talep->beden] = $talep->adet;
+                $requested_by_warehouse->varyasyonlar = json_encode($requested_by_warehouse_variants);
                 $DB->update_record('block_depo_yonetimi_urunler', $requested_by_warehouse);
 
                 $responding_warehouse = $DB->get_record('block_depo_yonetimi_urunler', ['name' => $talep->urun_adi]);
                 $responding_warehouse_variants = json_decode($responding_warehouse->varyasyonlar, true);
                 $responding_warehouse_variants[$talep->renk][$talep->beden] -= $talep->adet;
+                $responding_warehouse->varyasyonlar = json_encode($responding_warehouse_variants);
                 $DB->update_record('block_depo_yonetimi_urunler', $responding_warehouse);
             }
 
