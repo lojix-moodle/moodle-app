@@ -151,10 +151,7 @@ class block_depo_yonetimi extends block_base {
                             <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]) . '" class="btn btn-primary rounded-pill">
                                 <i class="fas fa-plus"></i> Yeni Ürün Ekle
                             </a>
-                            <!-- Stok Hareketleri butonu ekleniyor -->
-                            <a href="'. new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri_tablosu.php', ['depoid' => $depoid]) . '" class="btn btn-outline-primary me-2">
-                                    <i class="fas fa-exchange-alt me-2"></i>Stok Hareketleri
-                                </a>
+                            
                         </div>
                     </div>
                 </div>
