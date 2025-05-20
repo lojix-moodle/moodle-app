@@ -67,7 +67,7 @@ class block_depo_yonetimi extends block_base {
         }
         // Ana sayfa görüntüleniyorsa
         else {
-            return $this->render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme);
+            return $this->render_depolar_dashboard($depolar, $yetki);
         }
     }
 
@@ -303,7 +303,7 @@ class block_depo_yonetimi extends block_base {
     /**
      * Depo dashboard sayfasını render et
      */
-    private function render_depolar_dashboard($depolar, $yetki, $kullanici_depo_eslesme) {
+    private function render_depolar_dashboard($depolar, $yetki) {
         global $PAGE, $USER, $DB;
 
 
