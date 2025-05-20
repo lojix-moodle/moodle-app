@@ -420,15 +420,14 @@ echo $OUTPUT->header();
                 });
 
                 // Ürün Aktar butonu
-                const transferBtn = document.createElement('button');
-                transferBtn.className = 'btn btn-sm btn-success';
-                transferBtn.innerHTML = '<i class="fas fa-exchange-alt me-1"></i> Ürün Aktar';
-                transferBtn.addEventListener('click', function() {
-                    transferProduct(variant.color.value, variant.size.value, variant.color.text, variant.size.text);
-                });
+                // const transferBtn = document.createElement('button');
+                // transferBtn.className = 'btn btn-sm btn-success';
+                // transferBtn.innerHTML = '<i class="fas fa-exchange-alt me-1"></i> Ürün Aktar';
+                // transferBtn.addEventListener('click', function() {
+                //     transferProduct(variant.color.value, variant.size.value, variant.color.text, variant.size.text);
+                // });
 
                 actionsCell.appendChild(requestBtn);
-                actionsCell.appendChild(transferBtn);
 
                 row.appendChild(variantCell);
                 row.appendChild(stockCell);
