@@ -278,6 +278,18 @@
         display: none !important;
     }
 
+    /* Moodle'ın orijinal butonu için istisna */
+    .login-form-section .btn-primary,
+    .login-form-section [type="submit"] {
+        display: block !important;
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        border: none;
+        position: absolute;
+        pointer-events: none;
+    }
+
     /* Loader animation */
     .loader {
         position: absolute;
@@ -304,6 +316,11 @@
 
     .submitting .btn-text {
         opacity: 0;
+    }
+
+    /* Form düğme kapsayıcısı */
+    .form-submit-container {
+        margin-top: 30px;
     }
 
     /* Responsive */
@@ -412,10 +429,12 @@
         // Process any existing Moodle login form
         function processMoodleForm() {
             // Find and process Moodle's form elements
+            const loginForm = document.querySelector('#login-form');
             const moodleForm = document.querySelector('#login-form form');
+
             if (moodleForm) {
                 // Create our custom form elements
-                const inputs = moodleForm.querySelectorAll('input[type="text"], input[type="password"]');
+                const inputs = moodleForm.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
                 inputs.forEach(function(input) {
                     const newInput = document.createElement('input');
                     newInput.type = input.type;
@@ -423,7 +442,7 @@
                     newInput.id = input.id || input.name;
                     newInput.className = 'form-input';
                     newInput.placeholder = ' ';
-                    newInput.required = true;
+                    newInput.required = input.required;
 
                     const formGroup = document.createElement('div');
                     formGroup.className = 'form-group';
@@ -440,15 +459,14 @@
 
                     const label = document.createElement('label');
                     label.setAttribute('for', newInput.id);
-                    label.textContent = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+                    label.textContent = input.placeholder || input.name.charAt(0).toUpperCase() + input.name.slice(1);
 
                     formGroup.appendChild(newInput);
                     formGroup.appendChild(icon);
                     formGroup.appendChild(label);
 
-                    loginForm.querySelector('form') ?
-                            loginForm.querySelector('form').insertBefore(formGroup, loginForm.querySelector('button')) :
-                            loginForm.appendChild(formGroup);
+                    // Form içine yeni form-group'u ekle
+                    moodleForm.insertBefore(formGroup, moodleForm.firstChild);
 
                     // Hide original input
                     input.style.display = 'none';
@@ -457,55 +475,61 @@
                     newInput.addEventListener('input', function() {
                         input.value = newInput.value;
                     });
+
+                    // Mevcut değeri varsa kopyala
+                    if (input.value) {
+                        newInput.value = input.value;
+                    }
                 });
 
-                // Process submit button
-                const submitBtn = moodleForm.querySelector('input[type="submit"]');
-                if (submitBtn) {
-                    const newBtn = document.createElement('button');
-                    newBtn.type = 'submit';
-                    newBtn.className = 'submit-btn';
+                // Giriş yap butonunu ekle
+                const formSubmitContainer = document.createElement('div');
+                formSubmitContainer.className = 'form-submit-container';
 
-                    const btnText = document.createElement('span');
-                    btnText.className = 'btn-text';
-                    btnText.textContent = 'Giriş Yap';
+                const newBtn = document.createElement('button');
+                newBtn.type = 'submit';
+                newBtn.className = 'submit-btn';
 
-                    const loader = document.createElement('div');
-                    loader.className = 'loader';
+                const btnText = document.createElement('span');
+                btnText.className = 'btn-text';
+                btnText.textContent = 'Giriş Yap';
 
-                    newBtn.appendChild(btnText);
-                    newBtn.appendChild(loader);
+                const loader = document.createElement('div');
+                loader.className = 'loader';
 
-                    // Create a custom form if one doesn't exist
-                    if (!loginForm.querySelector('form')) {
-                        const customForm = document.createElement('form');
-                        customForm.id = 'login-form-element';
-                        customForm.method = moodleForm.method;
-                        customForm.action = moodleForm.action;
-                        loginForm.appendChild(customForm);
-                    }
+                newBtn.appendChild(btnText);
+                newBtn.appendChild(loader);
 
-                    // Add the new button to our form
-                    loginForm.querySelector('form').appendChild(newBtn);
+                formSubmitContainer.appendChild(newBtn);
+                moodleForm.appendChild(formSubmitContainer);
 
-                    // Hide original button
-                    submitBtn.style.display = 'none';
+                // Buton tıklandığında form gönderme
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    moodleForm.classList.add('submitting');
 
-                    // Sync submission
-                    newBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        newBtn.parentElement.classList.add('submitting');
-                        setTimeout(function() {
-                            submitBtn.click();
-                        }, 800);
+                    // Input değerlerini orijinal forma aktar
+                    const customInputs = moodleForm.querySelectorAll('.form-input');
+                    customInputs.forEach(input => {
+                        const originalInput = moodleForm.querySelector(`[name="${input.name}"]`);
+                        if (originalInput && originalInput !== input) {
+                            originalInput.value = input.value;
+                        }
                     });
-                }
+
+                    // Kısa bir gecikme ile formu gönder
+                    setTimeout(function() {
+                        moodleForm.submit();
+                    }, 800);
+                });
             }
 
-            // Hide all Moodle's original elements
-            const moodleElements = document.querySelectorAll('#login-form > *:not(form), #login-form form > *:not(.form-group):not(.submit-btn)');
+            // Moodle'ın gereksiz elementlerini gizle
+            const moodleElements = document.querySelectorAll('#login-form > *:not(form), #login-form form > *:not(.form-group):not(.form-submit-container)');
             moodleElements.forEach(function(el) {
-                el.style.display = 'none';
+                if (!el.classList.contains('form-group') && !el.classList.contains('form-submit-container')) {
+                    el.style.display = 'none';
+                }
             });
         }
 
@@ -520,10 +544,11 @@
             });
 
             input.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.parentElement.classList.remove('focused');
-                } else {
+                this.parentElement.classList.remove('focused');
+                if (this.value) {
                     this.parentElement.classList.add('has-value');
+                } else {
+                    this.parentElement.classList.remove('has-value');
                 }
             });
 
@@ -531,23 +556,6 @@
             if (input.value) {
                 input.parentElement.classList.add('has-value');
             }
-        });
-
-        // Add form submission animations
-        const forms = document.querySelectorAll('form');
-        forms.forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('.submit-btn');
-                if (submitBtn && !this.classList.contains('submitting')) {
-                    e.preventDefault();
-                    this.classList.add('submitting');
-
-                    // Gerçek formu gönder
-                    setTimeout(() => {
-                        form.submit();
-                    }, 800);
-                }
-            });
         });
     });
 </script>
