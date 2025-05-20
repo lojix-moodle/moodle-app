@@ -18,14 +18,14 @@ $PAGE->set_pagelayout('admin');
 
 // Yetki kontrolü
 $context = context_system::instance();
-$is_admin = has_capability('block/depo_yonetimi:viewall', $context);
-$is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
+$yetki = '';
+if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
+    $yetki = 'admin';
+} elseif (has_capability('block/depo_yonetimi:viewown', context_system::instance())) {
+$yetki = 'depoyetkilisi';
 
-if (!$is_admin OR !$is_depo_user) {
-    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
-    if (!$user_depo || $user_depo != $depoid) {
-        print_error('Erişim izniniz yok.');
-    }
+if ($yetki !== 'admin' OR $yetki !== 'depoyetkilisi') {
+    print_error('Erişim izniniz yok.');
 }
 
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
