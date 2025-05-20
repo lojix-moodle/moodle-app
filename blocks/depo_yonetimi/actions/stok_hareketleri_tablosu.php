@@ -8,7 +8,7 @@ require_login();
 global $DB, $PAGE, $OUTPUT, $USER;
 
 $depoid = required_param('depoid', PARAM_INT);
-$urunid = required_param('urunid', PARAM_INT);
+$urunid = optional_param('urunid', 0, PARAM_INT); // İsteğe bağlı parametre
 
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', ['depoid' => $depoid, 'urunid' => $urunid]));
 $PAGE->set_context(context_system::instance());
