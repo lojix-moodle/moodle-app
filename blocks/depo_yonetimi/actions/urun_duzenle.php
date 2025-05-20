@@ -26,15 +26,7 @@ $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
 if (!$is_admin OR !$is_depo_user) {
 //    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
 //    if (!$user_depo || $user_depo != $depoid) {
-    echo '            <div class="depo-access-denied">
-                <div class="card border-danger shadow">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
-                        <h4 class="text-danger">' . get_string('access_denied', 'block_depo_yonetimi', 'Erişim Reddedildi') . '</h4>
-                        <p class="lead">' . $message . '</p>
-                    </div>
-                </div>
-            </div>';
+    throw new moodle_exception('Erişim izniniz yok.');
 //    }
 }
 
@@ -43,7 +35,7 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 
 if (!$urun) {
-    print_error('Ürün bulunamadı.');
+    throw new moodle_exception('Ürün bulunamadı.');
 }
 
 // Mevcut renk ve boyut bilgilerini al
