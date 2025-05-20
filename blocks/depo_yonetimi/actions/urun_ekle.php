@@ -22,10 +22,23 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
+    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT); // Bu satırı ekleyin
+
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
+
+    $yeni_urun = new stdClass();
+    $yeni_urun->depoid = $depoid;
+    $yeni_urun->name = $name;
+    $yeni_urun->kategoriid = $kategoriid;
+    $yeni_urun->colors = json_encode($colors);
+    $yeni_urun->sizes = json_encode($sizes);
+    $yeni_urun->varyasyonlar = json_encode($varyasyonlar);
+    $yeni_urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekleyin
+
+
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -398,6 +411,20 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                             <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
+                        </div>
+
+                        <!-- Minimum Stok Seviyesi -->
+                        <div class="mb-4">
+                            <label for="min_stok_seviyesi" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
+                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
+                                       value="0" placeholder="Minimum stok miktarı" min="0" required>
+                            </div>
+                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
+                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
