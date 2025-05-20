@@ -41,10 +41,10 @@ class block_depo_yonetimi extends block_base {
         global $PAGE, $USER, $OUTPUT, $DB;
 
         $depolar = $DB->get_records('block_depo_yonetimi_depolar');
-        $kullanici_depo_eslesme = [
-            2 => 3,
-            5 => 1,
-        ];
+//        $kullanici_depo_eslesme = [
+//            2 => 3,
+//            5 => 1,
+//        ];
 
         if (has_capability('block/depo_yonetimi:viewall', context_system::instance())) {
             $yetki = 'admin';
@@ -58,7 +58,8 @@ class block_depo_yonetimi extends block_base {
 
         // Depo detayı görüntüleniyorsa
         if ($depoid) {
-            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
+//            if ($yetki === 'admin' || (isset($kullanici_depo_eslesme[$USER->id]) && $kullanici_depo_eslesme[$USER->id] == $depoid)) {
+            if ($yetki === 'admin' OR $yetki['depoyetkilisi']) {
                 return $this->render_depo_detay($depoid);
             } else {
                 return $this->render_access_denied('Bu depoya erişim izniniz yok.');
