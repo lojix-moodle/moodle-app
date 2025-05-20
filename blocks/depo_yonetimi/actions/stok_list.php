@@ -57,6 +57,12 @@ if (!empty($urun->sizes)) {
 
 $mevcut_varyasyonlar = !empty($urun->varyasyonlar) ? json_decode($urun->varyasyonlar, true) : [];
 
+$action = $_GET['action'] ?? null;
+
+if ($action && $action == 'talep')
+{
+    
+}
 
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
 function get_string_from_value($value, $type) {
