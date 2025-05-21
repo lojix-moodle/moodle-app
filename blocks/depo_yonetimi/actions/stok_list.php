@@ -250,7 +250,19 @@ echo $OUTPUT->header();
             let allVariants = [];
 
             // Mevcut varyasyonları JSON'dan al
-            const mevcutVaryasyonlar = <?php echo !empty($urun->varyasyonlar) ? $urun->varyasyonlar : '{}'; ?>;
+            //const mevcutVaryasyonlar = <?php //echo !empty($urun->varyasyonlar) ? $urun->varyasyonlar : '{}'; ?>//;
+
+            // Şu şekilde değiştirin
+            const mevcutVaryasyonlar = <?php
+                if(!empty($urun->varyasyonlar)) {
+                    // Veriyi JSON olarak decode edip sonra tekrar encode ederek geçerli JSON olmasını sağlayalım
+                    $decoded = json_decode($urun->varyasyonlar, true);
+                    echo json_encode($decoded);
+                } else {
+                    echo '{}';
+                }
+                ?>;
+
 
             // Sayfa yüklendiğinde mevcut varyasyonları göster
             document.addEventListener('DOMContentLoaded', function() {
