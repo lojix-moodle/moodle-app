@@ -557,14 +557,14 @@ echo $OUTPUT->header();
                             <div id="pageInfo" class="text-center text-muted mt-2"></div>
 
                             <!-- Sayfalama Kontrolleri -->
-                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
-                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-chevron-left me-1"></i> Önceki
-                                </button>
-                                <button id="nextPage" class="btn btn-sm btn-outline-primary">
-                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>
-                                </button>
-                            </div>
+<!--                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">-->
+<!--                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">-->
+<!--                                    <i class="fas fa-chevron-left me-1"></i> Önceki-->
+<!--                                </button>-->
+<!--                                <button id="nextPage" class="btn btn-sm btn-outline-primary">-->
+<!--                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>-->
+<!--                                </button>-->
+<!--                            </div>-->
                         </div>
                     </div>
                 </div>
@@ -601,9 +601,7 @@ echo $OUTPUT->header();
         const varyasyonBolumu = document.getElementById('varyasyonBolumu');
         const varyasyonTablo = document.getElementById('varyasyonTablo');
 
-        // Sayfalama değişkenleri
-        let currentPage = 1;
-        const itemsPerPage = 10;
+        // Tüm varyasyonları tutacak dizi
         let allVariants = [];
 
         // Varyasyon oluşturma
@@ -638,7 +636,7 @@ echo $OUTPUT->header();
             // Varyasyon bölümünü göster
             varyasyonBolumu.classList.remove('d-none');
 
-            // Tüm varyasyonları oluştur ve saklayalım
+            // Tüm varyasyonları oluştur
             allVariants = [];
             selectedColors.forEach(color => {
                 selectedSizes.forEach(size => {
@@ -649,233 +647,185 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Sayfalama değişkenlerini sıfırla
-            currentPage = 1;
-
-            // Varyasyonları sayfayla göster
+            // Varyasyonları göster
             displayVariantsByPage();
-
-            // Sayfalama kontrollerini güncelle
-            updatePaginationControls();
         });
 
-        // Belirli bir sayfadaki varyasyonları göster
+        // Tüm varyasyonları göster (sayfalama olmadan)
         function displayVariantsByPage() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, allVariants.length);
-            const pageVariants = allVariants.slice(startIndex, endIndex);
-
             // Tabloyu temizle
             varyasyonTablo.innerHTML = '';
 
-            // Seçili sayfadaki varyasyonları ekle
-            pageVariants.forEach(variant => {
+            // Tüm varyasyonları göster
+            allVariants.forEach(variant => {
                 const row = document.createElement('tr');
 
                 // Renk + Boyut hücresi
                 const variantCell = document.createElement('td');
                 variantCell.className = 'd-flex align-items-center';
 
-                    // Renk göstergesi
-                    const colorBadge = document.createElement('span');
-                    colorBadge.className = 'badge me-2';
-                    colorBadge.style.backgroundColor = getColorHex(variant.color.value);
-                    colorBadge.style.color = getContrastColor(variant.color.value);
-                    colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
+                // Renk göstergesi
+                const colorBadge = document.createElement('span');
+                colorBadge.className = 'badge me-2';
+                colorBadge.style.backgroundColor = getColorHex(variant.color.value);
+                colorBadge.style.color = getContrastColor(variant.color.value);
+                colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
 
-                    variantCell.appendChild(colorBadge);
-                    variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
+                variantCell.appendChild(colorBadge);
+                variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
 
-                    // Stok miktarı hücresi
-                    const stockCell = document.createElement('td');
-                    const stockInput = document.createElement('input');
-                    stockInput.type = 'number';
-                    stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
-                    stockInput.className = 'form-control form-control-sm';
-                    stockInput.min = 0;
-                    stockInput.value = 0;
-                    stockInput.required = true;
+                // Stok miktarı hücresi
+                const stockCell = document.createElement('td');
+                const stockInput = document.createElement('input');
+                stockInput.type = 'number';
+                stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
+                stockInput.className = 'form-control form-control-sm';
+                stockInput.min = 0;
+                stockInput.value = 0;
+                stockInput.required = true;
 
-                    stockCell.appendChild(stockInput);
+                stockCell.appendChild(stockInput);
 
-                    row.appendChild(variantCell);
-                    row.appendChild(stockCell);
-                    varyasyonTablo.appendChild(row);
+                row.appendChild(variantCell);
+                row.appendChild(stockCell);
+                varyasyonTablo.appendChild(row);
+            });
+        }
+
+        // Renk kodlarını al
+        function getColorHex(colorName) {
+            const colorMap = {
+                'kirmizi': '#dc3545',
+                'mavi': '#0d6efd',
+                'siyah': '#212529',
+                'beyaz': '#f8f9fa',
+                'yesil': '#198754',
+                'sari': '#ffc107',
+                'turuncu': '#fd7e14',
+                'mor': '#6f42c1',
+                'pembe': '#d63384',
+                'gri': '#6c757d',
+                'bej': '#E4DAD2',
+                'lacivert': '#11098A',
+                'kahverengi': '#8B4513',
+                'haki': '#8A9A5B',
+                'vizon': '#A89F91',
+                'bordo': '#800000'
+            };
+
+            return colorMap[colorName] || '#6c757d';
+        }
+
+        // Kontrast rengi hesapla
+        function getContrastColor(colorName) {
+            const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
+            return lightColors.includes(colorName) ? '#212529' : '#ffffff';
+        }
+
+        // Sayfa yüklendiğinde loading overlay'i gizle
+        window.addEventListener('load', function() {
+            loadingOverlay.style.display = 'none';
+        });
+
+        // Form doğrulama
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            // Dinamik doğrulama - alan değiştiğinde
+            const inputs = form.querySelectorAll('input, select');
+            Array.prototype.slice.call(inputs).forEach(function(input) {
+                input.addEventListener('change', function() {
+                    // Geçerlilik kontrolü
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                    }
                 });
-
-                document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${Math.ceil(allVariants.length / itemsPerPage)}`;
-            }
-
-            // Sayfalama kontrollerini güncelle
-            function updatePaginationControls() {
-                const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-                const prevPageBtn = document.getElementById('prevPage');
-                const nextPageBtn = document.getElementById('nextPage');
-
-                // Önceki sayfa butonunu güncelle
-                prevPageBtn.disabled = currentPage <= 1;
-
-                // Sonraki sayfa butonunu güncelle
-                nextPageBtn.disabled = currentPage >= totalPages;
-
-                // Sayfa bilgisini güncelle
-                document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
-            }
-
-            // Önceki sayfa butonuna tıklama
-            document.getElementById('prevPage').addEventListener('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayVariantsByPage();
-                    updatePaginationControls();
-                }
             });
 
-            // Sonraki sayfa butonuna tıklama
-            document.getElementById('nextPage').addEventListener('click', function() {
-                const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayVariantsByPage();
-                    updatePaginationControls();
-                }
-            });
+            // Form gönderildiğinde
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
 
-            // Renk kodlarını al
-            function getColorHex(colorName) {
-                const colorMap = {
-                    'kirmizi': '#dc3545',
-                    'mavi': '#0d6efd',
-                    'siyah': '#212529',
-                    'beyaz': '#f8f9fa',
-                    'yesil': '#198754',
-                    'sari': '#ffc107',
-                    'turuncu': '#fd7e14',
-                    'mor': '#6f42c1',
-                    'pembe': '#d63384',
-                    'gri': '#6c757d',
-                    'bej': '#E4DAD2',
-                    'lacivert': '#11098A',
-                    'kahverengi': '#8B4513',
-                    'haki': '#8A9A5B',
-                    'vizon': '#A89F91',
-                    'bordo': '#800000'
-
-                };
-
-                return colorMap[colorName] || '#6c757d';
-            }
-
-            // Kontrast rengi hesapla
-            function getContrastColor(colorName) {
-                const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
-                return lightColors.includes(colorName) ? '#212529' : '#ffffff';
-            }
-
-            // Sayfa yüklendiğinde loading overlay'i gizle
-            window.addEventListener('load', function() {
-                loadingOverlay.style.display = 'none';
-            });
-
-            // Form doğrulama
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                // Dinamik doğrulama - alan değiştiğinde
-                const inputs = form.querySelectorAll('input, select');
-                Array.prototype.slice.call(inputs).forEach(function(input) {
-                    input.addEventListener('change', function() {
-                        // Geçerlilik kontrolü
-                        if (input.checkValidity()) {
-                            input.classList.remove('is-invalid');
-                            input.classList.add('is-valid');
-                        } else {
-                            input.classList.remove('is-valid');
+                    // Geçersiz alanları işaretle
+                    Array.prototype.slice.call(inputs).forEach(function(input) {
+                        if (!input.checkValidity()) {
                             input.classList.add('is-invalid');
                         }
                     });
-                });
 
-                // Form gönderildiğinde
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
+                    // Hata mesajı göster
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Form Hatası',
+                        text: 'Lütfen zorunlu alanları doldurun!',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#3e64ff'
+                    });
+                } else {
+                    // Varyasyonlar var mı kontrol et
+                    const hasVariations = !varyasyonBolumu.classList.contains('d-none') &&
+                        varyasyonTablo.querySelectorAll('tr').length > 0;
 
-                        // Geçersiz alanları işaretle
-                        Array.prototype.slice.call(inputs).forEach(function(input) {
-                            if (!input.checkValidity()) {
-                                input.classList.add('is-invalid');
+                    if (hasVariations) {
+                        // Varyasyon girişlerini kontrol et
+                        const varyasyonInputs = varyasyonTablo.querySelectorAll('input[type="number"]');
+                        let varyasyonToplam = 0;
+                        let validVariants = 0;
+
+                        varyasyonInputs.forEach(function(input) {
+                            const value = parseInt(input.value);
+                            if (!isNaN(value) && value > 0) {
+                                varyasyonToplam += value;
+                                validVariants++;
                             }
                         });
 
-                        // Hata mesajı göster
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Form Hatası',
-                            text: 'Lütfen zorunlu alanları doldurun!',
-                            confirmButtonText: 'Tamam',
-                            confirmButtonColor: '#3e64ff'
-                        });
-                    } else {
-                        // Varyasyonlar var mı kontrol et
-                        const hasVariations = !varyasyonBolumu.classList.contains('d-none') &&
-                            varyasyonTablo.querySelectorAll('tr').length > 0;
-
-                        if (hasVariations) {
-                            // Varyasyon girişlerini kontrol et
-                            const varyasyonInputs = varyasyonTablo.querySelectorAll('input[type="number"]');
-                            let varyasyonToplam = 0;
-                            let validVariants = 0;
-
-                            varyasyonInputs.forEach(function(input) {
-                                const value = parseInt(input.value);
-                                if (!isNaN(value) && value > 0) {
-                                    varyasyonToplam += value;
-                                    validVariants++;
-                                }
-                            });
-
-                            if (validVariants === 0) {
-                                event.preventDefault();
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Varyasyon Hatası',
-                                    text: 'En az bir varyasyon için stok miktarı girmelisiniz!',
-                                    confirmButtonText: 'Tamam',
-                                    confirmButtonColor: '#3e64ff'
-                                });
-                                return;
-                            }
-
-                            // Onay mesajı göster
+                        if (validVariants === 0) {
                             event.preventDefault();
                             Swal.fire({
-                                icon: 'question',
-                                title: 'Onay',
-                                html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok eklemek üzeresiniz.</p>` +
-                                    `<p>Devam etmek istiyor musunuz?</p>`,
-                                showCancelButton: true,
-                                confirmButtonText: 'Evet, Kaydet',
-                                cancelButtonText: 'İptal',
-                                confirmButtonColor: '#3e64ff',
-                                cancelButtonColor: '#6c757d'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    loadingOverlay.style.display = 'flex';
-                                    submitBtn.disabled = true;
-                                    form.submit();
-                                }
+                                icon: 'warning',
+                                title: 'Varyasyon Hatası',
+                                text: 'En az bir varyasyon için stok miktarı girmelisiniz!',
+                                confirmButtonText: 'Tamam',
+                                confirmButtonColor: '#3e64ff'
                             });
-                        } else {
-                            // Varyasyon yok, normal form gönderimi
-                            loadingOverlay.style.display = 'flex';
-                            submitBtn.disabled = true;
+                            return;
                         }
-                    }
 
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
+                        // Onay mesajı göster
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Onay',
+                            html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok güncellemek üzeresiniz.</p>` +
+                                `<p>Devam etmek istiyor musunuz?</p>`,
+                            showCancelButton: true,
+                            confirmButtonText: 'Evet, Güncelle',
+                            cancelButtonText: 'İptal',
+                            confirmButtonColor: '#3e64ff',
+                            cancelButtonColor: '#6c757d'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                loadingOverlay.style.display = 'flex';
+                                submitBtn.disabled = true;
+                                form.submit();
+                            }
+                        });
+                    } else {
+                        // Varyasyon yok, normal form gönderimi
+                        loadingOverlay.style.display = 'flex';
+                        submitBtn.disabled = true;
+                    }
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
     </script>
 
 <!-- SweetAlert2 CDN -->
