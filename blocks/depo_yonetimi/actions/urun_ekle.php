@@ -7,6 +7,12 @@ require_once(__DIR__ . '/../../../config.php'); // Fixed DIR to _DIR_
 require_once(__DIR__ . '/../lib.php'); // Fixed DIR to _DIR_
 require_login();
 global $DB, $PAGE, $OUTPUT;
+// Moodle'da aktif şablonu kontrol etmek için bu kodu geçici olarak herhangi bir PHP dosyasına ekleyebilirsiniz
+
+echo '<pre>';
+echo "Geçerli tema: " . $PAGE->theme->name . "\n";
+echo "Geçerli şablon: " . $PAGE->pagelayout . "\n";
+echo '</pre>';
 
 $depoid = required_param('depoid', PARAM_INT);
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]));
