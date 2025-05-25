@@ -7,20 +7,30 @@
             $this->title = get_string('pluginname', 'block_depo_yonetimi');
         }
 
+        // blocks/depo_yonetimi/block_depo_yonetimi.php dosyasındaki get_content metodunu güncelleme
         public function get_content() {
-            // İçerik zaten varsa onu döndür
             if ($this->content !== null) {
                 return $this->content;
             }
 
-            // Yeni içerik oluştur
-            $this->content = new stdClass();
-            $this->content->text = $this->generate_boxes_html();
-            $this->content->footer = '';
+            $this->content = new stdClass;
+            $this->content->text = '';
 
-            // CSS ve JS dosyalarını dahil et
-            $this->page_add_assets();
+            // Menü içeriği
+            $menu = '<div class="list-group">';
 
+            // Diğer menü öğeleri...
+
+            // Depo haritası menü öğesini ekleyin
+            $menu .= html_writer::link(
+                new moodle_url('/blocks/depo_yonetimi/actions/depo_haritasi.php'),
+                '<i class="fa fa-map-marker"></i> Depo Haritası',
+                array('class' => 'list-group-item list-group-item-action')
+            );
+
+            $menu .= '</div>';
+
+            $this->content->text = $menu;
             return $this->content;
         }
 
