@@ -629,38 +629,28 @@ echo $OUTPUT->header();
         let allVariants = [];
 
         // Varyasyon oluşturma
+        // Varyasyon oluşturma
         varyasyonOlusturBtn.addEventListener('click', function() {
-            // Seçilen renkler ve boyutları al
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.text
-                };
+            // Önce seçili renkler ve boyutları al
+            const selectedColors = Array.from(colorSelect.selectedOptions).map(option => {
+                return { value: option.value, text: option.textContent };
             });
 
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.text
-                };
+            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(option => {
+                return { value: option.value, text: option.textContent };
             });
 
-            // Hiçbir seçim yapılmadıysa uyarı ver
+            // Eğer renk ve boyut seçilmemişse uyarı ver
             if (selectedColors.length === 0 || selectedSizes.length === 0) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Eksik Seçim',
-                    text: 'Lütfen en az bir renk ve bir boyut seçin.',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#3e64ff'
+                    title: 'Renk ve Boyut gerekli',
+                    text: 'Lütfen en az bir renk ve boyut seçin!'
                 });
                 return;
             }
 
-            // Varyasyon bölümünü göster
-            varyasyonBolumu.classList.remove('d-none');
-
-            // Tüm varyasyonları oluştur
+            // Tüm varyasyonları oluştur (renk ve boyutların kartezyen çarpımı)
             allVariants = [];
             selectedColors.forEach(color => {
                 selectedSizes.forEach(size => {
@@ -671,8 +661,11 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Varyasyonları göster
+            // Varyasyonları tabloda göster
             displayVariantsByPage();
+
+            // Varyasyon bölümünü görünür yap
+            varyasyonBolumu.classList.remove('d-none');
         });
 
         // Tüm varyasyonları göster (sayfalama olmadan)
@@ -755,6 +748,7 @@ echo $OUTPUT->header();
         }
 
 // Raf değiştiğinde bölümleri yükleyen fonksiyon
+        // Raf değiştiğinde bölümleri yükleyen fonksiyon
         function loadBolumler(rafSelectElement, color, size) {
             const rafid = rafSelectElement.value;
             const bolumSelect = document.querySelector(`select[name="varyasyon[${color}][${size}][bolum]"]`);
@@ -777,6 +771,9 @@ echo $OUTPUT->header();
                         bolumSelect.appendChild(option);
                     });
                     bolumSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Bölümler yüklenirken hata:', error);
                 });
         }
 
