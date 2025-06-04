@@ -60,5 +60,72 @@
             </KEYS>
         </TABLE>
 
+
+        <!-- Mevcut tablolar burada... -->
+
+        <TABLE NAME="block_depo_yonetimi_raflar" COMMENT="Depo rafları">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Rafın bulunduğu depo ID'si" />
+                <FIELD NAME="kod" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Raf kodu" />
+                <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Raf açıklaması" />
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id" />
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="depoid_ix" UNIQUE="false" FIELDS="depoid" />
+                <INDEX NAME="kod_ix" UNIQUE="false" FIELDS="kod" />
+            </INDEXES>
+        </TABLE>
+
+        <TABLE NAME="block_depo_yonetimi_bolumler" COMMENT="Raf bölümleri">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="rafid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Bölümün bulunduğu raf ID'si" />
+                <FIELD NAME="kod" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Bölüm kodu" />
+                <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Bölüm açıklaması" />
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+                <KEY NAME="rafid_fk" TYPE="foreign" FIELDS="rafid" REFTABLE="block_depo_yonetimi_raflar" REFFIELDS="id" />
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="rafid_ix" UNIQUE="false" FIELDS="rafid" />
+                <INDEX NAME="kod_ix" UNIQUE="false" FIELDS="kod" />
+            </INDEXES>
+        </TABLE>
+
+        <TABLE NAME="block_depo_yonetimi_urun_lok" COMMENT="Ürün lokasyonları">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="urunid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Ürün ID'si" />
+                <FIELD NAME="rafid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Raf ID'si" />
+                <FIELD NAME="bolumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Bölüm ID'si" />
+                <FIELD NAME="renk" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Ürün rengi" />
+                <FIELD NAME="beden" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Ürün bedeni" />
+                <FIELD NAME="adet" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Bu lokasyondaki adet" />
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+                <KEY NAME="urunid_fk" TYPE="foreign" FIELDS="urunid" REFTABLE="block_depo_yonetimi_urunler" REFFIELDS="id" />
+                <KEY NAME="rafid_fk" TYPE="foreign" FIELDS="rafid" REFTABLE="block_depo_yonetimi_raflar" REFFIELDS="id" />
+                <KEY NAME="bolumid_fk" TYPE="foreign" FIELDS="bolumid" REFTABLE="block_depo_yonetimi_bolumler" REFFIELDS="id" />
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="urunid_ix" UNIQUE="false" FIELDS="urunid" />
+                <INDEX NAME="rafid_ix" UNIQUE="false" FIELDS="rafid" />
+                <INDEX NAME="bolumid_ix" UNIQUE="false" FIELDS="bolumid" />
+                <INDEX NAME="varyasyon_ix" UNIQUE="false" FIELDS="renk, beden" />
+            </INDEXES>
+        </TABLE>
+
     </TABLES>
 </XMLDB>
