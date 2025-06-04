@@ -630,8 +630,11 @@ echo $OUTPUT->header();
 
         // Varyasyon oluşturma
         // Varyasyon oluşturma
+        // Varyasyon oluştur butonuna tıklama olayı
         varyasyonOlusturBtn.addEventListener('click', function() {
-            // Önce seçili renkler ve boyutları al
+            console.log("Varyasyon oluştur butonuna tıklandı");
+
+            // Seçili renkler ve boyutları al
             const selectedColors = Array.from(colorSelect.selectedOptions).map(option => {
                 return { value: option.value, text: option.textContent };
             });
@@ -640,17 +643,16 @@ echo $OUTPUT->header();
                 return { value: option.value, text: option.textContent };
             });
 
-            // Eğer renk ve boyut seçilmemişse uyarı ver
+            console.log("Seçilen renkler:", selectedColors);
+            console.log("Seçilen boyutlar:", selectedSizes);
+
+            // Renk veya boyut seçilmediyse uyarı ver
             if (selectedColors.length === 0 || selectedSizes.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Renk ve Boyut gerekli',
-                    text: 'Lütfen en az bir renk ve boyut seçin!'
-                });
+                alert("Lütfen en az bir renk ve boyut seçin!");
                 return;
             }
 
-            // Tüm varyasyonları oluştur (renk ve boyutların kartezyen çarpımı)
+            // Varyasyonları oluştur
             allVariants = [];
             selectedColors.forEach(color => {
                 selectedSizes.forEach(size => {
@@ -661,96 +663,124 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Varyasyonları tabloda göster
-            displayVariantsByPage();
+            console.log("Oluşturulan varyasyonlar:", allVariants);
+
+            // Varyasyon tablosunu doldur
+            createVariantTable();
 
             // Varyasyon bölümünü görünür yap
             varyasyonBolumu.classList.remove('d-none');
         });
 
-        // Tüm varyasyonları göster (sayfalama olmadan)
-        function displayVariantsByPage() {
+// Varyasyon tablosu oluşturma fonksiyonu
+        function createVariantTable() {
             // Tabloyu temizle
-            const varyasyonTablo = document.getElementById('varyasyonTablo');
             varyasyonTablo.innerHTML = '';
 
-            // Rafları ve bölümleri önceden al
-            const rafSelect = document.createElement('select');
-            rafSelect.className = 'form-select form-select-sm raf-select';
-            rafSelect.innerHTML = '<option value="">Raf seçin</option>';
+            const depoid = <?php echo $depoid; ?>;
+            console.log("Kullanılan depoid:", depoid);
 
-            // AJAX ile rafları getir
-            fetch('../actions/get_raflar.php?depoid=' + document.getElementById('depoid').value || <?php echo $depoid; ?>)
-                .then(response => response.json())
+            // Rafları getir
+            fetch('../actions/get_raflar.php?depoid=' + depoid)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Raflar alınırken bir hata oluştu: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    data.forEach(raf => {
-                        const option = document.createElement('option');
-                        option.value = raf.id;
-                        option.textContent = raf.kod;
-                        rafSelect.appendChild(option);
+                    console.log("Alınan raflar:", data);
+
+                    // Varyasyonları tabloya ekle
+                    allVariants.forEach(variant => {
+                        const row = document.createElement('tr');
+
+                        // Varyasyon adı (Renk/Boyut)
+                        const variantCell = document.createElement('td');
+                        variantCell.className = 'd-flex align-items-center';
+
+                        // Renk göstergesi
+                        const colorBadge = document.createElement('span');
+                        colorBadge.className = 'badge me-2';
+                        colorBadge.style.backgroundColor = getColorHex(variant.color.value);
+                        colorBadge.style.color = getContrastColor(variant.color.value);
+                        colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
+
+                        variantCell.appendChild(colorBadge);
+                        variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
+
+                        // Stok miktarı hücresi
+                        const stockCell = document.createElement('td');
+                        const stockInput = document.createElement('input');
+                        stockInput.type = 'number';
+                        stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}][adet]`;
+                        stockInput.className = 'form-control form-control-sm';
+                        stockInput.min = 0;
+                        stockInput.value = 0;
+                        stockInput.required = true;
+                        stockCell.appendChild(stockInput);
+
+                        // Raf seçimi hücresi
+                        const rafCell = document.createElement('td');
+                        const rafSelect = document.createElement('select');
+                        rafSelect.className = 'form-select form-select-sm';
+                        rafSelect.name = `varyasyon[${variant.color.value}][${variant.size.value}][raf]`;
+
+                        // Boş seçenek ekle
+                        const emptyOption = document.createElement('option');
+                        emptyOption.value = '';
+                        emptyOption.textContent = 'Raf seçin';
+                        rafSelect.appendChild(emptyOption);
+
+                        // Rafları ekle
+                        data.forEach(raf => {
+                            const option = document.createElement('option');
+                            option.value = raf.id;
+                            option.textContent = raf.kod;
+                            rafSelect.appendChild(option);
+                        });
+
+                        // Raf değişikliğinde bölümleri yükle
+                        rafSelect.addEventListener('change', function() {
+                            loadBolumler(this, variant.color.value, variant.size.value);
+                        });
+
+                        rafCell.appendChild(rafSelect);
+
+                        // Bölüm seçimi hücresi
+                        const bolumCell = document.createElement('td');
+                        const bolumSelect = document.createElement('select');
+                        bolumSelect.className = 'form-select form-select-sm';
+                        bolumSelect.name = `varyasyon[${variant.color.value}][${variant.size.value}][bolum]`;
+                        bolumSelect.disabled = true;
+
+                        // Boş seçenek ekle
+                        const emptyBolumOption = document.createElement('option');
+                        emptyBolumOption.value = '';
+                        emptyBolumOption.textContent = 'Önce raf seçin';
+                        bolumSelect.appendChild(emptyBolumOption);
+
+                        bolumCell.appendChild(bolumSelect);
+
+                        // Hücreleri satıra ekle
+                        row.appendChild(variantCell);
+                        row.appendChild(stockCell);
+                        row.appendChild(rafCell);
+                        row.appendChild(bolumCell);
+
+                        // Satırı tabloya ekle
+                        varyasyonTablo.appendChild(row);
                     });
+                })
+                .catch(error => {
+                    console.error('Hata oluştu:', error);
+                    alert('Raflar yüklenirken bir hata oluştu: ' + error.message);
                 });
-
-            // Tüm varyasyonları göster
-            allVariants.forEach(variant => {
-                const row = document.createElement('tr');
-
-                // Renk + Boyut hücresi
-                const variantCell = document.createElement('td');
-                variantCell.className = 'd-flex align-items-center';
-
-                // Renk göstergesi ekleyin
-                const colorBadge = document.createElement('span');
-                colorBadge.className = 'badge me-2';
-                colorBadge.style.backgroundColor = getColorHex(variant.color.value);
-                colorBadge.style.color = getContrastColor(variant.color.value);
-                colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
-
-                variantCell.appendChild(colorBadge);
-                variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
-
-                // Stok miktarı hücresi
-                const stockCell = document.createElement('td');
-                const stockInput = document.createElement('input');
-                stockInput.type = 'number';
-                stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}][adet]`;
-                stockInput.className = 'form-control form-control-sm';
-                stockInput.min = 0;
-                stockInput.value = 0;
-                stockInput.required = true;
-                stockCell.appendChild(stockInput);
-
-                // Raf seçimi hücresi
-                const rafCell = document.createElement('td');
-                const rafSelectClone = rafSelect.cloneNode(true);
-                rafSelectClone.name = `varyasyon[${variant.color.value}][${variant.size.value}][raf]`;
-                rafSelectClone.onchange = function() {
-                    loadBolumler(this, variant.color.value, variant.size.value);
-                };
-                rafCell.appendChild(rafSelectClone);
-
-                // Bölüm seçimi hücresi
-                const bolumCell = document.createElement('td');
-                const bolumSelect = document.createElement('select');
-                bolumSelect.className = 'form-select form-select-sm bolum-select';
-                bolumSelect.name = `varyasyon[${variant.color.value}][${variant.size.value}][bolum]`;
-                bolumSelect.disabled = true;
-                bolumSelect.innerHTML = '<option value="">Önce raf seçin</option>';
-                bolumCell.appendChild(bolumSelect);
-
-                // Tüm hücreleri satıra ekleyin
-                row.appendChild(variantCell);
-                row.appendChild(stockCell);
-                row.appendChild(rafCell);
-                row.appendChild(bolumCell);
-                varyasyonTablo.appendChild(row);
-            });
         }
 
-// Raf değiştiğinde bölümleri yükleyen fonksiyon
-        // Raf değiştiğinde bölümleri yükleyen fonksiyon
-        function loadBolumler(rafSelectElement, color, size) {
-            const rafid = rafSelectElement.value;
+// Raf değiştiğinde bölümleri yükle
+        function loadBolumler(rafSelect, color, size) {
+            const rafid = rafSelect.value;
             const bolumSelect = document.querySelector(`select[name="varyasyon[${color}][${size}][bolum]"]`);
 
             if (!rafid) {
@@ -759,47 +789,40 @@ echo $OUTPUT->header();
                 return;
             }
 
-            // AJAX ile bölümleri getir
+            console.log("Bölümler getiriliyor, rafid:", rafid);
+
+            // Bölümleri getir
             fetch('../actions/get_bolumler.php?rafid=' + rafid)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Bölümler alınırken bir hata oluştu: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    bolumSelect.innerHTML = '<option value="">Bölüm seçin</option>';
+                    console.log("Alınan bölümler:", data);
+
+                    bolumSelect.innerHTML = '';
+
+                    // Boş seçenek ekle
+                    const emptyOption = document.createElement('option');
+                    emptyOption.value = '';
+                    emptyOption.textContent = 'Bölüm seçin';
+                    bolumSelect.appendChild(emptyOption);
+
+                    // Bölümleri ekle
                     data.forEach(bolum => {
                         const option = document.createElement('option');
                         option.value = bolum.id;
                         option.textContent = bolum.kod;
                         bolumSelect.appendChild(option);
                     });
+
                     bolumSelect.disabled = false;
                 })
                 .catch(error => {
-                    console.error('Bölümler yüklenirken hata:', error);
-                });
-        }
-
-// Seçilen rafa göre bölümleri yükleme
-        function loadBolumler(rafSelectElement, color, size) {
-            const rafid = rafSelectElement.value;
-            const bolumSelect = document.querySelector(`select[name="varyasyon[${color}][${size}][bolum]"]`);
-
-            if (!rafid) {
-                bolumSelect.innerHTML = '<option value="">Önce raf seçin</option>';
-                bolumSelect.disabled = true;
-                return;
-            }
-
-            // AJAX ile bölümleri getir
-            fetch('../actions/get_bolumler.php?rafid=' + rafid)
-                .then(response => response.json())
-                .then(data => {
-                    bolumSelect.innerHTML = '<option value="">Bölüm seçin</option>';
-                    data.forEach(bolum => {
-                        const option = document.createElement('option');
-                        option.value = bolum.id;
-                        option.textContent = bolum.kod;
-                        bolumSelect.appendChild(option);
-                    });
-                    bolumSelect.disabled = false;
+                    console.error('Hata oluştu:', error);
+                    alert('Bölümler yüklenirken bir hata oluştu: ' + error.message);
                 });
         }
 
