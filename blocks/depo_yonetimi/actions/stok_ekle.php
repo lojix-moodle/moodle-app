@@ -267,6 +267,15 @@ echo $OUTPUT->header();
             <h5 class="card-title mb-0">
                 <i class="fas fa-history text-primary mr-2"></i> Son Stok Hareketleri
             </h5>
+            <td>
+                <?php
+                if (!empty($hareket->firstname) && !empty($hareket->lastname)) {
+                    echo $hareket->firstname . ' ' . $hareket->lastname;
+                } else {
+                    echo 'Bilinmiyor';
+                }
+                ?>
+            </td>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
