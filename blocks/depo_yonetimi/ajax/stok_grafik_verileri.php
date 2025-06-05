@@ -11,6 +11,9 @@ $tip = optional_param('tip', 'hareketler', PARAM_ALPHA); // 'hareketler' veya 's
 // Güvenlik kontrolü
 require_login();
 
+// JSON çıktısı için header
+header('Content-Type: application/json');
+
 // Tarih aralığı
 $baslangic = time() - ($gun * 86400);
 
@@ -34,7 +37,7 @@ if ($tip === 'stokseviye' && $urunid) {
             CONCAT(sh.renk, '/', sh.beden) as varyasyon
             FROM {block_depo_yonetimi_stok_hareketleri} sh
             WHERE sh.urunid = :urunid AND sh.tarih >= :baslangic
-            ORDER BY sh.tarih ASC";
+            ORDER BY sh.tarih DESC";
 
     $hareketler = $DB->get_records_sql($sql, ['urunid' => $urunid, 'baslangic' => $baslangic]);
 
@@ -42,11 +45,14 @@ if ($tip === 'stokseviye' && $urunid) {
     $baslangic_stok = $mevcut_stok;
     foreach ($hareketler as $hareket) {
         if ($hareket->islemtipi == 'giris') {
-            $baslangic_stok -= $hareket->miktar; // Giriş hareketlerini çıkar
+            $baslangic_stok -= $hareket->miktar; // Girişleri çıkar
         } else {
-            $baslangic_stok += $hareket->miktar; // Çıkış hareketlerini ekle
+            $baslangic_stok += $hareket->miktar; // Çıkışları ekle
         }
     }
+
+    // Hareketleri kronolojik sıraya çevir (eskiden yeniye)
+    $hareketler_sirali = array_reverse($hareketler);
 
     // Sonuç dizilerini hazırla
     $labels = [date('d.m.Y', $baslangic)]; // Başlangıç zamanı
@@ -55,11 +61,11 @@ if ($tip === 'stokseviye' && $urunid) {
     $guncel_stok = $baslangic_stok;
 
     // Her hareket için stok seviye değişimini hesapla
-    foreach ($hareketler as $hareket) {
+    foreach ($hareketler_sirali as $hareket) {
         if ($hareket->islemtipi == 'giris') {
-            $guncel_stok += $hareket->miktar;
+            $guncel_stok += $hareket->miktar; // Giriş işlemi stok arttırır
         } else {
-            $guncel_stok -= $hareket->miktar;
+            $guncel_stok -= $hareket->miktar; // Çıkış işlemi stok azaltır
         }
 
         $labels[] = date('d.m.Y H:i', $hareket->tarih);
@@ -69,16 +75,16 @@ if ($tip === 'stokseviye' && $urunid) {
     // Eğer hareket yoksa şu anki stok değerini de ekle
     if (empty($hareketler)) {
         $labels[] = date('d.m.Y H:i', time());
-        $stokSeviyesi[] = $baslangic_stok;
+        $stokSeviyesi[] = $mevcut_stok;
     }
 
     // Sonucu döndür
     $sonuc = [
         'labels' => $labels,
         'stokSeviyesi' => $stokSeviyesi,
+        'success' => true
     ];
 
-    header('Content-Type: application/json');
     echo json_encode($sonuc);
     exit;
 }
@@ -120,8 +126,8 @@ foreach ($hareketler as $hareket) {
 $sonuc = [
     'labels' => array_values($tarihler),
     'girisler' => array_values($girisler),
-    'cikislar' => array_values($cikislar)
+    'cikislar' => array_values($cikislar),
+    'success' => true
 ];
 
-header('Content-Type: application/json');
 echo json_encode($sonuc);
