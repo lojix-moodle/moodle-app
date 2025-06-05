@@ -75,9 +75,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Form gönderilen değerler - Raf: " . $raf . ", Bölüm: " . $bolum);
 
 // Ana ürüne raf ve bölüm bilgilerini ekle
+    // İlgili kayıt işleminden önce hata ayıklama kodları ekleyin
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
-    error_log("Kaydedilen raf: " . $raf . ", Bölüm: " . $bolum);
+
+// Depo ID'nin doğru geldiğinden emin olun
+    error_log("Depo ID: " . $depoid);
+
+// Kategori ID'sini kontrol edin
+    error_log("Kategori ID: " . $ana_urun->kategoriid);
+
+    try {
+        // Depo kaydının var olup olmadığını kontrol edin
+        $depo_kontrol = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
+
+        // Kategori kaydının var olup olmadığını kontrol edin
+        $kategori_kontrol = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $ana_urun->kategoriid], '*', MUST_EXIST);
+
+        // Ana ürünü ekle ve ID'sini al
+        $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
+
+        // Başarılı mesajı göster
+        \core\notification::success('Ürün başarıyla eklendi.');
+
+        redirect(new moodle_url('/my', ['depo' => $depoid]));
+    } catch (dml_missing_record_exception $e) {
+        // Kayıt bulunamadığında
+        error_log("Veritabanı hatası: " . $e->getMessage());
+        \core\notification::error('Depo veya kategori kaydı bulunamadı: ' . $e->getMessage());
+    } catch (Exception $e) {
+        // Diğer hatalar için
+        error_log("Genel hata: " . $e->getMessage());
+        \core\notification::error('Bir hata oluştu: ' . $e->getMessage());
+    }
 
 
     // Ana ürünü ekle ve ID'sini al
