@@ -110,53 +110,67 @@ function getColorHex($colorName) {
 }
 
 /**
- * Stok hareketini kaydeder ve ürün miktarını günceller
+ * Stok hareketi kaydeder ve stok miktarını günceller
  *
  * @param int $urunid Ürün ID
  * @param int $depoid Depo ID
- * @param int $miktar Hareket miktarı
- * @param string $hareket_tipi Hareket tipi (giris/cikis)
- * @param string $aciklama Hareket açıklaması
- * @param string $renk Ürün rengi (opsiyonel)
- * @param string $beden Ürün bedeni (opsiyonel)
- * @return bool İşlem başarılı mı?
+ * @param int $miktar İşlem miktarı
+ * @param string $hareket_tipi İşlem tipi (giris veya cikis)
+ * @param string $aciklama İşlem açıklaması
+ * @param string $renk Varyasyon rengi (opsiyonel)
+ * @param string $beden Varyasyon bedeni (opsiyonel)
+ * @return bool İşlem sonucu
  */
 function block_depo_yonetimi_stok_hareketi_kaydet($urunid, $depoid, $miktar, $hareket_tipi, $aciklama = '', $renk = '', $beden = '') {
     global $DB, $USER;
 
-    // Hata kontrolü
-    if ($miktar <= 0 || !in_array($hareket_tipi, ['giris', 'cikis'])) {
-        return false;
-    }
-
-    // Ürünü kontrol et
+    // Ürün bilgilerini al
     $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
     if (!$urun) {
         return false;
     }
 
-    // Stok çıkışında yeteri kadar stok var mı kontrol et
-    if ($hareket_tipi === 'cikis' && $urun->adet < $miktar) {
-        return false; // Yetersiz stok
+    // Çıkış işlemlerinde stok kontrolü
+    if ($hareket_tipi === 'cikis') {
+        // Genel stok kontrolü
+        if ($miktar > $urun->adet) {
+            return false;
+        }
+
+        // Varyasyon seçiliyse varyasyon stoğu kontrolü
+        if (!empty($renk) && !empty($beden) && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0') {
+            $varyasyonlar = json_decode($urun->varyasyonlar, true);
+            if (isset($varyasyonlar[$renk][$beden]) && $varyasyonlar[$renk][$beden] < $miktar) {
+                return false; // Varyasyon stoğu yetersiz
+            }
+        }
     }
 
     // Transaction başlat
     $transaction = $DB->start_delegated_transaction();
 
     try {
-        // Stok hareketi kaydını oluştur
-        $hareket = new stdClass();
-        $hareket->urunid = $urunid;
-        $hareket->depoid = $depoid;
-        $hareket->miktar = $miktar;
-        $hareket->islemtipi = $hareket_tipi;
-        $hareket->aciklama = $aciklama;
-        $hareket->renk = $renk;
-        $hareket->beden = $beden;
-        $hareket->tarih = time();
-        $hareket->userid = $USER->id;
+        // Stok hareketi kaydı oluştur
+        $stok_hareketi = new stdClass();
+        $stok_hareketi->urunid = $urunid;
+        $stok_hareketi->depoid = $depoid;
+        $stok_hareketi->miktar = $miktar;
+        $stok_hareketi->islemtipi = $hareket_tipi;
+        $stok_hareketi->aciklama = $aciklama;
+        $stok_hareketi->tarih = time();
+        $stok_hareketi->userid = $USER->id;
 
-        $DB->insert_record('block_depo_yonetimi_stok_hareketleri', $hareket);
+        // Varyasyon bilgileri varsa ekle
+        if (!empty($renk)) {
+            $stok_hareketi->renk = $renk;
+        }
+
+        if (!empty($beden)) {
+            $stok_hareketi->beden = $beden;
+        }
+
+        // Stok hareketi kaydını veritabanına ekle
+        $DB->insert_record('block_depo_yonetimi_stok_hareketleri', $stok_hareketi);
 
         // Ürün stok miktarını güncelle
         if ($hareket_tipi === 'giris') {
@@ -165,6 +179,29 @@ function block_depo_yonetimi_stok_hareketi_kaydet($urunid, $depoid, $miktar, $ha
             $urun->adet -= $miktar;
         }
 
+        // Varyasyon stoğunu güncelle
+        if (!empty($renk) && !empty($beden) && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0') {
+            $varyasyonlar = json_decode($urun->varyasyonlar, true);
+
+            if (is_array($varyasyonlar) && isset($varyasyonlar[$renk][$beden])) {
+                // Stok giriş/çıkış işlemine göre varyasyon stoğunu güncelle
+                if ($hareket_tipi === 'giris') {
+                    $varyasyonlar[$renk][$beden] += $miktar;
+                } else {
+                    $varyasyonlar[$renk][$beden] -= $miktar;
+                }
+
+                // Negatif stok kontrolü
+                if ($varyasyonlar[$renk][$beden] < 0) {
+                    $varyasyonlar[$renk][$beden] = 0;
+                }
+
+                // Güncellenmiş varyasyon bilgisini JSON olarak kaydet
+                $urun->varyasyonlar = json_encode($varyasyonlar);
+            }
+        }
+
+        // Ürün kaydını güncelle
         $DB->update_record('block_depo_yonetimi_urunler', $urun);
 
         // Transaction'ı tamamla
@@ -172,7 +209,9 @@ function block_depo_yonetimi_stok_hareketi_kaydet($urunid, $depoid, $miktar, $ha
 
         return true;
     } catch (Exception $e) {
+        // Hata durumunda transaction'ı geri al
         $transaction->rollback($e);
         return false;
     }
+
 }
