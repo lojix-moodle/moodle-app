@@ -320,7 +320,7 @@ echo $OUTPUT->header();
                 <h5 class="card-title mb-0">
                     <i class="fas fa-tags me-2"></i>Varyasyon Stok Durumu
                 </h5>
-                <span class="badge bg-light text-dark text-black-900 border">
+                <span class="badge bg-light text-dark  border">
                 Toplam: <strong><?php echo $urun->adet; ?></strong> adet
             </span>
             </div>
@@ -344,15 +344,18 @@ echo $OUTPUT->header();
                                         $stokDurumu = 'bg-danger text-white';
                                     } elseif ($miktar <= 5) {
                                         $stokDurumu = 'bg-warning text-dark';
+                                    } else {
+                                        // Normal stok durumu için metin rengini siyah yap
+                                        $stokDurumu = 'text-dark';
                                     }
 
                                     echo '<tr>';
                                     echo '<td class="align-middle">
-                                        <div class="d-flex align-items-center">
-                                            <span class="color-badge" style="background-color: '.getColorHex($renk).';"></span>
-                                            <strong>'.htmlspecialchars($renk).'</strong> / '.htmlspecialchars($beden).'
-                                        </div>
-                                      </td>';
+                <div class="d-flex align-items-center">
+                    <span class="color-badge" style="background-color: '.getColorHex($renk).';"></span>
+                    <strong style="color: #212529;">'.htmlspecialchars($renk).'</strong> / '.htmlspecialchars($beden).'
+                </div>
+              </td>';
                                     echo '<td><span class="badge ' . $stokDurumu . '" style="min-width: 60px;">' . $miktar . ' adet</span></td>';
                                     echo '</tr>';
                                 }
