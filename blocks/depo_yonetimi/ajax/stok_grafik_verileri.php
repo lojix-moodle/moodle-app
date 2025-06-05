@@ -1,133 +1,148 @@
 <?php
+// Hata ayıklama için
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+
+// Çıktı tamponlama başlat (header hatası olmaması için)
+ob_start();
+
 require_once('../../../config.php');
 global $DB, $CFG;
 
-// Parametre kontrolü
-$depoid = required_param('depoid', PARAM_INT);
-$gun = optional_param('gun', 30, PARAM_INT);
-$urunid = optional_param('urunid', 0, PARAM_INT);
-$tip = optional_param('tip', 'hareketler', PARAM_ALPHA); // 'hareketler' veya 'stokseviye'
+try {
+    // Parametre kontrolü
+    $depoid = required_param('depoid', PARAM_INT);
+    $gun = optional_param('gun', 30, PARAM_INT);
+    $urunid = optional_param('urunid', 0, PARAM_INT);
+    $tip = optional_param('tip', 'hareketler', PARAM_ALPHA); // 'hareketler' veya 'stokseviye'
 
-// Güvenlik kontrolü
-require_login();
+    // Güvenlik kontrolü
+    require_login();
 
-// JSON çıktısı için header
-header('Content-Type: application/json');
+    // Tarih hesaplama
+    $simdi = time();
+    $baslangic = $simdi - ($gun * 86400);
+    $sonuc = [];
 
-// Tarih aralığı
-$baslangic = time() - ($gun * 86400);
+    // Stok seviyesi grafiği
+    if ($tip === 'stokseviye' && $urunid > 0) {
+        // Mevcut stok durumunu al
+        $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid], '*', MUST_EXIST);
+        $guncel_stok = (int)$urun->adet;
 
-// SQL sorgusu parametreleri
-$params = ['depoid' => $depoid, 'baslangic' => $baslangic];
-$urunFilter = '';
+        // Tüm hareketleri kronolojik sırayla getir (yeniden eskiye)
+        $sql = "SELECT id, tarih, islemtipi, miktar 
+                FROM {block_depo_yonetimi_stok_hareketleri} 
+                WHERE urunid = :urunid AND tarih >= :baslangic 
+                ORDER BY tarih DESC";
 
-if ($urunid) {
-    $urunFilter = 'AND sh.urunid = :urunid';
-    $params['urunid'] = $urunid;
-}
+        $hareketler = $DB->get_records_sql($sql, [
+            'urunid' => $urunid,
+            'baslangic' => $baslangic
+        ]);
 
-// Stok seviyesi grafiği (yeni fonksiyon)
-if ($tip === 'stokseviye' && $urunid) {
-    // Mevcut stok durumunu al
-    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid], 'adet');
-    $mevcut_stok = $urun ? $urun->adet : 0;
+        // Geriye doğru stok hesaplaması yap
+        $stok_gecmisi = [];
+        $stok_gecmisi[$simdi] = $guncel_stok; // Şimdiki stok
 
-    // Şimdiki tarihe kadar olan tüm hareketleri zaman sırasıyla al
-    $sql = "SELECT sh.id, sh.tarih, sh.islemtipi, sh.miktar, sh.renk, sh.beden,
-            CONCAT(sh.renk, '/', sh.beden) as varyasyon
-            FROM {block_depo_yonetimi_stok_hareketleri} sh
-            WHERE sh.urunid = :urunid AND sh.tarih >= :baslangic
-            ORDER BY sh.tarih DESC";
+        $mevcut_stok = $guncel_stok;
+        foreach ($hareketler as $hareket) {
+            // Geriye doğru gidiyoruz - işlemleri tersine çevir
+            if ($hareket->islemtipi === 'giris') {
+                $mevcut_stok -= (int)$hareket->miktar;  // Giriş öncesi daha az stok vardı
+            } else {
+                $mevcut_stok += (int)$hareket->miktar;  // Çıkış öncesi daha fazla stok vardı
+            }
 
-    $hareketler = $DB->get_records_sql($sql, ['urunid' => $urunid, 'baslangic' => $baslangic]);
-
-    // İlk değeri hesapla (mevcut stoktan geçmişteki hareketleri geri alarak)
-    $baslangic_stok = $mevcut_stok;
-    foreach ($hareketler as $hareket) {
-        if ($hareket->islemtipi == 'giris') {
-            $baslangic_stok -= $hareket->miktar; // Girişleri çıkar
-        } else {
-            $baslangic_stok += $hareket->miktar; // Çıkışları ekle
-        }
-    }
-
-    // Hareketleri kronolojik sıraya çevir (eskiden yeniye)
-    $hareketler_sirali = array_reverse($hareketler);
-
-    // Sonuç dizilerini hazırla
-    $labels = [date('d.m.Y', $baslangic)]; // Başlangıç zamanı
-    $stokSeviyesi = [$baslangic_stok];      // Başlangıç stok değeri
-
-    $guncel_stok = $baslangic_stok;
-
-    // Her hareket için stok seviye değişimini hesapla
-    foreach ($hareketler_sirali as $hareket) {
-        if ($hareket->islemtipi == 'giris') {
-            $guncel_stok += $hareket->miktar; // Giriş işlemi stok arttırır
-        } else {
-            $guncel_stok -= $hareket->miktar; // Çıkış işlemi stok azaltır
+            $stok_gecmisi[$hareket->tarih] = $mevcut_stok;
         }
 
-        $labels[] = date('d.m.Y H:i', $hareket->tarih);
-        $stokSeviyesi[] = $guncel_stok;
+        // Başlangıç değerini ekle
+        if (!isset($stok_gecmisi[$baslangic])) {
+            // Hesaplanan son değeri başlangıç noktası olarak kullan
+            $stok_gecmisi[$baslangic] = $mevcut_stok;
+        }
+
+        // Tarihe göre artan şekilde sırala (eskiden yeniye)
+        ksort($stok_gecmisi);
+
+        // Veri formatını hazırla
+        $sonuc = [
+            'labels' => [],
+            'stokSeviyesi' => [],
+            'success' => true,
+            'count' => count($stok_gecmisi)
+        ];
+
+        foreach ($stok_gecmisi as $tarih => $miktar) {
+            $sonuc['labels'][] = date('d.m.Y H:i', $tarih);
+            $sonuc['stokSeviyesi'][] = $miktar;
+        }
+    }
+    // Gün bazlı giriş/çıkış grafik verisi (eski formatı da koru)
+    else {
+        $params = ['depoid' => $depoid, 'baslangic' => $baslangic];
+        $urunFilter = '';
+
+        if ($urunid > 0) {
+            $urunFilter = 'AND sh.urunid = :urunid';
+            $params['urunid'] = $urunid;
+        }
+
+        $sql = "SELECT DATE_FORMAT(FROM_UNIXTIME(sh.tarih), '%d.%m.%Y') as tarih_gun,
+                SUM(CASE WHEN sh.islemtipi = 'giris' THEN sh.miktar ELSE 0 END) as toplam_giris,
+                SUM(CASE WHEN sh.islemtipi = 'cikis' THEN sh.miktar ELSE 0 END) as toplam_cikis
+                FROM {block_depo_yonetimi_stok_hareketleri} sh
+                JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
+                WHERE ur.depoid = :depoid AND sh.tarih >= :baslangic $urunFilter
+                GROUP BY DATE_FORMAT(FROM_UNIXTIME(sh.tarih), '%d.%m.%Y')
+                ORDER BY MIN(sh.tarih) ASC";
+
+        $hareketler = $DB->get_records_sql($sql, $params);
+
+        // Tüm günleri doldur
+        $tarihler = [];
+        $girisler = [];
+        $cikislar = [];
+
+        for ($i = $gun; $i >= 0; $i--) {
+            $tarih = date('d.m.Y', $simdi - ($i * 86400));
+            $tarihler[$tarih] = $tarih;
+            $girisler[$tarih] = 0;
+            $cikislar[$tarih] = 0;
+        }
+
+        foreach ($hareketler as $hareket) {
+            if (isset($tarihler[$hareket->tarih_gun])) {
+                $girisler[$hareket->tarih_gun] = (int)$hareket->toplam_giris;
+                $cikislar[$hareket->tarih_gun] = (int)$hareket->toplam_cikis;
+            }
+        }
+
+        $sonuc = [
+            'labels' => array_values($tarihler),
+            'girisler' => array_values($girisler),
+            'cikislar' => array_values($cikislar),
+            'success' => true
+        ];
     }
 
-    // Eğer hareket yoksa şu anki stok değerini de ekle
-    if (empty($hareketler)) {
-        $labels[] = date('d.m.Y H:i', time());
-        $stokSeviyesi[] = $mevcut_stok;
-    }
+    // Tampon belleği temizle
+    ob_end_clean();
 
-    // Sonucu döndür
-    $sonuc = [
-        'labels' => $labels,
-        'stokSeviyesi' => $stokSeviyesi,
-        'success' => true
-    ];
-
+    // JSON çıktısı
+    header('Content-Type: application/json');
     echo json_encode($sonuc);
-    exit;
+
+} catch (Exception $e) {
+    // Tampon belleği temizle
+    ob_end_clean();
+
+    // Hata JSON çıktısı
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+    ]);
 }
-
-// Orijinal gün bazlı grafik (hareketler)
-$sql = "SELECT DATE_FORMAT(FROM_UNIXTIME(sh.tarih), '%d.%m.%Y') as tarih_gun,
-        SUM(CASE WHEN sh.islemtipi = 'giris' THEN sh.miktar ELSE 0 END) as toplam_giris,
-        SUM(CASE WHEN sh.islemtipi = 'cikis' THEN sh.miktar ELSE 0 END) as toplam_cikis
-        FROM {block_depo_yonetimi_stok_hareketleri} sh
-        JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
-        WHERE ur.depoid = :depoid AND sh.tarih >= :baslangic $urunFilter
-        GROUP BY DATE_FORMAT(FROM_UNIXTIME(sh.tarih), '%d.%m.%Y')
-        ORDER BY sh.tarih ASC";
-
-$hareketler = $DB->get_records_sql($sql, $params);
-
-// Tüm günleri doldur (boş günler için sıfır değerli veri)
-$tarihler = [];
-$girisler = [];
-$cikislar = [];
-
-// Son X günlük boş dizi oluştur
-for ($i = $gun; $i >= 0; $i--) {
-    $tarih = date('d.m.Y', time() - ($i * 86400));
-    $tarihler[$tarih] = $tarih;
-    $girisler[$tarih] = 0;
-    $cikislar[$tarih] = 0;
-}
-
-// Mevcut verileri ekle
-foreach ($hareketler as $hareket) {
-    if (isset($tarihler[$hareket->tarih_gun])) {
-        $girisler[$hareket->tarih_gun] = (int)$hareket->toplam_giris;
-        $cikislar[$hareket->tarih_gun] = (int)$hareket->toplam_cikis;
-    }
-}
-
-// Sonuç dizisine aktar
-$sonuc = [
-    'labels' => array_values($tarihler),
-    'girisler' => array_values($girisler),
-    'cikislar' => array_values($cikislar),
-    'success' => true
-];
-
-echo json_encode($sonuc);
