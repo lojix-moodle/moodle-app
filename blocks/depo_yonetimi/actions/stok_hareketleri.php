@@ -320,7 +320,7 @@ echo $OUTPUT->header();
                 <h5 class="card-title mb-0">
                     <i class="fas fa-tags me-2"></i>Varyasyon Stok Durumu
                 </h5>
-                <span class="badge bg-light text-dark border">
+                <span class="badge bg-light text-dark text-black-900 border">
                 Toplam: <strong><?php echo $urun->adet; ?></strong> adet
             </span>
             </div>
