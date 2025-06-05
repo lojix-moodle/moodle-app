@@ -665,12 +665,13 @@ echo $OUTPUT->header();
             // Grafik verilerini yükleme ve gösterme
             let stokChart;
             let grafikSuresi = 30; // Varsayılan 30 gün
+            let grafikTipi = 'stokseviye'; // Ürün stok seviyesi grafiği
 
             function grafikVerileriYukle() {
                 document.getElementById('loadingOverlay').style.display = 'flex';
 
-                // Ajax isteği ile verileri sunucudan al
-                fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/api/stok_grafik_verileri.php?depoid=<?php echo $depoid; ?>&gun=' + grafikSuresi + '<?php echo $urunid ? "&urunid=".$urunid : ""; ?>')
+                // API'ye stok seviyesi için tip parametresi ekle
+                fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/api/stok_grafik_verileri.php?depoid=<?php echo $depoid; ?>&gun=' + grafikSuresi + '&tip=' + grafikTipi + '<?php echo $urunid ? "&urunid=".$urunid : ""; ?>')
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('loadingOverlay').style.display = 'none';
@@ -689,28 +690,21 @@ echo $OUTPUT->header();
                     stokChart.destroy();
                 }
 
+                // Stok seviyesi grafiği için veri yapısı
                 stokChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: data.labels,
                         datasets: [
                             {
-                                label: 'Giriş',
-                                data: data.girisler,
-                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                                borderColor: 'rgba(40, 167, 69, 1)',
+                                label: 'Stok Seviyesi',
+                                data: data.stokSeviyesi,
+                                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                                borderColor: 'rgba(13, 110, 253, 1)',
                                 borderWidth: 2,
                                 tension: 0.3,
-                                pointRadius: 4
-                            },
-                            {
-                                label: 'Çıkış',
-                                data: data.cikislar,
-                                backgroundColor: 'rgba(220, 53, 69, 0.2)',
-                                borderColor: 'rgba(220, 53, 69, 1)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                pointRadius: 4
+                                pointRadius: 4,
+                                fill: true
                             }
                         ]
                     },
@@ -725,7 +719,7 @@ echo $OUTPUT->header();
                                 intersect: false,
                                 callbacks: {
                                     label: function(context) {
-                                        return context.dataset.label + ': ' + context.raw + ' adet';
+                                        return 'Stok: ' + context.raw + ' adet';
                                     }
                                 }
                             }
@@ -735,6 +729,16 @@ echo $OUTPUT->header();
                                 beginAtZero: true,
                                 ticks: {
                                     precision: 0
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Stok Miktarı (adet)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tarih'
                                 }
                             }
                         }
