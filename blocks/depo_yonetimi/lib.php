@@ -48,15 +48,29 @@ global $DB;
 function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0) {
     global $DB;
 
-    $sql = "SELECT sh.*, u.firstname, u.lastname 
-            FROM {block_depo_yonetimi_stok_hareketleri} sh
-            JOIN {user} u ON sh.userid = u.id
-            WHERE sh.urunid = :urunid AND sh.depoid = :depoid
-            ORDER BY sh.tarih DESC";
+    // Parametrelerin geçerliliğini kontrol et
+    $urunid = (int)$urunid;
+    $depoid = (int)$depoid;
+    $limit = (int)$limit;
 
-    return $DB->get_records_sql($sql, ['urunid' => $urunid, 'depoid' => $depoid], 0, $limit);
+    if ($urunid <= 0 || $depoid <= 0) {
+        return array(); // Geçersiz parametreler için boş dizi döndür
+    }
+
+    try {
+        $sql = "SELECT sh.*, u.firstname, u.lastname 
+                FROM {block_depo_yonetimi_stok_hareketleri} sh
+                LEFT JOIN {user} u ON sh.userid = u.id
+                WHERE sh.urunid = :urunid AND sh.depoid = :depoid
+                ORDER BY sh.tarih DESC";
+
+        return $DB->get_records_sql($sql, ['urunid' => $urunid, 'depoid' => $depoid], 0, $limit);
+    } catch (Exception $e) {
+        // Hata durumunda boş bir dizi döndür ve hatayı logla
+        error_log('Stok hareketleri sorgusu hatası: ' . $e->getMessage());
+        return array();
+    }
 }
-
 
 /**
  * Stok hareketini kaydeder ve ürün miktarını günceller
