@@ -232,16 +232,19 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle">
-    <span class="badge bg-light text-dark border"><?= !empty($urun->raf) ? htmlspecialchars($urun->raf) : '-' ?></span>
-</td>
-<td class="align-middle">
-    <span class="badge bg-light text-dark border"><?= !empty($urun->bolum) ? htmlspecialchars($urun->bolum) : '-' ?></span>
-</td>
+                                                <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
+                                            </td>
                                             <td class="text-center align-middle">
                                                 <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
                         $urun->adet . ' adet
                                                 </span>                                   
                                             </td>
+                                            <td class="align-middle">
+    <span class="badge bg-light text-dark border"><?= !empty($urun->raf) ? htmlspecialchars($urun->raf) : '-' ?></span>
+</td>
+<td class="align-middle">
+    <span class="badge bg-light text-dark border"><?= !empty($urun->bolum) ? htmlspecialchars($urun->bolum) : '-' ?></span>
+</td>
                                             
                                                                                 
                                             <td class="text-end pe-4 align-middle">
