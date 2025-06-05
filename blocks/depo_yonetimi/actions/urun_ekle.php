@@ -423,31 +423,34 @@ echo $OUTPUT->header();
                         <div class="row mb-4">
                             <!-- Raf -->
                             <div class="col-md-6 mb-3 mb-md-0">
-                                <label for="raf" class="form-label">
-                                    <i class="fas fa-archive me-2 text-primary"></i>Raf
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
-                                    <input type="text" class="form-control" id="raf" name="raf"
-                                           placeholder="Raf konumunu girin">
-                                </div>
-                                <div class="form-text">Ürünün bulunduğu rafı belirtin</div>
+                                <label for="raf" class="form-label">Raf</label>
+                                <select class="form-select" id="raf" name="raf">
+                                    <option value="">-- Raf Seçin --</option>
+                                    <option value="A Rafı">A Rafı</option>
+                                    <option value="B Rafı">B Rafı</option>
+                                    <option value="C Rafı">C Rafı</option>
+                                    <option value="D Rafı">D Rafı</option>
+                                    <option value="E Rafı">E Rafı</option>
+                                </select>
                             </div>
 
                             <!-- Bölüm -->
                             <div class="col-md-6">
-                                <label for="bolum" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Bölüm
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-puzzle-piece"></i></span>
-                                    <input type="text" class="form-control" id="bolum" name="bolum"
-                                           placeholder="Bölüm bilgisini girin">
-                                </div>
-                                <div class="form-text">Ürünün bulunduğu bölümü belirtin</div>
+                                <label for="bolum" class="form-label">Bölüm</label>
+                                <select class="form-select" id="bolum" name="bolum">
+                                    <option value="">-- Bölüm Seçin --</option>
+                                    <option value="Tişört">Tişört</option>
+                                    <option value="Pantolon">Pantolon</option>
+                                    <option value="Ayakkabı">Ayakkabı</option>
+                                    <option value="Gömlek">Gömlek</option>
+                                    <option value="Elbise">Elbise</option>
+                                    <option value="Ceket">Ceket</option>
+                                    <option value="Aksesuar">Aksesuar</option>
+                                    <option value="Çanta">Çanta</option>
+                                    <option value="İç Giyim">İç Giyim</option>
+                                </select>
                             </div>
                         </div>
-
                         <!-- Minimum Stok Seviyesi -->
                         <div class="mb-4">
                             <label for="min_stok_seviyesi" class="form-label">
