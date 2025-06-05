@@ -241,12 +241,12 @@
                                                                                 
                                             <td class="text-end pe-4 align-middle">
                                                 <div class="btn-group">
-                                                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', [
-                                                'depoid' => $depoid,
-                                                'urunid' => $urun->id
-                                            ]) . '" class="btn btn-sm btn-outline-success">
-                                                    <i class="fas fa-cube"></i>
-                                                </a>
+                                                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
+                            'depoid' => $depoid,
+                            'urunid' => $urun->id
+                        ]) . '" class="btn btn-sm btn-outline-success">
+    <i class="fas fa-cube"></i>
+</a>
                                                                                     
                                                 
                                                     <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
