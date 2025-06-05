@@ -125,6 +125,21 @@ echo $OUTPUT->header();
     </div>
 
 <?php if ($islem_yapildi): ?>
+    <script>
+        // İşlem başarıyla tamamlandıktan sonra
+        document.addEventListener("DOMContentLoaded", function() {
+            // Başarı mesajını göster
+            Swal.fire({
+                icon: "success",
+                title: "İşlem Başarılı",
+                text: "<?php echo $islem_mesaji; ?>",
+                confirmButtonText: "Tamam"
+            }).then((result) => {
+                // Sayfayı yenile (önbellek kullanmadan)
+                window.location.reload(true);
+            });
+        });
+    </script>
     <!-- Başarı mesajı -->
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <strong><i class="fas fa-check-circle"></i> Başarılı!</strong> <?php echo $islem_mesaji; ?>
@@ -439,9 +454,8 @@ echo $OUTPUT->header();
         });
 
         // Renk kodlarını al
-        // Şu satırı bulun (yaklaşık 313. satırda):
         function getColorHex(colorName) {
-            const colorMap = {  // Düzeltilmiş kısım
+            const colorMap = {
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
                 'siyah': '#212529',
