@@ -49,7 +49,7 @@ if ($urunid) {
 }
 
 if ($hareket_tipi) {
-    $sql_where .= " AND sh.islemtipi = :hareket_tipi";
+    $sql_where .= " AND sh.hareket_tipi = :hareket_tipi";
     $params['hareket_tipi'] = $hareket_tipi;
 }
 
@@ -83,6 +83,8 @@ switch ($sira) {
 }
 
 // Stok hareketleri verilerini al
+$sql_where = "ur.depoid = :depoid"; // sh.depoid yerine ur.depoid kullanılıyor
+
 $sql = "SELECT sh.*, sh.islemtipi as hareket_tipi, u.firstname, u.lastname, ur.name as urun_adi
         FROM {block_depo_yonetimi_stok_hareketleri} sh
         JOIN {user} u ON u.id = sh.userid
@@ -110,33 +112,6 @@ echo $OUTPUT->header();
         </div>
 
         <div class="card-body">
-            <?php if ($urunid && $urun): ?>
-                <!-- Ürün Özet Bilgileri -->
-                <div class="card mb-3">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="mb-3"><?php echo htmlspecialchars($urun->name); ?></h5>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="text-muted me-2">Mevcut Stok:</span>
-                                    <span class="badge <?php echo $urun->adet > $urun->min_stok_seviyesi ? 'bg-success' : 'bg-warning'; ?> px-3 py-2">
-                                    <i class="fas <?php echo $urun->adet > $urun->min_stok_seviyesi ? 'fa-check-circle' : 'fa-exclamation-circle'; ?> me-1"></i>
-                                    <strong><?php echo $urun->adet; ?></strong> adet
-                                </span>
-                                </div>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <div class="btn-group">
-                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-primary">
-                                        <i class="fas fa-plus-circle me-1"></i> Stok Hareketi Ekle
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
             <form method="get" action="" id="filterForm" class="mb-4">
                 <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
                 <?php if ($urunid): ?>
@@ -147,14 +122,13 @@ echo $OUTPUT->header();
                     <!-- Ürün Filtreleme (sadece tüm hareketler görüntüleniyorsa) -->
                     <?php if (!$urunid): ?>
                         <div class="col-md-3">
-                            <label for="urun_filtre" class="form-label">Ürün</label>
-                            <select name="urunid" id="urun_filtre" class="form-select">
+                            <label for="urun-filtre" class="form-label">Ürün</label>
+                            <select id="urun-filtre" name="urunid" class="form-select">
                                 <option value="">Tüm Ürünler</option>
                                 <?php
                                 $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid], 'name ASC');
-                                foreach ($urunler as $urun_item) {
-                                    echo '<option value="'.$urun_item->id.'"'.($urunid == $urun_item->id ? ' selected' : '').'>'
-                                        .htmlspecialchars($urun_item->name).'</option>';
+                                foreach ($urunler as $u) {
+                                    echo '<option value="' . $u->id . '">' . htmlspecialchars($u->name) . '</option>';
                                 }
                                 ?>
                             </select>
@@ -163,35 +137,35 @@ echo $OUTPUT->header();
 
                     <!-- Hareket Tipi Filtreleme -->
                     <div class="col-md-3">
-                        <label for="hareket_tipi" class="form-label">Hareket Tipi</label>
-                        <select name="hareket_tipi" id="hareket_tipi" class="form-select">
-                            <option value="">Tüm Hareketler</option>
-                            <option value="giris" <?php echo $hareket_tipi == 'giris' ? 'selected' : ''; ?>>Stok Girişi</option>
-                            <option value="cikis" <?php echo $hareket_tipi == 'cikis' ? 'selected' : ''; ?>>Stok Çıkışı</option>
+                        <label for="hareket-filtre" class="form-label">Hareket Tipi</label>
+                        <select id="hareket-filtre" name="hareket_tipi" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="giris" <?php echo $hareket_tipi === 'giris' ? 'selected' : ''; ?>>Stok Girişi</option>
+                            <option value="cikis" <?php echo $hareket_tipi === 'cikis' ? 'selected' : ''; ?>>Stok Çıkışı</option>
                         </select>
                     </div>
 
                     <!-- Tarih Filtreleme -->
                     <div class="col-md-2">
-                        <label for="tarih_baslangic" class="form-label">Başlangıç Tarihi</label>
-                        <input type="date" name="tarih_baslangic_str" id="tarih_baslangic" class="form-control"
+                        <label for="tarih-baslangic" class="form-label">Başlangıç Tarihi</label>
+                        <input type="date" id="tarih-baslangic" name="tarih_baslangic" class="form-control"
                                value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
                     </div>
 
                     <div class="col-md-2">
-                        <label for="tarih_bitis" class="form-label">Bitiş Tarihi</label>
-                        <input type="date" name="tarih_bitis_str" id="tarih_bitis" class="form-control"
+                        <label for="tarih-bitis" class="form-label">Bitiş Tarihi</label>
+                        <input type="date" id="tarih-bitis" name="tarih_bitis" class="form-control"
                                value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
                     </div>
 
                     <!-- Sıralama Seçimi -->
                     <div class="col-md-2">
-                        <label for="sira" class="form-label">Sıralama</label>
-                        <select name="sira" id="sira" class="form-select">
-                            <option value="tarih_desc" <?php echo $sira == 'tarih_desc' ? 'selected' : ''; ?>>Tarih (Yeni-Eski)</option>
-                            <option value="tarih_asc" <?php echo $sira == 'tarih_asc' ? 'selected' : ''; ?>>Tarih (Eski-Yeni)</option>
-                            <option value="miktar_desc" <?php echo $sira == 'miktar_desc' ? 'selected' : ''; ?>>Miktar (Çok-Az)</option>
-                            <option value="miktar_asc" <?php echo $sira == 'miktar_asc' ? 'selected' : ''; ?>>Miktar (Az-Çok)</option>
+                        <label for="sira-filtre" class="form-label">Sıralama</label>
+                        <select id="sira-filtre" name="sira" class="form-select">
+                            <option value="tarih_desc" <?php echo $sira === 'tarih_desc' ? 'selected' : ''; ?>>En Yeni</option>
+                            <option value="tarih_asc" <?php echo $sira === 'tarih_asc' ? 'selected' : ''; ?>>En Eski</option>
+                            <option value="miktar_desc" <?php echo $sira === 'miktar_desc' ? 'selected' : ''; ?>>Miktar (Büyük → Küçük)</option>
+                            <option value="miktar_asc" <?php echo $sira === 'miktar_asc' ? 'selected' : ''; ?>>Miktar (Küçük → Büyük)</option>
                         </select>
                     </div>
 
@@ -211,45 +185,44 @@ echo $OUTPUT->header();
                     <tr>
                         <th>Tarih</th>
                         <th>Ürün</th>
-                        <th>İşlem</th>
+                        <th>Hareket</th>
                         <th>Miktar</th>
                         <th>Varyasyon</th>
+                        <th>Açıklama</th>
                         <th>İşlemi Yapan</th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php if (empty($hareketler)): ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <i class="fas fa-info-circle text-muted me-1"></i>
-                                Bu kriterlere uygun stok hareketi bulunamadı.
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-info-circle text-muted me-2"></i>
+                                Belirtilen kriterlere uygun stok hareketi bulunamadı.
                             </td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($hareketler as $hareket): ?>
-                            <tr>
+                            <tr class="<?php echo $hareket->hareket_tipi == 'giris' ? 'table-success bg-opacity-25' : 'table-danger bg-opacity-25'; ?>">
                                 <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
-                                <td>
-                                    <?php if (!$urunid): ?>
-                                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $hareket->urunid]); ?>">
-                                            <?php echo htmlspecialchars($hareket->urun_adi); ?>
-                                        </a>
-                                    <?php else: ?>
-                                        <?php echo htmlspecialchars($hareket->urun_adi); ?>
-                                    <?php endif; ?>
-                                </td>
+                                <td><?php echo htmlspecialchars($hareket->urun_adi); ?></td>
                                 <td>
                                     <?php if ($hareket->hareket_tipi == 'giris'): ?>
-                                        <span class="badge bg-success">
-                                        <i class="fas fa-arrow-up me-1"></i> Giriş
-                                    </span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-success me-1">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </span>
+                                            <span>Stok Girişi</span>
+                                        </div>
                                     <?php else: ?>
-                                        <span class="badge bg-danger">
-                                        <i class="fas fa-arrow-down me-1"></i> Çıkış
-                                    </span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-danger me-1">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </span>
+                                            <span>Stok Çıkışı</span>
+                                        </div>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $hareket->miktar; ?> adet</td>
+                                <td><strong><?php echo $hareket->miktar; ?></strong> adet</td>
                                 <td>
                                     <?php
                                     if (!empty($hareket->renk) || !empty($hareket->beden)) {
@@ -281,6 +254,7 @@ echo $OUTPUT->header();
                                     }
                                     ?>
                                 </td>
+                                <td><?php echo !empty($hareket->aciklama) ? htmlspecialchars($hareket->aciklama) : '-'; ?></td>
                                 <td><?php echo fullname($hareket); ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -294,43 +268,61 @@ echo $OUTPUT->header();
     <script>
         // Tarih filtreleri değiştiğinde Unix timestamp'e çevirme
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('filterForm');
-            const tarihBaslangic = document.getElementById('tarih_baslangic');
-            const tarihBitis = document.getElementById('tarih_bitis');
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                const baslangicInput = document.getElementById('tarih-baslangic');
+                const bitisInput = document.getElementById('tarih-bitis');
 
-            // Form gönderildiğinde tarih değerlerini Unix timestamp'e çevir
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Tarih başlangıç ve bitiş değerlerini timestamp'e çevir
-                const tarihBaslangicVal = tarihBaslangic.value ? new Date(tarihBaslangic.value).getTime() / 1000 : 0;
-                const tarihBitisVal = tarihBitis.value ? new Date(tarihBitis.value + 'T23:59:59').getTime() / 1000 : 0;
-
-                // Gizli input'ları oluştur
-                if (tarihBaslangicVal) {
-                    const hiddenStart = document.createElement('input');
-                    hiddenStart.type = 'hidden';
-                    hiddenStart.name = 'tarih_baslangic';
-                    hiddenStart.value = tarihBaslangicVal;
-                    form.appendChild(hiddenStart);
+                if (baslangicInput.value) {
+                    const baslangicDate = new Date(baslangicInput.value);
+                    baslangicInput.name = 'tarih_baslangic';
+                    baslangicInput.value = Math.floor(baslangicDate.getTime() / 1000);
                 }
 
-                if (tarihBitisVal) {
-                    const hiddenEnd = document.createElement('input');
-                    hiddenEnd.type = 'hidden';
-                    hiddenEnd.name = 'tarih_bitis';
-                    hiddenEnd.value = tarihBitisVal;
-                    form.appendChild(hiddenEnd);
+                if (bitisInput.value) {
+                    const bitisDate = new Date(bitisInput.value);
+                    // Günün sonunu al (23:59:59)
+                    bitisDate.setHours(23, 59, 59);
+                    bitisInput.name = 'tarih_bitis';
+                    bitisInput.value = Math.floor(bitisDate.getTime() / 1000);
                 }
+            });
 
-                // Formu gönder
-                form.submit();
+            // Son 24 saat içindeki hareketleri vurgula
+            const simdi = new Date();
+            const yirmiDortSaatOnce = new Date(simdi.getTime() - (24 * 60 * 60 * 1000));
+            const hareketSatirlar = document.querySelectorAll('tbody tr');
+
+            hareketSatirlar.forEach(satir => {
+                const tarihHucresi = satir.querySelector('td:first-child');
+                if (tarihHucresi) {
+                    const tarihStr = tarihHucresi.textContent;
+                    const [tarihBolum, saatBolum] = tarihStr.split(' ');
+                    const [gun, ay, yil] = tarihBolum.split('.');
+                    const [saat, dakika] = saatBolum.split(':');
+
+                    const hareketTarihi = new Date(`${yil}-${ay}-${gun}T${saat}:${dakika}:00`);
+
+                    if (hareketTarihi > yirmiDortSaatOnce) {
+                        satir.classList.add('recent-activity');
+                        const hareketHucresi = satir.querySelector('td:nth-child(3) .badge');
+                        if (hareketHucresi) {
+                            hareketHucresi.classList.add('pulse');
+                        }
+                    }
+                }
             });
         });
 
         // Renk kodlarını al
+        /**
+         * Renk adına göre hex kodunu döndürür
+         *
+         * @param string $colorName Renk adı
+         * @return string Renk hex kodu
+         */
+        // Şu satırı bulun (yaklaşık 313. satırda):
         function getColorHex(colorName) {
-            const colorMap = {
+            const colorMap = {  // Düzeltilmiş kısım
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
                 'siyah': '#212529',
@@ -355,25 +347,11 @@ echo $OUTPUT->header();
 
     <style>
         .recent-activity {
-            border-left: 3px solid #0d6efd;
-            padding-left: 15px;
+            background-color: rgba(248, 249, 250, 0.5) !important;
         }
 
         .badge.pulse {
-            position: relative;
-        }
-
-        .badge.pulse::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: inherit;
-            border-radius: inherit;
             animation: pulse 1.5s infinite;
-            z-index: -1;
         }
 
         @keyframes pulse {
@@ -382,12 +360,12 @@ echo $OUTPUT->header();
                 opacity: 1;
             }
             50% {
-                transform: scale(1.3);
-                opacity: 0.3;
+                transform: scale(1.2);
+                opacity: 0.9;
             }
             100% {
                 transform: scale(1);
-                opacity: 0;
+                opacity: 1;
             }
         }
     </style>
