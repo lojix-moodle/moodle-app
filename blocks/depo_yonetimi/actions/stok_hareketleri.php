@@ -18,7 +18,7 @@ $PAGE->navbar->add('Stok Hareketleri');
 // Depo bilgilerini kontrol et
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 if (!$depo) {
-    redirect(new moodle_url('/blocks/depo_yonetimi/view.php'), 'Depo bulunamadı.', null, \core\output\notification::NOTIFY_ERROR);
+    redirect(new moodle_url('/blocks/depo_yonetimi/view.php'), 'Depo bulunamadı', null, \core\output\notification::NOTIFY_ERROR);
 }
 
 // Ürün seçildiyse bilgilerini al
@@ -26,11 +26,28 @@ $urun = null;
 $baslik = 'Tüm Stok Hareketleri';
 if ($urunid) {
     $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
-    if ($urun) {
-        $baslik = htmlspecialchars($urun->name) . ' - Stok Hareketleri';
-    } else {
-        $urunid = 0; // Ürün bulunamadıysa filtreleme yapma
+    if (!$urun) {
+        redirect(new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]), 'Ürün bulunamadı', null, \core\output\notification::NOTIFY_ERROR);
     }
+    $baslik = htmlspecialchars($urun->name) . ' - Stok Hareketleri';
+}
+
+// Tarih parametrelerini çevirme yardımcı fonksiyonu
+function convert_date_param($date_str) {
+    if (empty($date_str)) return 0;
+
+    $parts = explode('/', $date_str);
+    if (count($parts) === 3) {
+        $day = intval($parts[0]);
+        $month = intval($parts[1]);
+        $year = intval($parts[2]);
+
+        if (checkdate($month, $day, $year)) {
+            return mktime(0, 0, 0, $month, $day, $year);
+        }
+    }
+
+    return 0;
 }
 
 // Filtreleme ve sıralama
@@ -60,35 +77,31 @@ if ($tarih_baslangic) {
 }
 
 if ($tarih_bitis) {
-    $sql_where .= " AND sh.tarih <= :tarih_bitis";
-    $params['tarih_bitis'] = $tarih_bitis;
+    // Bitiş tarihine 1 gün ekle (23:59:59'a kadar olan kayıtlar dahil olsun)
+    $tarih_bitis_end = $tarih_bitis + 86400;
+    $sql_where .= " AND sh.tarih < :tarih_bitis";
+    $params['tarih_bitis'] = $tarih_bitis_end;
 }
 
 // Sıralama
+$sql_sort = "";
 switch ($sira) {
     case 'tarih_asc':
-        $sort = "sh.tarih ASC";
+        $sql_sort = "ORDER BY sh.tarih ASC";
         break;
     case 'tarih_desc':
-        $sort = "sh.tarih DESC";
-        break;
-    case 'miktar_asc':
-        $sort = "sh.miktar ASC";
-        break;
-    case 'miktar_desc':
-        $sort = "sh.miktar DESC";
-        break;
     default:
-        $sort = "sh.tarih DESC";
+        $sql_sort = "ORDER BY sh.tarih DESC";
+        break;
 }
 
 // Ana SQL sorgusu
 $sql = "SELECT sh.*, sh.islemtipi as hareket_tipi, u.firstname, u.lastname, ur.name as urun_adi
         FROM {block_depo_yonetimi_stok_hareketleri} sh
-        JOIN {user} u ON u.id = sh.userid
-        JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
+        INNER JOIN {user} u ON sh.userid = u.id
+        INNER JOIN {block_depo_yonetimi_urunler} ur ON sh.urunid = ur.id
         WHERE $sql_where
-        ORDER BY $sort";
+        $sql_sort";
 
 $hareketler = $DB->get_records_sql($sql, $params);
 
@@ -101,7 +114,7 @@ $son_24_saat = 0;
 $simdi = time();
 
 foreach ($hareketler as $hareket) {
-    if ($hareket->hareket_tipi === 'giris') {
+    if ($hareket->hareket_tipi == 'giris') {
         $giris_sayisi++;
         $toplam_giris_miktari += $hareket->miktar;
     } else {
@@ -109,352 +122,304 @@ foreach ($hareketler as $hareket) {
         $toplam_cikis_miktari += $hareket->miktar;
     }
 
-    if ($simdi - $hareket->tarih <= 86400) { // Son 24 saat içinde
+    if ($simdi - $hareket->tarih <= 86400) {
         $son_24_saat++;
     }
 }
 
 // Sayfayı render et
+$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css'));
 echo $OUTPUT->header();
 ?>
 
+<!-- Kütüphaneleri ekleyin -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/file-saver/dist/FileSaver.min.js"></script>
+<script src="https://unpkg.com/tableexport/dist/js/tableexport.min.js"></script>
+
 <style>
-    /* Genel stil ayarları */
     .stok-card {
         border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all 0.2s;
-        margin-bottom: 20px;
-    }
-    .stok-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    }
-    .stok-card .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        background: linear-gradient(to right, #f8f9fa, #ffffff);
-        border-radius: 8px 8px 0 0;
-        padding: 15px 20px;
-    }
-    .stok-card .card-title {
-        font-weight: 600;
-        color: #3e64ff;
-    }
-    .stok-card .card-body {
-        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 24px;
+        background-color: #fff;
     }
 
-    /* Özet kartları */
-    .summary-card {
-        border-left: 4px solid;
-        border-radius: 5px;
-        transition: all 0.2s;
-    }
-    .summary-card:hover {
-        transform: translateY(-2px);
-    }
-    .summary-card .counter {
-        font-size: 1.8rem;
+    .stok-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(0,0,0,.05);
         font-weight: 600;
     }
-    .summary-card .counter-label {
-        font-size: 0.85rem;
-        color: #6c757d;
+
+    .summary-card {
+        border-radius: 10px;
+        border-left-width: 5px;
+        overflow: hidden;
     }
-    .summary-card .icon-container {
-        width: 50px;
-        height: 50px;
+
+    .summary-card .counter {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .icon-container {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
+        font-size: 1.4rem;
+        box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,.08);
     }
 
-    /* Tablo stilleri */
-    .table-hover tbody tr:hover {
-        background-color: rgba(62, 100, 255, 0.04);
-    }
-    .table th {
-        border-top: none;
-        font-weight: 600;
-    }
-    .badge-giris {
-        background-color: #28a745;
-        color: #fff;
-    }
-    .badge-cikis {
-        background-color: #dc3545;
-        color: #fff;
-    }
-    .pulse-animation {
-        animation: pulse 1.5s infinite;
-    }
-
-    /* Renk işaretleyici */
-    .color-badge {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border-radius: 3px;
-        margin-right: 5px;
-    }
-
-    /* Form elemanları */
-    .form-control, .form-select {
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        padding: 8px 12px;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #3e64ff;
-        box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.25);
-    }
     .filter-card {
         background-color: #f8f9fa;
-        border-radius: 8px;
+        padding: 20px;
     }
 
-    /* Animasyonlar */
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.9; }
-        100% { transform: scale(1); opacity: 1; }
+    .filter-card .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
     }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .color-badge {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        margin-right: 8px;
+        border: 1px solid rgba(0,0,0,.1);
+    }
+
+    .badge-giris {
+        background-color: #198754;
+        color: white;
+    }
+
+    .badge-cikis {
+        background-color: #dc3545;
+        color: white;
+    }
+
     .recent-row {
-        border-left: 3px solid #3e64ff;
+        background-color: rgba(0, 123, 255, 0.05);
+        animation: highlight-fade 2s ease-out;
     }
 
-    /* Responsive ayarlar */
-    @media (max-width: 768px) {
-        .summary-cards .col-md-3 {
-            margin-bottom: 15px;
-        }
+    @keyframes highlight-fade {
+        from { background-color: rgba(0, 123, 255, 0.2); }
+        to { background-color: rgba(0, 123, 255, 0.05); }
+    }
+
+    .stok-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2rem rgba(0,0,0,.1);
+    }
+
+    .btn-excel {
+        background-color: #1D6F42;
+        color: white;
+        transition: all 0.3s;
+    }
+
+    .btn-excel:hover {
+        background-color: #0E5A32;
+        color: white;
+        transform: translateY(-2px);
     }
 </style>
+
+<!-- Yükleniyor ekranı -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none;">
+    <div class="d-flex flex-column align-items-center">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <div class="fw-medium">İşleminiz gerçekleştiriliyor...</div>
+    </div>
+</div>
 
 <div class="container-fluid p-0">
     <!-- Üst Başlık ve Geri Dönüş Butonu -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <div>
-            <h2 class="mb-1">
-                <i class="fas fa-exchange-alt text-primary me-2"></i>
-                <?php echo $baslik; ?>
-            </h2>
-            <p class="text-muted mb-0">
-                <i class="fas fa-warehouse me-1"></i>
-                <?php echo htmlspecialchars($depo->name); ?> deposunda stok hareketleri
-            </p>
+            <h2 class="mb-1"><?php echo $baslik; ?></h2>
+            <p class="text-muted mb-0">Depo: <?php echo htmlspecialchars($depo->name); ?></p>
         </div>
-        <div class="d-flex gap-2">
-            <?php if ($urunid): ?>
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i> Yeni Hareket Ekle
-                </a>
-            <?php endif; ?>
-            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-outline-secondary">
+        <div>
+            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Depoya Dön
             </a>
+            <button type="button" class="btn btn-excel ms-2" id="exportBtn">
+                <i class="fas fa-file-excel me-1"></i> Excel'e Aktar
+            </button>
         </div>
     </div>
 
     <!-- İstatistik Kartları -->
     <div class="row summary-cards mb-4">
-        <div class="col-md-3">
-            <div class="summary-card card border-0 shadow-sm" style="border-left-color: #3e64ff;">
-                <div class="card-body d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <div class="counter"><?php echo count($hareketler); ?></div>
-                        <div class="counter-label">Toplam Hareket</div>
+        <!-- Toplam Kayıt Sayısı -->
+        <div class="col-md-3 mb-3">
+            <div class="card summary-card h-100 border-primary">
+                <div class="card-body d-flex">
+                    <div class="icon-container bg-primary-subtle text-primary">
+                        <i class="fas fa-clipboard-list"></i>
                     </div>
-                    <div class="icon-container bg-primary bg-opacity-10">
-                        <i class="fas fa-exchange-alt fa-fw text-primary"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="summary-card card border-0 shadow-sm" style="border-left-color: #28a745;">
-                <div class="card-body d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <div class="counter"><?php echo $giris_sayisi; ?></div>
-                        <div class="counter-label">Stok Girişi</div>
-                    </div>
-                    <div class="icon-container bg-success bg-opacity-10">
-                        <i class="fas fa-arrow-up fa-fw text-success"></i>
+                    <div class="ms-3">
+                        <h6 class="text-uppercase text-muted mb-0">Toplam Kayıt</h6>
+                        <span class="counter text-primary"><?php echo count($hareketler); ?></span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="summary-card card border-0 shadow-sm" style="border-left-color: #dc3545;">
-                <div class="card-body d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <div class="counter"><?php echo $cikis_sayisi; ?></div>
-                        <div class="counter-label">Stok Çıkışı</div>
+
+        <!-- Giriş İşlemleri -->
+        <div class="col-md-3 mb-3">
+            <div class="card summary-card h-100 border-success">
+                <div class="card-body d-flex">
+                    <div class="icon-container bg-success-subtle text-success">
+                        <i class="fas fa-arrow-up"></i>
                     </div>
-                    <div class="icon-container bg-danger bg-opacity-10">
-                        <i class="fas fa-arrow-down fa-fw text-danger"></i>
+                    <div class="ms-3">
+                        <h6 class="text-uppercase text-muted mb-0">Toplam Giriş</h6>
+                        <span class="counter text-success"><?php echo $giris_sayisi; ?></span>
+                        <span class="text-muted ms-2">(<?php echo $toplam_giris_miktari; ?> adet)</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="summary-card card border-0 shadow-sm" style="border-left-color: #17a2b8;">
-                <div class="card-body d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <div class="counter"><?php echo $son_24_saat; ?></div>
-                        <div class="counter-label">Son 24 Saatte</div>
+
+        <!-- Çıkış İşlemleri -->
+        <div class="col-md-3 mb-3">
+            <div class="card summary-card h-100 border-danger">
+                <div class="card-body d-flex">
+                    <div class="icon-container bg-danger-subtle text-danger">
+                        <i class="fas fa-arrow-down"></i>
                     </div>
-                    <div class="icon-container bg-info bg-opacity-10">
-                        <i class="fas fa-clock fa-fw text-info"></i>
+                    <div class="ms-3">
+                        <h6 class="text-uppercase text-muted mb-0">Toplam Çıkış</h6>
+                        <span class="counter text-danger"><?php echo $cikis_sayisi; ?></span>
+                        <span class="text-muted ms-2">(<?php echo $toplam_cikis_miktari; ?> adet)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Son 24 Saat İşlemleri -->
+        <div class="col-md-3 mb-3">
+            <div class="card summary-card h-100 border-info">
+                <div class="card-body d-flex">
+                    <div class="icon-container bg-info-subtle text-info">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="text-uppercase text-muted mb-0">Son 24 Saat</h6>
+                        <span class="counter text-info"><?php echo $son_24_saat; ?></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Varyasyon Stokları -->
-    <?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
-        <div class="card stok-card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-tags me-2"></i>Varyasyon Stok Durumu
-                </h5>
-                <span class="badge bg-light text-dark border">
-                Toplam: <strong><?php echo $urun->adet; ?></strong> adet
-            </span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                        <tr>
-                            <th style="width: 60%">Varyasyon</th>
-                            <th style="width: 40%">Mevcut Stok</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                        $varyasyonlar = json_decode($urun->varyasyonlar, true);
-                        if ($varyasyonlar) {
-                            foreach ($varyasyonlar as $renk => $bedenler) {
-                                foreach ($bedenler as $beden => $miktar) {
-                                    $stokDurumu = '';
-                                    if ($miktar <= 0) {
-                                        $stokDurumu = 'bg-danger text-white';
-                                    } elseif ($miktar <= 5) {
-                                        $stokDurumu = 'bg-warning text-dark';
-                                    }
-
-                                    echo '<tr>';
-                                    echo '<td class="align-middle">
-                                        <div class="d-flex align-items-center">
-                                            <span class="color-badge" style="background-color: '.getColorHex($renk).';"></span>
-                                            <strong>'.htmlspecialchars($renk).'</strong> / '.htmlspecialchars($beden).'
-                                        </div>
-                                      </td>';
-                                    echo '<td><span class="badge ' . $stokDurumu . '" style="min-width: 60px;">' . $miktar . ' adet</span></td>';
-                                    echo '</tr>';
-                                }
-                            }
-                        } else {
-                            echo '<tr><td colspan="2" class="text-center py-3">Varyasyon bilgisi bulunamadı.</td></tr>';
-                        }
-                        ?>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Stok Hareketleri Grafiği -->
+    <div class="card stok-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-chart-line text-primary me-2"></i>
+                Stok Hareketleri Grafiği
+            </h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="haftalikGrafik">
+                    Son 7 Gün
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary active" id="aylikGrafik">
+                    Son 30 Gün
+                </button>
             </div>
         </div>
-    <?php endif; ?>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="stokHareketleriGrafik"></canvas>
+            </div>
+        </div>
+    </div>
 
     <!-- Filtreler -->
     <div class="card stok-card filter-card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-filter me-2"></i>
-                Filtreleme ve Sıralama
-            </h5>
-        </div>
-        <div class="card-body">
-            <form method="get" action="" id="filterForm" class="mb-0">
-                <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
-                <?php if ($urunid): ?>
-                    <input type="hidden" name="urunid" value="<?php echo $urunid; ?>">
-                <?php endif; ?>
+        <form method="get" action="" id="filterForm">
+            <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
+            <?php if ($urunid): ?>
+                <input type="hidden" name="urunid" value="<?php echo $urunid; ?>">
+            <?php endif; ?>
 
-                <div class="row align-items-end g-3">
-                    <?php if (!$urunid): ?>
-                        <div class="col-md-3 col-sm-6">
-                            <label for="urun-filtre" class="form-label fw-medium">Ürün Seç</label>
-                            <select id="urun-filtre" name="urunid" class="form-select">
-                                <option value="">Tüm Ürünler</option>
-                                <?php
-                                $urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid], 'name ASC');
-                                foreach ($urunler as $u) {
-                                    echo '<option value="' . $u->id . '">' . htmlspecialchars($u->name) . '</option>';
-                                }
-                                ?>
-                            </select>
+            <div class="row g-3 align-items-end">
+                <!-- Tarih Aralığı -->
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="tarih-baslangic" class="form-label">Başlangıç Tarihi</label>
+                            <input type="date" class="form-control" id="tarih-baslangic"
+                                   value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
+                            <input type="hidden" id="tarih_baslangic_hidden" name="tarih_baslangic" value="<?php echo $tarih_baslangic; ?>">
                         </div>
-                    <?php endif; ?>
-
-                    <div class="col-md-<?php echo $urunid ? '3' : '2'; ?> col-sm-6">
-                        <label for="hareket-filtre" class="form-label fw-medium">Hareket Tipi</label>
-                        <select id="hareket-filtre" name="hareket_tipi" class="form-select">
-                            <option value="">Tümü</option>
-                            <option value="giris" <?php echo $hareket_tipi === 'giris' ? 'selected' : ''; ?>>
-                                <i class="fas fa-arrow-up"></i> Stok Girişi
-                            </option>
-                            <option value="cikis" <?php echo $hareket_tipi === 'cikis' ? 'selected' : ''; ?>>
-                                <i class="fas fa-arrow-down"></i> Stok Çıkışı
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-<?php echo $urunid ? '3' : '2'; ?> col-sm-6">
-                        <label for="tarih-baslangic" class="form-label fw-medium">Başlangıç Tarihi</label>
-                        <input type="date" id="tarih-baslangic" class="form-control"
-                               value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
-                    </div>
-
-                    <div class="col-md-<?php echo $urunid ? '3' : '2'; ?> col-sm-6">
-                        <label for="tarih-bitis" class="form-label fw-medium">Bitiş Tarihi</label>
-                        <input type="date" id="tarih-bitis" class="form-control"
-                               value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
-                    </div>
-
-                    <div class="col-md-<?php echo $urunid ? '3' : '2'; ?> col-sm-6">
-                        <label for="sira-filtre" class="form-label fw-medium">Sıralama</label>
-                        <select id="sira-filtre" name="sira" class="form-select">
-                            <option value="tarih_desc" <?php echo $sira === 'tarih_desc' ? 'selected' : ''; ?>>En Yeni</option>
-                            <option value="tarih_asc" <?php echo $sira === 'tarih_asc' ? 'selected' : ''; ?>>En Eski</option>
-                            <option value="miktar_desc" <?php echo $sira === 'miktar_desc' ? 'selected' : ''; ?>>Miktar (Çok → Az)</option>
-                            <option value="miktar_asc" <?php echo $sira === 'miktar_asc' ? 'selected' : ''; ?>>Miktar (Az → Çok)</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-<?php echo $urunid ? '12' : '4'; ?> col-sm-12 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-grow-1">
-                            <i class="fas fa-filter me-1"></i> Filtrele
-                        </button>
-
-                        <?php if (!empty($_GET) && (count($_GET) > 1)): ?>
-                            <a href="?depoid=<?php echo $depoid; ?><?php echo $urunid ? '&urunid='.$urunid : ''; ?>"
-                               class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-1"></i> Filtreleri Temizle
-                            </a>
-                        <?php endif; ?>
-
-                        <?php if (!empty($hareketler)): ?>
-                            <button type="button" class="btn btn-success" id="exportBtn">
-                                <i class="fas fa-download me-1"></i> Excel
-                            </button>
-                        <?php endif; ?>
+                        <div class="col-md-6">
+                            <label for="tarih-bitis" class="form-label">Bitiş Tarihi</label>
+                            <input type="date" class="form-control" id="tarih-bitis"
+                                   value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
+                            <input type="hidden" id="tarih_bitis_hidden" name="tarih_bitis" value="<?php echo $tarih_bitis; ?>">
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
+
+                <!-- İşlem Tipi -->
+                <div class="col-md-3">
+                    <label for="hareket_tipi" class="form-label">İşlem Tipi</label>
+                    <select name="hareket_tipi" id="hareket_tipi" class="form-select">
+                        <option value="">Tüm İşlemler</option>
+                        <option value="giris" <?php echo $hareket_tipi == 'giris' ? 'selected' : ''; ?>>Stok Girişleri</option>
+                        <option value="cikis" <?php echo $hareket_tipi == 'cikis' ? 'selected' : ''; ?>>Stok Çıkışları</option>
+                    </select>
+                </div>
+
+                <!-- Sıralama -->
+                <div class="col-md-3">
+                    <label for="sira" class="form-label">Sıralama</label>
+                    <select name="sira" id="sira" class="form-select">
+                        <option value="tarih_desc" <?php echo $sira == 'tarih_desc' ? 'selected' : ''; ?>>En Yeni</option>
+                        <option value="tarih_asc" <?php echo $sira == 'tarih_asc' ? 'selected' : ''; ?>>En Eski</option>
+                    </select>
+                </div>
+
+                <!-- Filtrele Butonu -->
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i> Filtrele
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 
     <!-- Hareket Tablosu -->
@@ -571,88 +536,250 @@ echo $OUTPUT->header();
                     <?php endif; ?>
                     </tbody>
                 </table>
-            </div
+            </div> <!-- .table-responsive kapanış -->
+        </div> <!-- .card-body kapanış -->
+    </div> <!-- .card kapanış -->
 
-                <!-- JavaScript - Tarih filtrelerini ve tooltip işlemleri -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Tooltip'leri aktifleştir
-                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    <script>
+        // Grafikler için veri hazırlama
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tooltip'leri aktifleştir
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                    // Tarih filtrelerini işle
-                    const tarihBaslangic = document.getElementById('tarih-baslangic');
-                    const tarihBitis = document.getElementById('tarih-bitis');
-                    const filterForm = document.getElementById('filterForm');
+            // Veri hazırlama (PHP verilerini JS'de kullanmak için)
+            const hareketVerileri = <?php
+                // Son 30 günlük stok hareketleri
+                $son30Gun = time() - (30 * 24 * 60 * 60);
+                $grafik_verileri = [];
 
-                    filterForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
+                foreach ($hareketler as $hareket) {
+                    if ($hareket->tarih >= $son30Gun) {
+                        $tarih = date('Y-m-d', $hareket->tarih);
 
-                        // Başlangıç tarihini unix timestamp'e dönüştür
-                        if (tarihBaslangic.value) {
-                            const baslangicDate = new Date(tarihBaslangic.value);
-                            const baslangicTimestamp = Math.floor(baslangicDate.getTime() / 1000);
-
-                            const hiddenBaslangic = document.createElement('input');
-                            hiddenBaslangic.type = 'hidden';
-                            hiddenBaslangic.name = 'tarih_baslangic';
-                            hiddenBaslangic.value = baslangicTimestamp;
-                            filterForm.appendChild(hiddenBaslangic);
+                        if (!isset($grafik_verileri[$tarih])) {
+                            $grafik_verileri[$tarih] = [
+                                'giris' => 0,
+                                'cikis' => 0
+                            ];
                         }
 
-                        // Bitiş tarihini unix timestamp'e dönüştür
-                        if (tarihBitis.value) {
-                            const bitisDate = new Date(tarihBitis.value);
-                            bitisDate.setHours(23, 59, 59); // Günün sonuna ayarla
-                            const bitisTimestamp = Math.floor(bitisDate.getTime() / 1000);
-
-                            const hiddenBitis = document.createElement('input');
-                            hiddenBitis.type = 'hidden';
-                            hiddenBitis.name = 'tarih_bitis';
-                            hiddenBitis.value = bitisTimestamp;
-                            filterForm.appendChild(hiddenBitis);
+                        if ($hareket->hareket_tipi == 'giris') {
+                            $grafik_verileri[$tarih]['giris'] += $hareket->miktar;
+                        } else {
+                            $grafik_verileri[$tarih]['cikis'] += $hareket->miktar;
                         }
+                    }
+                }
 
-                        // Formu gönder
-                        filterForm.submit();
+                // JSON formatında döndürme
+                echo json_encode($grafik_verileri);
+                ?>;
+
+            // Grafik oluşturma
+            const ctx = document.getElementById('stokHareketleriGrafik').getContext('2d');
+            let stokGrafik = null;
+
+            // Grafik verilerini düzenle
+            function grafikVerileriniDuzenle(gunSayisi) {
+                const labels = [];
+                const girisVerileri = [];
+                const cikisVerileri = [];
+
+                const baslangicTarihi = new Date();
+                baslangicTarihi.setDate(baslangicTarihi.getDate() - gunSayisi);
+
+                for (let i = 0; i <= gunSayisi; i++) {
+                    const tarih = new Date(baslangicTarihi);
+                    tarih.setDate(tarih.getDate() + i);
+
+                    const tarihStr = tarih.toISOString().split('T')[0];
+                    labels.push(tarih.getDate() + '/' + (tarih.getMonth() + 1));
+
+                    girisVerileri.push(hareketVerileri[tarihStr] ? hareketVerileri[tarihStr].giris : 0);
+                    cikisVerileri.push(hareketVerileri[tarihStr] ? hareketVerileri[tarihStr].cikis : 0);
+                }
+
+                return { labels, girisVerileri, cikisVerileri };
+            }
+
+            // Grafik oluştur veya güncelle
+            function grafigiGuncelle(gunSayisi) {
+                const { labels, girisVerileri, cikisVerileri } = grafikVerileriniDuzenle(gunSayisi);
+
+                if (stokGrafik) {
+                    stokGrafik.data.labels = labels;
+                    stokGrafik.data.datasets[0].data = girisVerileri;
+                    stokGrafik.data.datasets[1].data = cikisVerileri;
+                    stokGrafik.update();
+                } else {
+                    stokGrafik = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Stok Girişleri',
+                                    data: girisVerileri,
+                                    backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                                    borderColor: 'rgb(25, 135, 84)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Stok Çıkışları',
+                                    data: cikisVerileri,
+                                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                    borderColor: 'rgb(220, 53, 69)',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            }
+                        }
                     });
+                }
+            }
 
-                    // Excel export işlemi
-                    const exportBtn = document.getElementById('exportBtn');
-                    if (exportBtn) {
-                        exportBtn.addEventListener('click', function() {
+            // Varsayılan olarak aylık grafiği göster
+            grafigiGuncelle(30);
+
+            // Butonlar için olay dinleyicileri
+            document.getElementById('haftalikGrafik').addEventListener('click', function() {
+                document.getElementById('aylikGrafik').classList.remove('active');
+                this.classList.add('active');
+                grafigiGuncelle(7);
+            });
+
+            document.getElementById('aylikGrafik').addEventListener('click', function() {
+                document.getElementById('haftalikGrafik').classList.remove('active');
+                this.classList.add('active');
+                grafigiGuncelle(30);
+            });
+
+            // Excel dışa aktarma
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.style.display = 'flex';
+
+                    setTimeout(() => {
+                        try {
                             const table = document.getElementById('stokHareketleriTable');
-                            const fileName = '<?php echo $baslik; ?> - Stok Hareketleri.xlsx';
-
-                            // TableExport kütüphanesi ile Excel export işlemi
                             const exporter = new TableExport(table, {
                                 headers: true,
                                 footers: false,
                                 formats: ['xlsx'],
-                                filename: fileName,
+                                filename: 'stok-hareketleri-raporu',
                                 bootstrap: true,
                                 exportButtons: false,
-                                position: 'bottom',
-                                ignoreRows: null,
-                                ignoreCols: null,
-                                trimWhitespace: true,
-                                RTL: false,
-                                sheetname: 'Stok Hareketleri'
+                                position: 'top',
+                                ignoreRows: [],
+                                ignoreCols: [],
+                                trimWhitespace: true
                             });
 
-                            const exportData = exporter.getExportData()[table.id]['xlsx'];
+                            const exportData = exporter.getExportData()['stokHareketleriTable']['xlsx'];
                             exporter.export2file(
                                 exportData.data,
                                 exportData.mimeType,
                                 exportData.filename,
                                 exportData.fileExtension
                             );
-                        });
-                    }
-                });
-            </script>
-        </div> <!-- .container-fluid kapanış -->
 
-        <?php
-        echo $OUTPUT->footer();
-        ?>
+                            loadingOverlay.style.display = 'none';
+
+                            // Başarı mesajı göster
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı!',
+                                text: 'Excel raporu başarıyla oluşturuldu.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } catch (error) {
+                            console.error('Excel dışa aktarma hatası:', error);
+                            loadingOverlay.style.display = 'none';
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Excel Aktarma Hatası',
+                                text: 'Rapor oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.'
+                            });
+                        }
+                    }, 500);
+                });
+            }
+
+            // Tarih filtrelerini işle
+            const tarihBaslangic = document.getElementById('tarih-baslangic');
+            const tarihBitis = document.getElementById('tarih-bitis');
+            const filterForm = document.getElementById('filterForm');
+
+            filterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.display = 'flex';
+
+                // Tarih verilerini hidden input'lara ekle
+                if (tarihBaslangic.value) {
+                    const timestamp = Math.floor(new Date(tarihBaslangic.value).getTime() / 1000);
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'tarih_baslangic';
+                    input.value = timestamp;
+                    this.appendChild(input);
+                }
+
+                if (tarihBitis.value) {
+                    const timestamp = Math.floor(new Date(tarihBitis.value).getTime() / 1000 + 86399); // Günün sonuna kadar
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'tarih_bitis';
+                    input.value = timestamp;
+                    this.appendChild(input);
+                }
+
+                // Formu gönder
+                this.submit();
+            });
+        });
+    </script>
+</div> <!-- .container-fluid kapanış -->
+
+<?php
+echo $OUTPUT->footer();
+?>
