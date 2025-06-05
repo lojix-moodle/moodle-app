@@ -421,21 +421,8 @@ echo $OUTPUT->header();
 
                         <!-- Raf ve Bölüm Bilgileri -->
                         <div class="row mb-4">
-                            <!-- Raf -->
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <label for="raf" class="form-label">Raf</label>
-                                <select class="form-select" id="raf" name="raf">
-                                    <option value="">-- Raf Seçin --</option>
-                                    <option value="A Rafı">A Rafı</option>
-                                    <option value="B Rafı">B Rafı</option>
-                                    <option value="C Rafı">C Rafı</option>
-                                    <option value="D Rafı">D Rafı</option>
-                                    <option value="E Rafı">E Rafı</option>
-                                </select>
-                            </div>
-
                             <!-- Bölüm -->
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="bolum" class="form-label">Bölüm</label>
                                 <select class="form-select" id="bolum" name="bolum">
                                     <option value="">-- Bölüm Seçin --</option>
@@ -448,6 +435,14 @@ echo $OUTPUT->header();
                                     <option value="Aksesuar">Aksesuar</option>
                                     <option value="Çanta">Çanta</option>
                                     <option value="İç Giyim">İç Giyim</option>
+                                </select>
+                            </div>
+
+                            <!-- Raf -->
+                            <div class="col-md-6">
+                                <label for="raf" class="form-label">Raf</label>
+                                <select class="form-select" id="raf" name="raf">
+                                    <option value="">-- Önce Bölüm Seçin --</option>
                                 </select>
                             </div>
                         </div>
@@ -864,6 +859,43 @@ echo $OUTPUT->header();
             }, false);
         });
     })();
+
+    // Bölüm seçildiğinde rafları güncelleme
+    document.getElementById("bolum").addEventListener("change", function() {
+        const bolum = this.value;
+        const rafSelect = document.getElementById("raf");
+
+        // Bölüme göre uygun rafları ayarla
+        rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+        if (bolum === "Tişört" || bolum === "Gömlek") {
+            // Üst kıyafet bölümlerinin rafları
+            rafSelect.innerHTML += '<option value="A1 Rafı">A1 Rafı</option>';
+            rafSelect.innerHTML += '<option value="A2 Rafı">A2 Rafı</option>';
+            rafSelect.innerHTML += '<option value="A3 Rafı">A3 Rafı</option>';
+        } else if (bolum === "Pantolon") {
+            // Alt kıyafet bölümlerinin rafları
+            rafSelect.innerHTML += '<option value="B1 Rafı">B1 Rafı</option>';
+            rafSelect.innerHTML += '<option value="B2 Rafı">B2 Rafı</option>';
+            rafSelect.innerHTML += '<option value="B3 Rafı">B3 Rafı</option>';
+        } else if (bolum === "Ayakkabı") {
+            // Ayakkabı rafları
+            rafSelect.innerHTML += '<option value="C1 Rafı">C1 Rafı</option>';
+            rafSelect.innerHTML += '<option value="C2 Rafı">C2 Rafı</option>';
+            rafSelect.innerHTML += '<option value="C3 Rafı">C3 Rafı</option>';
+            rafSelect.innerHTML += '<option value="C4 Rafı">C4 Rafı</option>';
+        } else if (bolum === "Aksesuar" || bolum === "Çanta") {
+            // Aksesuar ve çanta rafları
+            rafSelect.innerHTML += '<option value="D1 Rafı">D1 Rafı</option>';
+            rafSelect.innerHTML += '<option value="D2 Rafı">D2 Rafı</option>';
+        } else {
+            // Diğer tüm bölümler için
+            rafSelect.innerHTML += '<option value="E1 Rafı">E1 Rafı</option>';
+            rafSelect.innerHTML += '<option value="E2 Rafı">E2 Rafı</option>';
+            rafSelect.innerHTML += '<option value="E3 Rafı">E3 Rafı</option>';
+        }
+    });
+
     </script>
 
 <!-- SweetAlert2 CDN -->
