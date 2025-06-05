@@ -65,7 +65,7 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
                 <FIELD NAME="urunid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
-<!--                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />-->
+                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="miktar" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="islemtipi" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="giris veya cikis" />
                 <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" />

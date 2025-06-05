@@ -59,7 +59,7 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
     }
 
     try {
-        $sql = "SELECT sh.*, u.firstname, u.lastname, ur.name as urun_adi
+        $sql = "SELECT sh.*, sh.islemtipi as hareket_tipi, u.firstname, u.lastname, ur.name as urun_adi
         FROM {block_depo_yonetimi_stok_hareketleri} sh
         INNER JOIN {user} u ON sh.userid = u.id
         INNER JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
