@@ -56,3 +56,72 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
 
     return $DB->get_records_sql($sql, ['urunid' => $urunid, 'depoid' => $depoid], 0, $limit);
 }
+
+
+/**
+ * Stok hareketini kaydeder ve ürün miktarını günceller
+ *
+ * @param int $urunid Ürün ID
+ * @param int $depoid Depo ID
+ * @param int $miktar Hareket miktarı
+ * @param string $hareket_tipi Hareket tipi (giris/cikis)
+ * @param string $aciklama Hareket açıklaması
+ * @param string $renk Ürün rengi (opsiyonel)
+ * @param string $beden Ürün bedeni (opsiyonel)
+ * @return bool İşlem başarılı mı?
+ */
+function block_depo_yonetimi_stok_hareketi_kaydet($urunid, $depoid, $miktar, $hareket_tipi, $aciklama = '', $renk = '', $beden = '') {
+    global $DB, $USER;
+
+    // Hata kontrolü
+    if ($miktar <= 0 || !in_array($hareket_tipi, ['giris', 'cikis'])) {
+        return false;
+    }
+
+    // Ürünü kontrol et
+    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
+    if (!$urun) {
+        return false;
+    }
+
+    // Stok çıkışında yeteri kadar stok var mı kontrol et
+    if ($hareket_tipi === 'cikis' && $urun->adet < $miktar) {
+        return false; // Yetersiz stok
+    }
+
+    // Transaction başlat
+    $transaction = $DB->start_delegated_transaction();
+
+    try {
+        // Stok hareketi kaydını oluştur
+        $hareket = new stdClass();
+        $hareket->urunid = $urunid;
+        $hareket->depoid = $depoid;
+        $hareket->miktar = $miktar;
+        $hareket->hareket_tipi = $hareket_tipi;
+        $hareket->aciklama = $aciklama;
+        $hareket->renk = $renk;
+        $hareket->beden = $beden;
+        $hareket->tarih = time();
+        $hareket->userid = $USER->id;
+
+        $DB->insert_record('block_depo_yonetimi_stok_hareketleri', $hareket);
+
+        // Ürün stok miktarını güncelle
+        if ($hareket_tipi === 'giris') {
+            $urun->adet += $miktar;
+        } else {
+            $urun->adet -= $miktar;
+        }
+
+        $DB->update_record('block_depo_yonetimi_urunler', $urun);
+
+        // Transaction'ı tamamla
+        $transaction->allow_commit();
+
+        return true;
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+        return false;
+    }
+}
