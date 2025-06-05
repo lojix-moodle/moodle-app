@@ -86,27 +86,37 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
  * @param string $colorName Renk adı
  * @return string Renk hex kodu
  */
-function getColorHex($colorName) {
+/**
+ * Renk adına göre hex kodunu ve uygun metin rengini döndürür
+ *
+ * @param string $colorName Renk adı
+ * @param bool $returnTextColor true ise metin rengi de döndürülür
+ * @return string|array Renk hex kodu veya [hex, textColor] dizisi
+ */
+function getColorHex($colorName, $returnTextColor = false) {
     $colorMap = [
-        'kirmizi' => '#dc3545',
-        'mavi' => '#0d6efd',
-        'siyah' => '#212529',
-        'beyaz' => '#f8f9fa',
-        'yesil' => '#198754',
-        'sari' => '#ffc107',
-        'turuncu' => '#fd7e14',
-        'mor' => '#6f42c1',
-        'pembe' => '#d63384',
-        'gri' => '#6c757d',
-        'bej' => '#E4DAD2',
-        'lacivert' => '#11098A',
-        'kahverengi' => '#8B4513',
-        'haki' => '#8A9A5B',
-        'vizon' => '#A89F91',
-        'bordo' => '#800000'
+        'kirmizi' => ['#dc3545', '#ffffff'],
+        'mavi' => ['#0d6efd', '#ffffff'],
+        'siyah' => ['#212529', '#ffffff'],
+        'beyaz' => ['#f8f9fa', '#212529'],
+        'yesil' => ['#198754', '#ffffff'],
+        'sari' => ['#ffc107', '#212529'],
+        'turuncu' => ['#fd7e14', '#212529'],
+        'mor' => ['#6f42c1', '#ffffff'],
+        'pembe' => ['#d63384', '#ffffff'],
+        'gri' => ['#6c757d', '#ffffff'],
+        'bej' => ['#E4DAD2', '#212529'],
+        'lacivert' => ['#11098A', '#ffffff'],
+        'kahverengi' => ['#8B4513', '#ffffff'],
+        'haki' => ['#8A9A5B', '#212529'],
+        'vizon' => ['#A89F91', '#212529'],
+        'bordo' => ['#800000', '#ffffff']
     ];
 
-    return isset($colorMap[$colorName]) ? $colorMap[$colorName] : '#6c757d';
+    $defaultColor = ['#6c757d', '#ffffff'];
+    $colorData = isset($colorMap[$colorName]) ? $colorMap[$colorName] : $defaultColor;
+
+    return $returnTextColor ? $colorData : $colorData[0];
 }
 
 /**
