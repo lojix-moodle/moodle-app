@@ -134,6 +134,43 @@ echo $OUTPUT->header();
                             </select>
                         </div>
                     <?php endif; ?>
+                    <!-- Filtreleme formunun altına, tablo üstüne ekleyin -->
+                    <?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Varyasyon Stokları</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Varyasyon</th>
+                                            <th>Mevcut Stok</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php
+                                        $varyasyonlar = json_decode($urun->varyasyonlar, true);
+                                        if ($varyasyonlar) {
+                                            foreach ($varyasyonlar as $renk => $bedenler) {
+                                                foreach ($bedenler as $beden => $miktar) {
+                                                    echo '<tr>';
+                                                    echo '<td><span class="badge me-1" style="background-color: '.getColorHex($renk).'">&nbsp;&nbsp;&nbsp;</span> ' . $renk . ' / ' . $beden . '</td>';
+                                                    echo '<td><strong>' . $miktar . '</strong> adet</td>';
+                                                    echo '</tr>';
+                                                }
+                                            }
+                                        } else {
+                                            echo '<tr><td colspan="2" class="text-center">Varyasyon bilgisi bulunamadı.</td></tr>';
+                                        }
+                                        ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Hareket Tipi Filtreleme -->
                     <div class="col-md-3">

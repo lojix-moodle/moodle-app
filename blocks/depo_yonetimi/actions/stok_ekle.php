@@ -182,23 +182,37 @@ echo $OUTPUT->header();
                         </div>
                     </div>
 
+                    <!-- Varyasyonlar ve miktarları (stok_ekle.php dosyasında) -->
                     <?php if ($varyasyonlu): ?>
                         <div class="mb-3">
-                            <div class="text-muted mb-1">Varyasyonlar:</div>
-                            <div class="d-flex flex-wrap gap-1">
-                                <?php foreach ($colors as $color): ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1">
-                                        <span class="color-badge" style="background-color: <?php echo getColorHex($color); ?>"></span>
-                                        <?php echo htmlspecialchars($color); ?>
-                                    </span>
-                                <?php endforeach; ?>
-
-                                <?php foreach ($sizes as $size): ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1">
-                                        <i class="fas fa-ruler-combined me-1 text-muted"></i>
-                                        <?php echo htmlspecialchars($size); ?>
-                                    </span>
-                                <?php endforeach; ?>
+                            <div class="text-muted mb-1">Varyasyon Stokları:</div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Varyasyon</th>
+                                        <th>Stok</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    // Varyasyon stok bilgilerini çek
+                                    if (!empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0') {
+                                        $varyasyonlar = json_decode($urun->varyasyonlar, true);
+                                        if ($varyasyonlar) {
+                                            foreach ($varyasyonlar as $renk => $bedenler) {
+                                                foreach ($bedenler as $beden => $miktar) {
+                                                    echo '<tr>';
+                                                    echo '<td><span class="color-badge" style="background-color: '.getColorHex($renk).'"></span>' . $renk . ' / ' . $beden . '</td>';
+                                                    echo '<td><strong>' . $miktar . '</strong> adet</td>';
+                                                    echo '</tr>';
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     <?php endif; ?>
