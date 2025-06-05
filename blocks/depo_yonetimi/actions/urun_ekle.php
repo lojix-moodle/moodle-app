@@ -3,11 +3,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once(__DIR__ . '/../../../config.php'); // Fixed DIR to _DIR_
-require_once(__DIR__ . '/../lib.php'); // Fixed DIR to _DIR_
+require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../lib.php');
 require_login();
 global $DB, $PAGE, $OUTPUT;
-
 
 $depoid = required_param('depoid', PARAM_INT);
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]));
@@ -16,15 +15,13 @@ $PAGE->set_title('Ürün Ekle');
 $PAGE->set_heading('Ürün Ekle');
 
 // Depo bilgisini al
-
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT); // Bu satırı ekleyin
-
+    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
@@ -37,10 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $yeni_urun->colors = json_encode($colors);
     $yeni_urun->sizes = json_encode($sizes);
     $yeni_urun->varyasyonlar = json_encode($varyasyonlar);
-    $yeni_urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekleyin
-
-
-
+    $yeni_urun->min_stok_seviyesi = $min_stok_seviyesi;
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -52,12 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
-
-//    $colors = optional_param_array('colors', false, PARAM_CLEAN);
-//    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
-//    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
-
     $ana_urun = new stdClass();
     $ana_urun->depoid = $depoid;
     $ana_urun->name = $name;
@@ -66,22 +54,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
-    $raf = optional_param('raf', '', PARAM_TEXT);
-    $bolum = optional_param('bolum', '', PARAM_TEXT);
+
+    // Raf ve bölüm değerlerini alırken trim kullanarak boşlukları temizleyelim
+    $raf = trim(optional_param('raf', '', PARAM_TEXT));
+    $bolum = trim(optional_param('bolum', '', PARAM_TEXT));
+
+    // Değerlerin boş olmadığından emin olalım
+    if (empty($raf)) {
+        $raf = '';  // Boşsa boş string atayalım
+    }
+
+    if (empty($bolum)) {
+        $bolum = '';  // Boşsa boş string atayalım
+    }
 
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
-    error_log("Kaydedilen raf: " . $raf . ", Bölüm: " . $bolum);
 
+    // Debug için daha detaylı log yazalım
+    error_log("Ürün ekleme - Ürün adı: " . $name . ", Raf: " . $raf . ", Bölüm: " . $bolum);
 
     // Ana ürünü ekle ve ID'sini al
     $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
+
     // Başarılı mesajı göster
     \core\notification::success('Ürün başarıyla eklendi.');
 
     redirect(new moodle_url('/my', ['depo' => $depoid]));
-
-
 }
 
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
@@ -97,7 +96,13 @@ function get_string_from_value($value, $type) {
             'turuncu' => 'Turuncu',
             'mor' => 'Mor',
             'pembe' => 'Pembe',
-            'gri' => 'Gri'
+            'gri' => 'Gri',
+            'bej' => 'Bej',
+            'lacivert' => 'Lacivert',
+            'kahverengi' => 'Kahverengi',
+            'haki' => 'Haki',
+            'vizon' => 'Vizon',
+            'bordo' => 'Bordo'
         ];
         return isset($colors[$value]) ? $colors[$value] : $value;
     } else if ($type == 'size') {
@@ -114,7 +119,6 @@ function get_string_from_value($value, $type) {
     }
     return $value;
 }
-
 
 echo $OUTPUT->header();
 ?>
@@ -448,6 +452,7 @@ echo $OUTPUT->header();
                                 </select>
                             </div>
                         </div>
+
                         <!-- Minimum Stok Seviyesi -->
                         <div class="mb-4">
                             <label for="min_stok_seviyesi" class="form-label">
@@ -488,7 +493,6 @@ echo $OUTPUT->header();
                                         <option value="kirmizi">Kırmızı</option>
                                         <option value="yesil">Yeşil</option>
                                         <option value="bordo">Bordo</option>
-
                                     </select>
                                 </div>
                                 <div class="form-text small">
@@ -590,16 +594,6 @@ echo $OUTPUT->header();
 
                             <!-- Sayfalama Bilgisi -->
                             <div id="pageInfo" class="text-center text-muted mt-2"></div>
-
-                            <!-- Sayfalama Kontrolleri -->
-<!--                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">-->
-<!--                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">-->
-<!--                                    <i class="fas fa-chevron-left me-1"></i> Önceki-->
-<!--                                </button>-->
-<!--                                <button id="nextPage" class="btn btn-sm btn-outline-primary">-->
-<!--                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>-->
-<!--                                </button>-->
-<!--                            </div>-->
                         </div>
                     </div>
                 </div>
@@ -618,7 +612,6 @@ echo $OUTPUT->header();
         </div>
     </div>
 </div>
-
 
 <script>
     (function () {
@@ -686,7 +679,7 @@ echo $OUTPUT->header();
             displayVariantsByPage();
         });
 
-        // Tüm varyasyonları göster (sayfalama olmadan)
+// Tüm varyasyonları göster (sayfalama olmadan)
         function displayVariantsByPage() {
             // Tabloyu temizle
             varyasyonTablo.innerHTML = '';
@@ -727,7 +720,7 @@ echo $OUTPUT->header();
             });
         }
 
-        // Renk kodlarını al
+// Renk kodlarını al
         function getColorHex(colorName) {
             const colorMap = {
                 'kirmizi': '#dc3545',
@@ -751,18 +744,18 @@ echo $OUTPUT->header();
             return colorMap[colorName] || '#6c757d';
         }
 
-        // Kontrast rengi hesapla
+// Kontrast rengi hesapla
         function getContrastColor(colorName) {
             const lightColors = ['beyaz', 'sari', 'acik-mavi', 'acik-yesil', 'acik-pembe'];
             return lightColors.includes(colorName) ? '#212529' : '#ffffff';
         }
 
-        // Sayfa yüklendiğinde loading overlay'i gizle
+// Sayfa yüklendiğinde loading overlay'i gizle
         window.addEventListener('load', function() {
             loadingOverlay.style.display = 'none';
         });
 
-        // Form doğrulama
+// Form doğrulama
         Array.prototype.slice.call(forms).forEach(function (form) {
             // Dinamik doğrulama - alan değiştiğinde
             const inputs = form.querySelectorAll('input, select');
@@ -861,47 +854,7 @@ echo $OUTPUT->header();
             }, false);
         });
     })();
-
-    // Bölüm seçildiğinde rafları güncelleme
-    document.getElementById("bolum").addEventListener("change", function() {
-        const bolum = this.value;
-        const rafSelect = document.getElementById("raf");
-
-        // Bölüme göre uygun rafları ayarla
-        rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
-
-        if (bolum === "Tişört" || bolum === "Gömlek") {
-            // Üst kıyafet bölümlerinin rafları
-            rafSelect.innerHTML += '<option value="A1 Rafı">A1 Rafı</option>';
-            rafSelect.innerHTML += '<option value="A2 Rafı">A2 Rafı</option>';
-            rafSelect.innerHTML += '<option value="A3 Rafı">A3 Rafı</option>';
-        } else if (bolum === "Pantolon") {
-            // Alt kıyafet bölümlerinin rafları
-            rafSelect.innerHTML += '<option value="B1 Rafı">B1 Rafı</option>';
-            rafSelect.innerHTML += '<option value="B2 Rafı">B2 Rafı</option>';
-            rafSelect.innerHTML += '<option value="B3 Rafı">B3 Rafı</option>';
-        } else if (bolum === "Ayakkabı") {
-            // Ayakkabı rafları
-            rafSelect.innerHTML += '<option value="C1 Rafı">C1 Rafı</option>';
-            rafSelect.innerHTML += '<option value="C2 Rafı">C2 Rafı</option>';
-            rafSelect.innerHTML += '<option value="C3 Rafı">C3 Rafı</option>';
-            rafSelect.innerHTML += '<option value="C4 Rafı">C4 Rafı</option>';
-        } else if (bolum === "Aksesuar" || bolum === "Çanta") {
-            // Aksesuar ve çanta rafları
-            rafSelect.innerHTML += '<option value="D1 Rafı">D1 Rafı</option>';
-            rafSelect.innerHTML += '<option value="D2 Rafı">D2 Rafı</option>';
-        } else {
-            // Diğer tüm bölümler için
-            rafSelect.innerHTML += '<option value="E1 Rafı">E1 Rafı</option>';
-            rafSelect.innerHTML += '<option value="E2 Rafı">E2 Rafı</option>';
-            rafSelect.innerHTML += '<option value="E3 Rafı">E3 Rafı</option>';
-        }
-    });
-
-    </script>
-
-<!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</script>
 
 <?php
 echo $OUTPUT->footer();
