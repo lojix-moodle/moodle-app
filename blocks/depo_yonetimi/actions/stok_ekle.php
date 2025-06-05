@@ -66,9 +66,15 @@ if ($data = data_submitted() && confirm_sesskey()) {
 
 // Varyasyonlu bir ürün mü?
 $varyasyonlu = (!empty($urun->colors) && $urun->colors !== '0') && (!empty($urun->sizes) && $urun->sizes !== '0');
-$colors = $varyasyonlu ? json_decode($urun->colors) : [];
-$sizes = $varyasyonlu ? json_decode($urun->sizes) : [];
+$colors = [];
+$sizes = [];
+if ($varyasyonlu) {
+    $colors_data = json_decode($urun->colors);
+    $sizes_data = json_decode($urun->sizes);
 
+    $colors = (is_array($colors_data) || is_object($colors_data)) ? $colors_data : [];
+    $sizes = (is_array($sizes_data) || is_object($sizes_data)) ? $sizes_data : [];
+}
 
 echo $OUTPUT->header();
 
@@ -139,7 +145,7 @@ echo $OUTPUT->header();
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-cube text-primary me-2"></i>
+                            <i class="fas fa-box text-primary me-2"></i>
                             Ürün Bilgileri
                         </h5>
                         <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-sm btn-outline-secondary">
@@ -152,41 +158,47 @@ echo $OUTPUT->header();
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="text-muted">Kategori:</span>
-                                <span class="badge bg-light text-dark ms-1"><?php echo htmlspecialchars($kategori_adi); ?></span>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="text-muted me-2">Kategori:</span>
+                                <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($kategori_adi); ?></span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="text-muted me-2">Stok:</span>
+                                <span class="badge <?php echo $urun->adet > $urun->min_stok_seviyesi ? 'bg-success' : 'bg-warning'; ?> stok-badge">
+                                    <i class="fas <?php echo $urun->adet > $urun->min_stok_seviyesi ? 'fa-check-circle' : 'fa-exclamation-circle'; ?> me-1"></i>
+                                    <?php echo $urun->adet; ?> adet
+                                </span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="text-muted">Güncel Stok:</span>
-                                <span class="badge bg-<?php echo ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')); ?> ms-1 stok-badge">
-                                <?php echo $urun->adet; ?> adet
-                            </span>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="text-muted me-2">Depo:</span>
+                                <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($depo->name); ?></span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="text-muted me-2">Min. Stok:</span>
+                                <span class="badge bg-secondary"><?php echo $urun->min_stok_seviyesi; ?> adet</span>
                             </div>
                         </div>
                     </div>
 
                     <?php if ($varyasyonlu): ?>
                         <div class="mb-3">
-                            <span class="text-muted">Varyasyonlar:</span>
-                            <div class="mt-2">
+                            <div class="text-muted mb-1">Varyasyonlar:</div>
+                            <div class="d-flex flex-wrap gap-1">
                                 <?php foreach ($colors as $color): ?>
-                                    <span class="badge bg-light text-dark me-1 mb-1">
-                                <span class="color-badge" style="background-color: <?php echo getColorHex($color); ?>"></span>
-                                <?php echo htmlspecialchars($color); ?>
-                            </span>
+                                    <span class="badge bg-light text-dark border me-1 mb-1">
+                                        <span class="color-badge" style="background-color: <?php echo getColorHex($color); ?>"></span>
+                                        <?php echo htmlspecialchars($color); ?>
+                                    </span>
                                 <?php endforeach; ?>
 
-                                <?php if (!empty($sizes)): ?>
-                                    <div class="mt-2">
-                                        <?php foreach ($sizes as $size): ?>
-                                            <span class="badge bg-light text-dark me-1 mb-1">
+                                <?php foreach ($sizes as $size): ?>
+                                    <span class="badge bg-light text-dark border me-1 mb-1">
+                                        <i class="fas fa-ruler-combined me-1 text-muted"></i>
                                         <?php echo htmlspecialchars($size); ?>
                                     </span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -207,17 +219,22 @@ echo $OUTPUT->header();
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="hareket_tipi" class="form-label">Hareket Tipi</label>
-                                <select id="hareket_tipi" name="hareket_tipi" class="form-select" required>
-                                    <option value="giris">Stok Girişi</option>
-                                    <option value="cikis">Stok Çıkışı</option>
-                                </select>
+                                <div class="mb-3">
+                                    <label for="hareket_tipi" class="form-label">Hareket Tipi</label>
+                                    <select id="hareket_tipi" name="hareket_tipi" class="form-select" required>
+                                        <option value="">Seçiniz</option>
+                                        <option value="giris">Stok Girişi</option>
+                                        <option value="cikis">Stok Çıkışı</option>
+                                    </select>
+                                    <div class="invalid-feedback">Lütfen hareket tipi seçin</div>
+                                </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label for="miktar" class="form-label">Miktar</label>
-                                <input type="number" id="miktar" name="miktar" class="form-control" min="1" value="1" required>
-                                <div class="invalid-feedback">
-                                    Lütfen geçerli bir miktar girin.
+                                <div class="mb-3">
+                                    <label for="miktar" class="form-label">Miktar</label>
+                                    <input type="number" class="form-control" id="miktar" name="miktar" min="1" max="10000" value="1" required>
+                                    <div class="invalid-feedback">Lütfen geçerli bir miktar girin</div>
                                 </div>
                             </div>
                         </div>
@@ -227,18 +244,22 @@ echo $OUTPUT->header();
                                 <div class="col-md-6">
                                     <label for="renk" class="form-label">Renk</label>
                                     <select id="renk" name="renk" class="form-select">
-                                        <option value="">Renk Seçin</option>
+                                        <option value="">Seçiniz</option>
                                         <?php foreach ($colors as $color): ?>
-                                            <option value="<?php echo htmlspecialchars($color); ?>"><?php echo htmlspecialchars($color); ?></option>
+                                            <option value="<?php echo htmlspecialchars($color); ?>">
+                                                <?php echo htmlspecialchars($color); ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="beden" class="form-label">Beden</label>
                                     <select id="beden" name="beden" class="form-select">
-                                        <option value="">Beden Seçin</option>
+                                        <option value="">Seçiniz</option>
                                         <?php foreach ($sizes as $size): ?>
-                                            <option value="<?php echo htmlspecialchars($size); ?>"><?php echo htmlspecialchars($size); ?></option>
+                                            <option value="<?php echo htmlspecialchars($size); ?>">
+                                                <?php echo htmlspecialchars($size); ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -246,8 +267,8 @@ echo $OUTPUT->header();
                         <?php endif; ?>
 
                         <div class="mb-3">
-                            <label for="aciklama" class="form-label">Açıklama</label>
-                            <textarea id="aciklama" name="aciklama" class="form-control" rows="2" placeholder="Hareket ile ilgili açıklama (opsiyonel)"></textarea>
+                            <label for="aciklama" class="form-label">Açıklama (Opsiyonel)</label>
+                            <textarea class="form-control" id="aciklama" name="aciklama" rows="2" maxlength="500"></textarea>
                         </div>
 
                         <div class="d-grid">
@@ -299,12 +320,12 @@ echo $OUTPUT->header();
                                         <td>
                                             <?php if ($hareket->hareket_tipi == 'giris'): ?>
                                                 <span class="badge bg-success">
-                                        <i class="fas fa-arrow-up me-1"></i> Giriş
-                                    </span>
+                                                    <i class="fas fa-arrow-up me-1"></i> Giriş
+                                                </span>
                                             <?php else: ?>
                                                 <span class="badge bg-danger">
-                                        <i class="fas fa-arrow-down me-1"></i> Çıkış
-                                    </span>
+                                                    <i class="fas fa-arrow-down me-1"></i> Çıkış
+                                                </span>
                                             <?php endif; ?>
                                         </td>
                                         <td><strong><?php echo $hareket->miktar; ?></strong> adet</td>
@@ -313,7 +334,7 @@ echo $OUTPUT->header();
                                             if (!empty($hareket->renk) || !empty($hareket->beden)) {
                                                 $varyasyon_detay = [];
                                                 if (!empty($hareket->renk)) {
-                                                    echo '<span class="badge me-1" style="background-color: '.getColorHex($hareket->renk).'">&nbsp;</span>';
+                                                    echo '<span class="badge me-1" style="background-color: ' . getColorHex($hareket->renk) . '">&nbsp;</span>';
                                                     $varyasyon_detay[] = $hareket->renk;
                                                 }
                                                 if (!empty($hareket->beden)) $varyasyon_detay[] = $hareket->beden;
@@ -345,36 +366,38 @@ echo $OUTPUT->header();
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const stokForm = document.getElementById('stokForm');
-            const hareket_tipiSelect = document.getElementById('hareket_tipi');
+            const hareket_tipi = document.getElementById('hareket_tipi');
             const miktarInput = document.getElementById('miktar');
             const submitBtn = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loading');
 
             // Form gönderimine kontroller
             stokForm.addEventListener('submit', function(e) {
-                // Form validasyonu
+                e.preventDefault();
+
                 if (!stokForm.checkValidity()) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    // Form geçerli değil
                     stokForm.classList.add('was-validated');
                     return;
                 }
 
-                // Stok çıkışı için kontrol
-                if (hareket_tipiSelect.value === 'cikis') {
-                    const guncelStok = <?php echo $urun->adet; ?>;
-                    const istenenMiktar = parseInt(miktarInput.value);
+                // Stok çıkışı kontrolü
+                if (hareket_tipi.value === 'cikis') {
+                    const currentStock = parseInt(<?php echo $urun->adet; ?>);
+                    const requestedAmount = parseInt(miktarInput.value);
 
-                    if (istenenMiktar > guncelStok) {
-                        e.preventDefault();
-                        alert('Yetersiz stok! Çıkış yapılmak istenen miktar (' + istenenMiktar + ') mevcut stok miktarından (' + guncelStok + ') fazla olamaz.');
+                    if (requestedAmount > currentStock) {
+                        alert('Yetersiz stok! Mevcut stok: ' + currentStock + ' adet');
                         return;
                     }
                 }
 
-                // Form gönderilirken loading overlay göster
+                // Loading overlay göster
                 loadingOverlay.style.display = 'flex';
                 submitBtn.disabled = true;
+
+                // Formu gönder
+                stokForm.submit();
             });
 
             // Miktar değeri için kontrol
@@ -386,7 +409,7 @@ echo $OUTPUT->header();
         });
 
         // Renk kodlarını al
-        function getColorHex(colorName) {
+        function getColorHexJS(colorName) {
             const colorMap = {
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
@@ -412,33 +435,4 @@ echo $OUTPUT->header();
 
 <?php
 echo $OUTPUT->footer();
-
-/**
- * Renk kodlarını almak için yardımcı fonksiyon
- *
- * @param string $colorName Renk adı
- * @return string Renk hex kodu
- */
-function getColorHex($colorName) {
-    $colorMap = [
-        'kirmizi' => '#dc3545',
-        'mavi' => '#0d6efd',
-        'siyah' => '#212529',
-        'beyaz' => '#f8f9fa',
-        'yesil' => '#198754',
-        'sari' => '#ffc107',
-        'turuncu' => '#fd7e14',
-        'mor' => '#6f42c1',
-        'pembe' => '#d63384',
-        'gri' => '#6c757d',
-        'bej' => '#E4DAD2',
-        'lacivert' => '#11098A',
-        'kahverengi' => '#8B4513',
-        'haki' => '#8A9A5B',
-        'vizon' => '#A89F91',
-        'bordo' => '#800000'
-    ];
-
-    return isset($colorMap[$colorName]) ? $colorMap[$colorName] : '#6c757d';
-}
 ?>
