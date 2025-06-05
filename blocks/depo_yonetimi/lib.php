@@ -138,7 +138,7 @@ function block_depo_yonetimi_stok_hareketi_kaydet($urunid, $depoid, $miktar, $ha
         $hareket->urunid = $urunid;
         $hareket->depoid = $depoid;
         $hareket->miktar = $miktar;
-        $hareket->hareket_tipi = $hareket_tipi;
+        $hareket->islemtipi = $hareket_tipi;
         $hareket->aciklama = $aciklama;
         $hareket->renk = $renk;
         $hareket->beden = $beden;
