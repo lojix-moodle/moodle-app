@@ -66,9 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+    // urun_ekle.php dosyasında, POST işleme bölümünde:
+// Bu satırlar zaten var mı kontrol edin, yoksa ekleyin
     $raf = optional_param('raf', '', PARAM_TEXT);
     $bolum = optional_param('bolum', '', PARAM_TEXT);
 
+// Debug için
+    error_log("Form gönderilen değerler - Raf: " . $raf . ", Bölüm: " . $bolum);
+
+// Ana ürüne raf ve bölüm bilgilerini ekle
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
     error_log("Kaydedilen raf: " . $raf . ", Bölüm: " . $bolum);
@@ -862,61 +868,85 @@ echo $OUTPUT->header();
         });
     })();
 
-    // Bölüm seçildiğinde rafları güncelleme
-    // Sayfa yüklendikten sonra tüm JavaScript kodlarının çalışmasını sağlayalım
+    // Bu script'i ürün ekle sayfanızdaki <script> etiketleri arasına ekleyin
     document.addEventListener('DOMContentLoaded', function() {
-        // Bölüm ve raf elementlerini güvenli bir şekilde alalım
+        // Bölüm ve raf elementlerini al
         const bolumSelect = document.getElementById("bolum");
         const rafSelect = document.getElementById("raf");
 
         if (bolumSelect && rafSelect) {
             // Bölüm seçildiğinde rafları güncelleme
-            bolumSelect.addEventListener("change", function() {
-                const bolum = this.value;
+            bolumSelect.addEventListener("change", updateRaflar);
 
-                // Bölüme göre uygun rafları ayarla
-                rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
-
-                // Her seçim sonrası konsola bilgi yazalım
-                console.log("Seçilen bölüm:", bolum);
-
-                if (bolum === "Tişört" || bolum === "Gömlek") {
-                    // Üst kıyafet bölümlerinin rafları
-                    rafSelect.innerHTML += '<option value="A1 Rafı">A1 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="A2 Rafı">A2 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="A3 Rafı">A3 Rafı</option>';
-                } else if (bolum === "Pantolon") {
-                    // Alt kıyafet bölümlerinin rafları
-                    rafSelect.innerHTML += '<option value="B1 Rafı">B1 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="B2 Rafı">B2 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="B3 Rafı">B3 Rafı</option>';
-                } else if (bolum === "Ayakkabı") {
-                    // Ayakkabı rafları
-                    rafSelect.innerHTML += '<option value="C1 Rafı">C1 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="C2 Rafı">C2 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="C3 Rafı">C3 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="C4 Rafı">C4 Rafı</option>';
-                } else if (bolum === "Aksesuar" || bolum === "Çanta") {
-                    // Aksesuar ve çanta rafları
-                    rafSelect.innerHTML += '<option value="D1 Rafı">D1 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="D2 Rafı">D2 Rafı</option>';
-                } else {
-                    // Diğer tüm bölümler için
-                    rafSelect.innerHTML += '<option value="E1 Rafı">E1 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="E2 Rafı">E2 Rafı</option>';
-                    rafSelect.innerHTML += '<option value="E3 Rafı">E3 Rafı</option>';
-                }
-
-                // Raf seçeneklerinin eklenip eklenmediğini kontrol edelim
-                console.log("Raf seçenekleri güncellendi:", rafSelect.options.length);
-            });
-
-            // Başlangıçta bir kez tetikleyelim (sayfa yüklendikten sonra)
+            // Sayfa yüklendiğinde mevcut bölüm seçimine göre rafları ayarla
             if (bolumSelect.value) {
-                bolumSelect.dispatchEvent(new Event('change'));
+                updateRaflar.call(bolumSelect);
             }
-        } else {
-            console.error("Bölüm veya Raf elementi bulunamadı!");
+
+            // Form gönderimini kontrol et
+            const form = document.getElementById("urunForm");
+            if (form) {
+                form.addEventListener("submit", function(event) {
+                    const bolumValue = bolumSelect.value;
+                    const rafValue = rafSelect.value;
+
+                    // Bölüm seçilmiş ama raf seçilmemişse
+                    if (bolumValue && !rafValue) {
+                        event.preventDefault();
+                        alert("Lütfen raf seçimi yapınız.");
+                        return false;
+                    }
+
+                    // Debug için konsola yazdır
+                    console.log("Form gönderiliyor - Bölüm:", bolumValue, "Raf:", rafValue);
+                });
+            }
+        }
+
+        // Rafları güncelleme fonksiyonu
+        function updateRaflar() {
+            const bolum = this.value;
+            const rafSelect = document.getElementById("raf");
+
+            // Raf seçimini temizle
+            rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+            console.log("Seçilen bölüm:", bolum);
+
+            // Bölüme göre rafları ayarla
+            if (bolum === "Tişört" || bolum === "Gömlek") {
+                addRafOption(rafSelect, "A1 Rafı");
+                addRafOption(rafSelect, "A2 Rafı");
+                addRafOption(rafSelect, "A3 Rafı");
+            } else if (bolum === "Pantolon") {
+                addRafOption(rafSelect, "B1 Rafı");
+                addRafOption(rafSelect, "B2 Rafı");
+                addRafOption(rafSelect, "B3 Rafı");
+            } else if (bolum === "Ayakkabı") {
+                addRafOption(rafSelect, "C1 Rafı");
+                addRafOption(rafSelect, "C2 Rafı");
+                addRafOption(rafSelect, "C3 Rafı");
+                addRafOption(rafSelect, "C4 Rafı");
+            } else if (bolum === "Aksesuar" || bolum === "Çanta") {
+                addRafOption(rafSelect, "D1 Rafı");
+                addRafOption(rafSelect, "D2 Rafı");
+            } else if (bolum) {
+                // Diğer tüm bölümler için
+                addRafOption(rafSelect, "E1 Rafı");
+                addRafOption(rafSelect, "E2 Rafı");
+                addRafOption(rafSelect, "E3 Rafı");
+            }
+
+            // Seçenek sayısını kontrol et
+            console.log("Raf seçenekleri güncellendi:", rafSelect.options.length);
+        }
+
+        // Raf seçeneği ekleme yardımcı fonksiyonu
+        function addRafOption(select, value) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = value;
+            select.appendChild(option);
         }
     });
     </script>
