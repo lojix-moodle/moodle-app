@@ -65,17 +65,19 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
                 <FIELD NAME="urunid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+<!--                <FIELD NAME="depoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />-->
+                <FIELD NAME="miktar" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+                <FIELD NAME="islemtipi" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="giris veya cikis" />
+                <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" />
+                <FIELD NAME="tarih" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
                 <FIELD NAME="renk" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" />
                 <FIELD NAME="beden" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" />
-                <FIELD NAME="miktar" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
-                <FIELD NAME="aciklama" TYPE="text" NOTNULL="false" SEQUENCE="false" />
-                <FIELD NAME="islemtipi" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="giris veya cikis" />
-                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
-                <FIELD NAME="tarih" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="urunid_fk" TYPE="foreign" FIELDS="urunid" REFTABLE="block_depo_yonetimi_urunler" REFFIELDS="id"/>
+                <KEY NAME="depoid_fk" TYPE="foreign" FIELDS="depoid" REFTABLE="block_depo_yonetimi_depolar" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
