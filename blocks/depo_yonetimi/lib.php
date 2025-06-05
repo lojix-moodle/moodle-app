@@ -80,22 +80,33 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
     }
 }
 
-function block_depo_yonetimi_stok_hareketleri_debug($urunid, $depoid) {
-    global $DB;
+/**
+ * Renk adına göre hex kodunu döndürür
+ *
+ * @param string $colorName Renk adı
+ * @return string Renk hex kodu
+ */
+function getColorHex($colorName) {
+    $colorMap = [
+        'kirmizi' => '#dc3545',
+        'mavi' => '#0d6efd',
+        'siyah' => '#212529',
+        'beyaz' => '#f8f9fa',
+        'yesil' => '#198754',
+        'sari' => '#ffc107',
+        'turuncu' => '#fd7e14',
+        'mor' => '#6f42c1',
+        'pembe' => '#d63384',
+        'gri' => '#6c757d',
+        'bej' => '#E4DAD2',
+        'lacivert' => '#11098A',
+        'kahverengi' => '#8B4513',
+        'haki' => '#8A9A5B',
+        'vizon' => '#A89F91',
+        'bordo' => '#800000'
+    ];
 
-    // Ürün ve depo var mı kontrol et
-    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid]);
-    $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
-
-    if (!$urun || !$depo) {
-        return "Ürün veya depo bulunamadı: urunid=$urunid, depoid=$depoid";
-    }
-
-    // Stok hareketleri tablosunda kayıt var mı kontrol et
-    $count = $DB->count_records('block_depo_yonetimi_stok_hareketleri',
-        ['urunid' => $urunid, 'depoid' => $depoid]);
-
-    return "Ürün: {$urun->name}, Depo: {$depo->name}, Hareket sayısı: $count";
+    return isset($colorMap[$colorName]) ? $colorMap[$colorName] : '#6c757d';
 }
 
 /**
