@@ -35,9 +35,17 @@ if ($data = data_submitted() && confirm_sesskey()) {
     $renk = optional_param('renk', '', PARAM_TEXT);
     $beden = optional_param('beden', '', PARAM_TEXT);
 
+    // Renk bazında miktar
+    $renk_miktar = optional_param('renk_miktar', 0, PARAM_INT);
+
     // Renk ve beden varyasyonu var mı kontrol et
     $renk = empty($renk) ? null : $renk;
     $beden = empty($beden) ? null : $beden;
+
+    // Renk seçilmişse ve renk miktarı belirlenmişse, o miktarı kullan
+    if (!empty($renk) && $renk_miktar > 0) {
+        $miktar = $renk_miktar;
+    }
 
     if ($miktar <= 0) {
         $islem_mesaji = 'Miktar 0\'dan büyük olmalıdır.';
@@ -49,7 +57,8 @@ if ($data = data_submitted() && confirm_sesskey()) {
         if ($sonuc) {
             $islem_yapildi = true;
             $islem_tipi = ($hareket_tipi == 'giris') ? 'girişi' : 'çıkışı';
-            $islem_mesaji = "$miktar adet ürün stok $islem_tipi başarıyla kaydedildi.";
+            $renk_bilgisi = !empty($renk) ? " ($renk rengi için)" : "";
+            $islem_mesaji = "$miktar adet ürün$renk_bilgisi stok $islem_tipi başarıyla kaydedildi.";
         } else {
             $islem_mesaji = 'Stok hareketi kaydedilirken bir hata oluştu.';
         }
@@ -165,40 +174,48 @@ echo $OUTPUT->header();
                 </div>
 
                 <!-- Varyasyon alanı -->
-                <?php
-                $has_variations = !empty($urun->colors) && $urun->colors != '0' && !empty($urun->sizes) && $urun->sizes != '0';
-                if ($has_variations):
-                    // Renk ve beden bilgilerini al
-                    $colors = json_decode($urun->colors, true);
-                    $sizes = json_decode($urun->sizes, true);
-                    ?>
-                    <div class="form-group mb-3">
-                        <label for="renk" class="form-label"><i class="fas fa-palette mr-1"></i> Renk Seçimi</label>
-                        <select class="form-select" id="renk" name="renk">
-                            <option value="">Renk Seçin</option>
-                            <?php foreach ($colors as $color): ?>
-                                <option value="<?php echo htmlspecialchars($color['value']); ?>"><?php echo htmlspecialchars($color['text']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
 
-                    <div class="form-group mb-3">
-                        <label for="beden" class="form-label"><i class="fas fa-ruler mr-1"></i> Beden Seçimi</label>
-                        <select class="form-select" id="beden" name="beden">
-                            <option value="">Beden Seçin</option>
-                            <?php foreach ($sizes as $size): ?>
-                                <option value="<?php echo htmlspecialchars($size['value']); ?>"><?php echo htmlspecialchars($size['text']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                <?php endif; ?>
+<?php
+$has_variations = !empty($urun->colors) && $urun->colors != '0' && !empty($urun->sizes) && $urun->sizes != '0';
+if ($has_variations):
+    // Renk ve beden bilgilerini al
+    $colors = json_decode($urun->colors, true);
+    $sizes = json_decode($urun->sizes, true);
+    ?>
+    <div class="form-group mb-3">
+        <label for="renk" class="form-label"><i class="fas fa-palette mr-1"></i> Renk Seçimi</label>
+        <select class="form-select" id="renk" name="renk">
+            <option value="">Renk Seçin</option>
+            <?php foreach ($colors as $color): ?>
+                <option value="<?php echo htmlspecialchars($color['value']); ?>"><?php echo htmlspecialchars($color['text']); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
-                <!-- Miktar -->
-                <div class="form-group mb-3">
-                    <label for="miktar" class="form-label"><i class="fas fa-sort-numeric-up mr-1"></i> Miktar</label>
-                    <input type="number" class="form-control" id="miktar" name="miktar" min="1" value="1" required>
-                    <div id="stok-preview" class="stok-preview"></div>
-                </div>
+    <div class="form-group mb-3">
+        <label for="beden" class="form-label"><i class="fas fa-ruler mr-1"></i> Beden Seçimi</label>
+        <select class="form-select" id="beden" name="beden">
+            <option value="">Beden Seçin</option>
+            <?php foreach ($sizes as $size): ?>
+                <option value="<?php echo htmlspecialchars($size['value']); ?>"><?php echo htmlspecialchars($size['text']); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Renk bazında miktar alanı -->
+    <div id="renk-miktar-alani" class="form-group mb-3" style="display: none;">
+        <label for="renk_miktar" class="form-label"><i class="fas fa-tint mr-1"></i> <span id="secili-renk-ad"></span> Renk İçin Miktar</label>
+        <input type="number" class="form-control" id="renk_miktar" name="renk_miktar" min="1" value="1">
+        <div class="form-text text-muted">Bu renk için eklenecek/çıkarılacak miktarı belirtin</div>
+    </div>
+<?php endif; ?>
+
+<!-- Miktar -->
+<div class="form-group mb-3">
+    <label for="miktar" class="form-label"><i class="fas fa-sort-numeric-up mr-1"></i> Toplam Miktar</label>
+    <input type="number" class="form-control" id="miktar" name="miktar" min="1" value="1" required>
+    <div id="stok-preview" class="stok-preview"></div>
+</div>
 
                 <!-- Açıklama -->
                 <div class="form-group mb-3">
@@ -297,10 +314,40 @@ echo $OUTPUT->header();
             const miktarInput = document.getElementById('miktar');
             const stokPreview = document.getElementById('stok-preview');
             const mevcutStok = <?php echo $urun->adet; ?>;
+            const renkSelect = document.getElementById('renk');
+            const renkMiktarAlani = document.getElementById('renk-miktar-alani');
+            const seciliRenkAd = document.getElementById('secili-renk-ad');
+            const renkMiktarInput = document.getElementById('renk_miktar');
+
+            // Renk seçildiğinde renk bazında miktar alanını göster/gizle
+            renkSelect.addEventListener('change', function() {
+                if (this.value) {
+                    const seciliRenkText = this.options[this.selectedIndex].text;
+                    seciliRenkAd.textContent = seciliRenkText;
+                    renkMiktarAlani.style.display = 'block';
+                    renkMiktarInput.value = miktarInput.value; // Varsayılan olarak toplam miktarı ata
+                } else {
+                    renkMiktarAlani.style.display = 'none';
+                    renkMiktarInput.value = '';
+                }
+                updateStokDurumu();
+            });
+
+            // Renk miktarı değiştiğinde stok önizlemeyi güncelle
+            renkMiktarInput.addEventListener('input', function() {
+                if (renkSelect.value) {
+                    updateStokDurumu();
+                }
+            });
 
             function updateStokDurumu() {
                 const tip = hareketTipi.value;
-                const miktar = parseInt(miktarInput.value) || 0;
+                let miktar = parseInt(miktarInput.value) || 0;
+
+                // Renk seçilmişse renk miktarını kullan
+                if (renkSelect && renkSelect.value && renkMiktarAlani.style.display !== 'none') {
+                    miktar = parseInt(renkMiktarInput.value) || 0;
+                }
 
                 if (miktar <= 0) {
                     stokPreview.innerHTML = '';
@@ -313,11 +360,14 @@ echo $OUTPUT->header();
                 let previewClass = '';
                 let message = '';
 
+                const renkBilgisi = renkSelect && renkSelect.value ?
+                    ' (' + renkSelect.options[renkSelect.selectedIndex].text + ' rengi için)' : '';
+
                 if (tip === 'giris') {
                     yeniStok += miktar;
                     iconClass = 'stok-giris';
                     previewClass = 'stok-giris-preview';
-                    message = '<i class="fas fa-arrow-up"></i> Stok girişi sonrası: <strong>' + yeniStok + ' adet</strong>';
+                    message = '<i class="fas fa-arrow-up"></i> Stok girişi sonrası' + renkBilgisi + ': <strong>' + yeniStok + ' adet</strong>';
                 } else {
                     yeniStok -= miktar;
                     iconClass = 'stok-cikis';
@@ -326,7 +376,7 @@ echo $OUTPUT->header();
                     if (yeniStok < 0) {
                         message = '<i class="fas fa-exclamation-triangle"></i> <strong>Uyarı:</strong> Yeterli stok bulunmuyor. Mevcut stok: ' + mevcutStok + ' adet';
                     } else {
-                        message = '<i class="fas fa-arrow-down"></i> Stok çıkışı sonrası: <strong>' + yeniStok + ' adet</strong>';
+                        message = '<i class="fas fa-arrow-down"></i> Stok çıkışı sonrası' + renkBilgisi + ': <strong>' + yeniStok + ' adet</strong>';
                     }
                 }
 
