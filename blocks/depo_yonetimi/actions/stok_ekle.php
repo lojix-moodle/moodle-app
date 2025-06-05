@@ -329,7 +329,6 @@ echo $OUTPUT->header();
                                             <?php endif; ?>
                                         </td>
                                         <td><strong><?php echo $hareket->miktar; ?></strong> adet</td>
-                                        // Yaklaşık 255. satırda:
                                         <td>
                                             <?php
                                             if (!empty($hareket->renk) || !empty($hareket->beden)) {
