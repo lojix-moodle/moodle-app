@@ -20,8 +20,12 @@ $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
 
 if (!$depo || !$urun) {
-    redirect(new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]), 'Depo veya ürün bulunamadı.', null, \core\output\notification::NOTIFY_ERROR);
+    redirect(new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]), 'Ürün veya depo bulunamadı', null, \core\output\notification::NOTIFY_ERROR);
 }
+
+// Kategori bilgisi
+$kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
+$kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
 // İşlem yapıldı mı?
 $islem_yapildi = false;
@@ -29,415 +33,411 @@ $islem_mesaji = '';
 
 // Form gönderildi mi?
 if ($data = data_submitted() && confirm_sesskey()) {
-    $hareket_tipi = required_param('hareket_tipi', PARAM_ALPHA);
     $miktar = required_param('miktar', PARAM_INT);
+    $hareket_tipi = required_param('hareket_tipi', PARAM_ALPHA);
     $aciklama = optional_param('aciklama', '', PARAM_TEXT);
     $renk = optional_param('renk', '', PARAM_TEXT);
     $beden = optional_param('beden', '', PARAM_TEXT);
-    $renk_miktar = optional_param('renk_miktar', 0, PARAM_INT);
 
-    // Renk seçilmişse ve özel miktar girildiyse onu kullan
-    if (!empty($renk) && $renk_miktar > 0) {
-        $miktar = $renk_miktar;
-    }
+    // Stok hareketi kaydet
+    $sonuc = block_depo_yonetimi_stok_hareketi_kaydet(
+        $urunid,
+        $depoid,
+        $miktar,
+        $hareket_tipi,
+        $aciklama,
+        $renk,
+        $beden
+    );
 
-    if ($miktar <= 0) {
-        $islem_mesaji = 'Miktar 0\'dan büyük olmalıdır.';
+    if ($sonuc) {
+        $islem_yapildi = true;
+        $islem_mesaji = ($hareket_tipi === 'giris' ? 'Stok girişi' : 'Stok çıkışı') . ' başarıyla kaydedildi.';
+
+        // Ürün bilgisini güncelle (sayfadaki gösterim için)
+        $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid]);
     } else {
-        $sonuc = block_depo_yonetimi_stok_hareketi_kaydet(
-            $urunid, $depoid, $miktar, $hareket_tipi, $aciklama, $renk, $beden
-        );
-
-        if ($sonuc) {
-            $islem_yapildi = true;
-            $islem_mesaji = $hareket_tipi == 'giris' ? 'Stok girişi başarıyla kaydedildi.' : 'Stok çıkışı başarıyla kaydedildi.';
-        } else {
-            $islem_mesaji = 'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+        $islem_mesaji = 'Stok hareketi kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.';
+        if ($hareket_tipi === 'cikis' && $miktar > $urun->adet) {
+            $islem_mesaji = 'Yetersiz stok! Çıkış yapılmak istenen miktar mevcut stok miktarından fazla.';
         }
     }
 }
+
+// Varyasyonlu bir ürün mü?
+$varyasyonlu = (!empty($urun->colors) && $urun->colors !== '0') && (!empty($urun->sizes) && $urun->sizes !== '0');
+$colors = $varyasyonlu ? explode(',', $urun->colors) : [];
+$sizes = $varyasyonlu ? explode(',', $urun->sizes) : [];
 
 echo $OUTPUT->header();
 
 // CSS eklemeleri
 ?>
     <style>
-        .stok-giris {
-            color: #28a745;
-            animation: fadeInUp 0.5s ease-out;
+        .stok-card {
+            border: 0;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
-
-        .stok-cikis {
-            color: #dc3545;
-            animation: fadeInDown 0.5s ease-out;
+        .stok-badge {
+            font-size: 0.95rem;
+            padding: 0.5rem 0.85rem;
         }
-
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .color-badge {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+            border-radius: 3px;
         }
-
-        @keyframes fadeInDown {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .stok-preview {
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-
-        .stok-giris-preview {
-            background-color: rgba(40, 167, 69, 0.1);
-        }
-
-        .stok-cikis-preview {
-            background-color: rgba(220, 53, 69, 0.1);
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
         }
     </style>
 
-    <!-- İşlem başarılıysa notification göster -->
+    <!-- Loading Overlay -->
+    <div id="loading" style="display: none;">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <div class="mt-2">İşlem gerçekleştiriliyor...</div>
+        </div>
+    </div>
+
 <?php if ($islem_yapildi): ?>
-    <div class="alert alert-success">
-        <i class="fas fa-check-circle mr-2"></i> <?php echo $islem_mesaji; ?>
+    <!-- Başarı mesajı -->
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong><i class="fas fa-check-circle"></i> Başarılı!</strong> <?php echo $islem_mesaji; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php elseif (!empty($islem_mesaji)): ?>
-    <div class="alert alert-danger">
-        <i class="fas fa-times-circle mr-2"></i> <?php echo $islem_mesaji; ?>
+    <!-- Hata mesajı -->
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><i class="fas fa-exclamation-circle"></i> Hata!</strong> <?php echo $islem_mesaji; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php endif; ?>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-exchange-alt text-primary mr-2"></i>
-                    Stok Hareketi
-                </h4>
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left mr-1"></i> Geri Dön
-                </a>
-            </div>
-        </div>
-
-        <div class="card-body">
-            <!-- Ürün bilgisi -->
-            <div class="mb-4">
-                <h5 class="border-bottom pb-2">Ürün Bilgileri</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Depo:</strong> <?php echo htmlspecialchars($depo->name); ?></p>
-                        <p><strong>Ürün:</strong> <?php echo htmlspecialchars($urun->name); ?></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p>
-                            <strong>Mevcut Stok:</strong>
-                            <span class="badge bg-<?php echo ($urun->adet > 10) ? 'success' : (($urun->adet > 3) ? 'warning' : 'danger'); ?> rounded-pill px-3 py-2">
-                            <?php echo $urun->adet; ?> adet
-                        </span>
-                        </p>
+    <div class="row">
+        <!-- Sol kolon - Ürün bilgileri ve stok hareketi formu -->
+        <div class="col-md-6">
+            <div class="card mb-4 stok-card">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-cube text-primary me-2"></i>
+                            Ürün Bilgileri
+                        </h5>
+                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Depoya Dön
+                        </a>
                     </div>
                 </div>
-            </div>
+                <div class="card-body">
+                    <h4 class="mb-3"><?php echo htmlspecialchars($urun->name); ?></h4>
 
-            <form method="post" action="<?php echo $PAGE->url; ?>">
-                <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-
-                <!-- Hareket tipi -->
-                <div class="form-group mb-3">
-                    <label for="hareket_tipi" class="form-label"><i class="fas fa-exchange-alt mr-1"></i> Hareket Tipi</label>
-                    <select class="form-select" id="hareket_tipi" name="hareket_tipi" required>
-                        <option value="giris">Stok Girişi (Ekleme)</option>
-                        <option value="cikis">Stok Çıkışı (Azaltma)</option>
-                    </select>
-                </div>
-
-                <!-- Varyasyonlar bölümü -->
-                <?php
-                // Önce varyasyon verilerini doğru şekilde kontrol edelim
-                $has_variations = false;
-                $colors = [];
-                $sizes = [];
-
-                if (!empty($urun->colors) && $urun->colors != '0') {
-                    $colors = json_decode($urun->colors, true);
-                    // json_decode başarısız olursa null döner, bunu kontrol edelim
-                    if (!is_array($colors)) {
-                        $colors = [];
-                    }
-                }
-
-                if (!empty($urun->sizes) && $urun->sizes != '0') {
-                    $sizes = json_decode($urun->sizes, true);
-                    if (!is_array($sizes)) {
-                        $sizes = [];
-                    }
-                }
-
-                $has_variations = !empty($colors) || !empty($sizes);
-
-                if ($has_variations):
-                    ?>
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0"><i class="fas fa-palette me-2"></i> Varyasyon Seçimi</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="text-muted">Kategori:</span>
+                                <span class="badge bg-light text-dark ms-1"><?php echo htmlspecialchars($kategori_adi); ?></span>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <!-- Renk Seçimi -->
-                            <?php if (!empty($colors)): ?>
-                                <div class="form-group mb-3">
-                                    <label for="renk" class="form-label">Renk</label>
-                                    <select id="renk" name="renk" class="form-select">
-                                        <option value="">Renk Seçin</option>
-                                        <?php foreach ($colors as $color_key => $color_name): ?>
-                                            <option value="<?php echo htmlspecialchars($color_name); ?>"><?php echo htmlspecialchars($color_name); ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            <?php endif; ?>
-
-                            <!-- Beden Seçimi -->
-                            <?php if (!empty($sizes)): ?>
-                                <div class="form-group mb-3">
-                                    <label for="beden" class="form-label">Beden</label>
-                                    <select id="beden" name="beden" class="form-select">
-                                        <option value="">Beden Seçin</option>
-                                        <?php foreach ($sizes as $size_key => $size_name): ?>
-                                            <option value="<?php echo htmlspecialchars($size_name); ?>"><?php echo htmlspecialchars($size_name); ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            <?php endif; ?>
-
-                            <!-- Renk bazında miktar alanı -->
-                            <div id="renk-miktar-alani" class="form-group mt-3" style="display: none;">
-                                <div class="alert alert-info">
-                                    <strong id="secili-renk-ad"></strong> rengi için:
-                                    <div class="input-group mt-2">
-                                        <span class="input-group-text"><i class="fas fa-cubes"></i></span>
-                                        <input type="number" class="form-control" id="renk_miktar" name="renk_miktar" min="1" value="1">
-                                        <span class="input-group-text">adet</span>
-                                    </div>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="text-muted">Güncel Stok:</span>
+                                <span class="badge bg-<?php echo ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')); ?> ms-1 stok-badge">
+                                <?php echo $urun->adet; ?> adet
+                            </span>
                             </div>
                         </div>
                     </div>
-                <?php endif; ?>
 
-                <!-- Genel Miktar -->
-                <div class="form-group mb-3">
-                    <label for="miktar" class="form-label"><i class="fas fa-sort-numeric-up me-1"></i> Toplam Miktar</label>
-                    <input type="number" class="form-control" id="miktar" name="miktar" min="1" value="1" required>
-                    <div id="stok-preview" class="stok-preview mt-2"></div>
-                </div>
-                <!-- Açıklama -->
-                <div class="form-group mb-3">
-                    <label for="aciklama" class="form-label"><i class="fas fa-comment-alt mr-1"></i> Açıklama</label>
-                    <textarea class="form-control" id="aciklama" name="aciklama" rows="3" placeholder="İsteğe bağlı açıklama ekleyebilirsiniz"></textarea>
-                </div>
+                    <?php if ($varyasyonlu): ?>
+                        <div class="mb-3">
+                            <span class="text-muted">Varyasyonlar:</span>
+                            <div class="mt-2">
+                                <?php foreach ($colors as $color): ?>
+                                    <span class="badge bg-light text-dark me-1 mb-1">
+                                <span class="color-badge" style="background-color: <?php echo getColorHex($color); ?>"></span>
+                                <?php echo htmlspecialchars($color); ?>
+                            </span>
+                                <?php endforeach; ?>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/view.php', ['depo' => $depoid]); ?>" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-times mr-1"></i> İptal
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save mr-1"></i> Stok Hareketini Kaydet
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Stok Geçmişi -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-light">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-history text-primary mr-2"></i> Son Stok Hareketleri
-            </h5>
-            <td>
-                <?php
-                if (!empty($hareket->firstname) && !empty($hareket->lastname)) {
-                    echo $hareket->firstname . ' ' . $hareket->lastname;
-                } else {
-                    echo 'Bilinmiyor';
-                }
-                ?>
-            </td>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Tarih</th>
-                        <th>Hareket</th>
-                        <th>Miktar</th>
-                        <th>Açıklama</th>
-                        <th>Kullanıcı</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    $hareketler = block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, 5);
-                    if (empty($hareketler)):
-                        ?>
-                        <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <i class="fas fa-info-circle text-muted mr-1"></i>
-                                Bu ürüne ait stok hareketi kaydı henüz bulunmuyor.
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($hareketler as $hareket): ?>
-                            <tr>
-                                <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
-                                <td>
-                                    <?php if ($hareket->hareket_tipi == 'giris'): ?>
-                                        <span class="badge bg-success">
-                                    <i class="fas fa-arrow-up mr-1"></i> Giriş
-                                </span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger">
-                                    <i class="fas fa-arrow-down mr-1"></i> Çıkış
-                                </span>
-                                    <?php endif; ?>
-
-                                    <?php if (!empty($hareket->renk) || !empty($hareket->beden)): ?>
-                                        <small class="ms-2 text-muted">
-                                            <?php
-                                            $varyasyon_detay = [];
-                                            if (!empty($hareket->renk)) $varyasyon_detay[] = $hareket->renk;
-                                            if (!empty($hareket->beden)) $varyasyon_detay[] = $hareket->beden;
-                                            echo implode(' / ', $varyasyon_detay);
-                                            ?>
-                                        </small>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo $hareket->miktar; ?> adet</td>
-                                <td><?php echo !empty($hareket->aciklama) ? htmlspecialchars($hareket->aciklama) : '-'; ?></td>
-                                <td><?php echo fullname($hareket); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
+                                <?php if (!empty($sizes)): ?>
+                                    <div class="mt-2">
+                                        <?php foreach ($sizes as $size): ?>
+                                            <span class="badge bg-light text-dark me-1 mb-1">
+                                        <?php echo htmlspecialchars($size); ?>
+                                    </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     <?php endif; ?>
-                    </tbody>
-                </table>
+                </div>
+            </div>
+
+            <!-- Stok Hareketi Formu -->
+            <div class="card stok-card">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exchange-alt text-primary me-2"></i>
+                        Yeni Stok Hareketi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="stokForm" method="post" action="">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="hareket_tipi" class="form-label">Hareket Tipi</label>
+                                <select id="hareket_tipi" name="hareket_tipi" class="form-select" required>
+                                    <option value="giris">Stok Girişi</option>
+                                    <option value="cikis">Stok Çıkışı</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="miktar" class="form-label">Miktar</label>
+                                <input type="number" id="miktar" name="miktar" class="form-control" min="1" value="1" required>
+                                <div class="invalid-feedback">
+                                    Lütfen geçerli bir miktar girin.
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php if ($varyasyonlu): ?>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="renk" class="form-label">Renk</label>
+                                    <select id="renk" name="renk" class="form-select">
+                                        <option value="">Renk Seçin</option>
+                                        <?php foreach ($colors as $color): ?>
+                                            <option value="<?php echo htmlspecialchars($color); ?>"><?php echo htmlspecialchars($color); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="beden" class="form-label">Beden</label>
+                                    <select id="beden" name="beden" class="form-select">
+                                        <option value="">Beden Seçin</option>
+                                        <?php foreach ($sizes as $size): ?>
+                                            <option value="<?php echo htmlspecialchars($size); ?>"><?php echo htmlspecialchars($size); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="mb-3">
+                            <label for="aciklama" class="form-label">Açıklama</label>
+                            <textarea id="aciklama" name="aciklama" class="form-control" rows="2" placeholder="Hareket ile ilgili açıklama (opsiyonel)"></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" id="submitBtn" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Stok Hareketini Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="card-footer text-end">
-            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-list mr-1"></i> Tüm Hareketleri Görüntüle
-            </a>
+
+        <!-- Sağ kolon - Son Stok Hareketleri -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history text-primary me-2"></i>
+                        Son Stok Hareketleri
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Tarih</th>
+                                <th>İşlem</th>
+                                <th>Miktar</th>
+                                <th>Varyasyon</th>
+                                <th>İşlemi Yapan</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $hareketler = block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, 5);
+                            if (empty($hareketler)):
+                                ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="fas fa-info-circle text-muted mr-1"></i>
+                                        Bu ürüne ait stok hareketi kaydı henüz bulunmuyor.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($hareketler as $hareket): ?>
+                                    <tr>
+                                        <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
+                                        <td>
+                                            <?php if ($hareket->hareket_tipi == 'giris'): ?>
+                                                <span class="badge bg-success">
+                                        <i class="fas fa-arrow-up me-1"></i> Giriş
+                                    </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger">
+                                        <i class="fas fa-arrow-down me-1"></i> Çıkış
+                                    </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><strong><?php echo $hareket->miktar; ?></strong> adet</td>
+                                        <td>
+                                            <?php
+                                            if (!empty($hareket->renk) || !empty($hareket->beden)) {
+                                                $varyasyon_detay = [];
+                                                if (!empty($hareket->renk)) {
+                                                    echo '<span class="badge me-1" style="background-color: '.getColorHex($hareket->renk).'">&nbsp;</span>';
+                                                    $varyasyon_detay[] = $hareket->renk;
+                                                }
+                                                if (!empty($hareket->beden)) $varyasyon_detay[] = $hareket->beden;
+                                                echo implode(' / ', $varyasyon_detay);
+                                            } else {
+                                                echo '-';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td><?php echo fullname($hareket); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-list me-1"></i> Tüm Stok Hareketlerini Görüntüle
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const hareketTipi = document.getElementById('hareket_tipi');
+            const stokForm = document.getElementById('stokForm');
+            const hareket_tipiSelect = document.getElementById('hareket_tipi');
             const miktarInput = document.getElementById('miktar');
-            const stokPreview = document.getElementById('stok-preview');
-            const mevcutStok = <?php echo $urun->adet; ?>;
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loading');
 
-            // Renk seçimi elementleri
-            const renkSelect = document.getElementById('renk');
-            const renkMiktarAlani = document.getElementById('renk-miktar-alani');
-            const seciliRenkAd = document.getElementById('secili-renk-ad');
-            const renkMiktarInput = document.getElementById('renk_miktar');
-
-            // Eğer renk seçimi varsa olayları ayarlayalım
-            if (renkSelect) {
-                renkSelect.addEventListener('change', function() {
-                    if (this.value) {
-                        // Seçilen renk adını göster
-                        seciliRenkAd.textContent = this.options[this.selectedIndex].text;
-                        // Renk miktar alanını göster
-                        renkMiktarAlani.style.display = 'block';
-                        // Renk miktarını güncelle
-                        if (renkMiktarInput.value) {
-                            miktarInput.value = renkMiktarInput.value;
-                        }
-                    } else {
-                        // Renk seçilmemişse alanı gizle
-                        renkMiktarAlani.style.display = 'none';
-                    }
-                    updateStokDurumu();
-                });
-
-                // Renk miktarı değiştiğinde toplam miktarı güncelle
-                if (renkMiktarInput) {
-                    renkMiktarInput.addEventListener('input', function() {
-                        if (this.value && !isNaN(this.value) && this.value > 0) {
-                            miktarInput.value = this.value;
-                            updateStokDurumu();
-                        }
-                    });
-                }
-            }
-
-            function updateStokDurumu() {
-                const tip = hareketTipi.value;
-                let miktar = parseInt(miktarInput.value) || 0;
-
-                // Miktar kontrolü
-                if (miktar <= 0) {
-                    stokPreview.innerHTML = '<div class="alert alert-warning">Lütfen geçerli bir miktar girin</div>';
+            // Form gönderimine kontroller
+            stokForm.addEventListener('submit', function(e) {
+                // Form validasyonu
+                if (!stokForm.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    stokForm.classList.add('was-validated');
                     return;
                 }
 
-                let yeniStok = mevcutStok;
-                let iconClass = '';
-                let previewClass = '';
-                let message = '';
+                // Stok çıkışı için kontrol
+                if (hareket_tipiSelect.value === 'cikis') {
+                    const guncelStok = <?php echo $urun->adet; ?>;
+                    const istenenMiktar = parseInt(miktarInput.value);
 
-                // Renk bilgisini ekle
-                const renkBilgisi = renkSelect && renkSelect.value ?
-                    ' (' + renkSelect.options[renkSelect.selectedIndex].text + ' rengi için)' : '';
-
-                if (tip === 'giris') {
-                    yeniStok += miktar;
-                    iconClass = 'stok-giris';
-                    previewClass = 'stok-giris-preview';
-                    message = '<i class="fas fa-arrow-up"></i> Stok girişi sonrası' + renkBilgisi + ': <strong>' + yeniStok + ' adet</strong>';
-                } else {
-                    yeniStok -= miktar;
-                    iconClass = 'stok-cikis';
-                    previewClass = 'stok-cikis-preview';
-
-                    if (yeniStok < 0) {
-                        message = '<i class="fas fa-exclamation-circle"></i> Yetersiz stok: İşlem sonrası <strong>' + yeniStok + ' adet</strong> (eksik stok)';
-                        previewClass = 'stok-warning-preview';
-                    } else {
-                        message = '<i class="fas fa-arrow-down"></i> Stok çıkışı sonrası' + renkBilgisi + ': <strong>' + yeniStok + ' adet</strong>';
+                    if (istenenMiktar > guncelStok) {
+                        e.preventDefault();
+                        alert('Yetersiz stok! Çıkış yapılmak istenen miktar (' + istenenMiktar + ') mevcut stok miktarından (' + guncelStok + ') fazla olamaz.');
+                        return;
                     }
                 }
 
-                stokPreview.innerHTML = '<div class="alert alert-' +
-                    (previewClass === 'stok-warning-preview' ? 'danger' :
-                        (previewClass === 'stok-giris-preview' ? 'success' : 'warning')) +
-                    '">' + message + '</div>';
-            }
+                // Form gönderilirken loading overlay göster
+                loadingOverlay.style.display = 'flex';
+                submitBtn.disabled = true;
+            });
 
-            // Olay dinleyicileri
-            hareketTipi.addEventListener('change', updateStokDurumu);
-            miktarInput.addEventListener('input', updateStokDurumu);
-
-            // Sayfa yüklenince çalıştır
-            updateStokDurumu();
+            // Miktar değeri için kontrol
+            miktarInput.addEventListener('input', function() {
+                if (parseInt(this.value) < 1) {
+                    this.value = 1;
+                }
+            });
         });
+
+        // Renk kodlarını al
+        function getColorHex(colorName) {
+            const colorMap = {
+                'kirmizi': '#dc3545',
+                'mavi': '#0d6efd',
+                'siyah': '#212529',
+                'beyaz': '#f8f9fa',
+                'yesil': '#198754',
+                'sari': '#ffc107',
+                'turuncu': '#fd7e14',
+                'mor': '#6f42c1',
+                'pembe': '#d63384',
+                'gri': '#6c757d',
+                'bej': '#E4DAD2',
+                'lacivert': '#11098A',
+                'kahverengi': '#8B4513',
+                'haki': '#8A9A5B',
+                'vizon': '#A89F91',
+                'bordo': '#800000'
+            };
+
+            return colorMap[colorName] || '#6c757d';
+        }
     </script>
 
 <?php
 echo $OUTPUT->footer();
+
+/**
+ * Renk kodlarını almak için yardımcı fonksiyon
+ *
+ * @param string $colorName Renk adı
+ * @return string Renk hex kodu
+ */
+function getColorHex($colorName) {
+    $colorMap = [
+        'kirmizi' => '#dc3545',
+        'mavi' => '#0d6efd',
+        'siyah' => '#212529',
+        'beyaz' => '#f8f9fa',
+        'yesil' => '#198754',
+        'sari' => '#ffc107',
+        'turuncu' => '#fd7e14',
+        'mor' => '#6f42c1',
+        'pembe' => '#d63384',
+        'gri' => '#6c757d',
+        'bej' => '#E4DAD2',
+        'lacivert' => '#11098A',
+        'kahverengi' => '#8B4513',
+        'haki' => '#8A9A5B',
+        'vizon' => '#A89F91',
+        'bordo' => '#800000'
+    ];
+
+    return isset($colorMap[$colorName]) ? $colorMap[$colorName] : '#6c757d';
+}
 ?>
