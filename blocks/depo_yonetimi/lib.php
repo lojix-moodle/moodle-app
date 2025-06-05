@@ -63,7 +63,7 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
         FROM {block_depo_yonetimi_stok_hareketleri} sh
         INNER JOIN {user} u ON sh.userid = u.id
         INNER JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
-        WHERE sh.urunid = :urunid AND sh.depoid = :depoid
+        WHERE sh.urunid = :urunid AND ur.depoid = :depoid
         ORDER BY sh.tarih DESC";
 
         $params = ['urunid' => $urunid, 'depoid' => $depoid];

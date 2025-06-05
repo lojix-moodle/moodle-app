@@ -83,8 +83,9 @@ switch ($sira) {
 }
 
 // Stok hareketleri verilerini al
-// Stok hareketleri verilerini al
-$sql = "SELECT sh.*, u.firstname, u.lastname, ur.name as urun_adi
+$sql_where = "ur.depoid = :depoid"; // sh.depoid yerine ur.depoid kullanılıyor
+
+$sql = "SELECT sh.*, sh.islemtipi as hareket_tipi, u.firstname, u.lastname, ur.name as urun_adi
         FROM {block_depo_yonetimi_stok_hareketleri} sh
         JOIN {user} u ON u.id = sh.userid
         JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
