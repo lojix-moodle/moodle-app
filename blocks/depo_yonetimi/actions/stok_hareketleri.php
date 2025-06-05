@@ -41,7 +41,7 @@ $sira = optional_param('sira', 'tarih_desc', PARAM_TEXT);
 
 // SQL sorgusu oluştur
 $params = array('depoid' => $depoid);
-$sql_where = "sh.depoid = :depoid";
+$sql_where = "ur.depoid = :depoid";
 
 if ($urunid) {
     $sql_where .= " AND sh.urunid = :urunid";
@@ -49,7 +49,7 @@ if ($urunid) {
 }
 
 if ($hareket_tipi) {
-    $sql_where .= " AND sh.hareket_tipi = :hareket_tipi";
+    $sql_where .= " AND sh.islemtipi = :hareket_tipi";
     $params['hareket_tipi'] = $hareket_tipi;
 }
 
@@ -83,8 +83,6 @@ switch ($sira) {
 }
 
 // Stok hareketleri verilerini al
-$sql_where = "ur.depoid = :depoid"; // sh.depoid yerine ur.depoid kullanılıyor
-
 $sql = "SELECT sh.*, sh.islemtipi as hareket_tipi, u.firstname, u.lastname, ur.name as urun_adi
         FROM {block_depo_yonetimi_stok_hareketleri} sh
         JOIN {user} u ON u.id = sh.userid
@@ -185,13 +183,13 @@ echo $OUTPUT->header();
                     <!-- Tarih Filtreleme -->
                     <div class="col-md-2">
                         <label for="tarih-baslangic" class="form-label">Başlangıç Tarihi</label>
-                        <input type="date" id="tarih-baslangic" name="tarih_baslangic" class="form-control"
+                        <input type="date" id="tarih-baslangic" class="form-control"
                                value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
                     </div>
 
                     <div class="col-md-2">
                         <label for="tarih-bitis" class="form-label">Bitiş Tarihi</label>
-                        <input type="date" id="tarih-bitis" name="tarih_bitis" class="form-control"
+                        <input type="date" id="tarih-bitis" class="form-control"
                                value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
                     </div>
 
@@ -310,17 +308,23 @@ echo $OUTPUT->header();
                 const bitisInput = document.getElementById('tarih-bitis');
 
                 if (baslangicInput.value) {
-                    const baslangicDate = new Date(baslangicInput.value);
-                    baslangicInput.name = 'tarih_baslangic';
-                    baslangicInput.value = Math.floor(baslangicDate.getTime() / 1000);
+                    const baslangicDate = new Date(baslangicInput.value + 'T00:00:00');
+                    const baslangicTimestamp = Math.floor(baslangicDate.getTime() / 1000);
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'tarih_baslangic';
+                    hiddenInput.value = baslangicTimestamp;
+                    this.appendChild(hiddenInput);
                 }
 
                 if (bitisInput.value) {
-                    const bitisDate = new Date(bitisInput.value);
-                    // Günün sonunu al (23:59:59)
-                    bitisDate.setHours(23, 59, 59);
-                    bitisInput.name = 'tarih_bitis';
-                    bitisInput.value = Math.floor(bitisDate.getTime() / 1000);
+                    const bitisDate = new Date(bitisInput.value + 'T23:59:59');
+                    const bitisTimestamp = Math.floor(bitisDate.getTime() / 1000);
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'tarih_bitis';
+                    hiddenInput.value = bitisTimestamp;
+                    this.appendChild(hiddenInput);
                 }
             });
 
@@ -351,15 +355,8 @@ echo $OUTPUT->header();
         });
 
         // Renk kodlarını al
-        /**
-         * Renk adına göre hex kodunu döndürür
-         *
-         * @param string $colorName Renk adı
-         * @return string Renk hex kodu
-         */
-        // Şu satırı bulun (yaklaşık 313. satırda):
         function getColorHex(colorName) {
-            const colorMap = {  // Düzeltilmiş kısım
+            const colorMap = {
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
                 'siyah': '#212529',
