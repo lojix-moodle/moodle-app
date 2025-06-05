@@ -118,165 +118,191 @@ foreach ($hareketler as $hareket) {
 echo $OUTPUT->header();
 ?>
 
-    <style>
-        /* Genel stil ayarları */
+<style>
+    /* Genel stil ayarları */
+    .stok-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        transition: all 0.25s ease;
+        margin-bottom: 24px;
+    }
+    .stok-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    }
+    .stok-card .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+        background: linear-gradient(to right, #f8f9fa, #ffffff);
+        border-radius: 12px 12px 0 0;
+        padding: 16px 20px;
+    }
+    .stok-card .card-title {
+        font-weight: 600;
+        color: #3e64ff;
+    }
+    .stok-card .card-body {
+        padding: 20px;
+    }
+
+    /* Özet kartları */
+    .summary-card {
+        border-left: 4px solid;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+    .summary-card:hover {
+        transform: translateY(-2px);
+    }
+    .summary-card .counter {
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+    .summary-card .counter-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .summary-card .icon-container {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    /* Tablo stilleri */
+    .table-hover tbody tr:hover {
+        background-color: rgba(62, 100, 255, 0.04);
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+    .badge-giris {
+        background-color: #28a745;
+        color: #fff;
+    }
+    .badge-cikis {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    .pulse-animation {
+        animation: pulse 1.5s infinite;
+    }
+
+    /* Renk işaretleyici */
+    .color-badge {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        margin-right: 5px;
+    }
+
+    /* Form elemanları */
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 8px 12px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3e64ff;
+        box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.25);
+    }
+    .filter-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    /* Animasyonlar */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.9; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .recent-row {
+        border-left: 3px solid #3e64ff;
+    }
+
+    /* Responsive ayarlar */
+    @media (max-width: 768px) {
+        .summary-cards .col-md-3 {
+            margin-bottom: 15px;
+        }
         .stok-card {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: all 0.2s;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        .stok-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        }
-        .stok-card .card-header {
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            background: linear-gradient(to right, #f8f9fa, #ffffff);
-            border-radius: 8px 8px 0 0;
-            padding: 15px 20px;
-        }
-        .stok-card .card-title {
-            font-weight: 600;
-            color: #3e64ff;
-        }
-        .stok-card .card-body {
-            padding: 20px;
-        }
+    }
 
-        /* Özet kartları */
-        .summary-card {
-            border-left: 4px solid;
-            border-radius: 5px;
-            transition: all 0.2s;
-        }
-        .summary-card:hover {
-            transform: translateY(-2px);
-        }
-        .summary-card .counter {
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-        .summary-card .counter-label {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-        .summary-card .icon-container {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
+    /* Loading Overlay */
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(2px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
 
-        /* Tablo stilleri */
-        .table-hover tbody tr:hover {
-            background-color: rgba(62, 100, 255, 0.04);
-        }
-        .table th {
-            border-top: none;
-            font-weight: 600;
-        }
-        .badge-giris {
-            background-color: #28a745;
-            color: #fff;
-        }
-        .badge-cikis {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .pulse-animation {
-            animation: pulse 1.5s infinite;
-        }
+    /* Varyasyon grafikler için stiller */
+    .varyasyon-grafik-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .varyasyon-grafik-card:hover {
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12) !important;
+        transform: translateY(-4px);
+    }
+    .varyasyon-grafik-card .card-header {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        border-radius: 10px 10px 0 0;
+        background: linear-gradient(to right, rgba(248,249,250,0.8), rgba(255,255,255,0.8));
+    }
+    .varyasyon-grafik-card .card-body {
+        border-radius: 0 0 10px 10px;
+        padding: 8px;
+        background-color: rgba(255,255,255,0.85);
+    }
 
-        /* Renk işaretleyici */
-        .color-badge {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-            margin-right: 5px;
-        }
+    /* Tooltip ve chart stilleri */
+    .chartjs-tooltip {
+        opacity: 0;
+        position: absolute;
+        background: rgba(33, 37, 41, 0.9);
+        color: white;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        transform: translate(-50%, 0);
+        padding: 10px;
+    }
+</style>
 
-        /* Form elemanları */
-        .form-control, .form-select {
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-            padding: 8px 12px;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #3e64ff;
-            box-shadow: 0 0 0 0.25rem rgba(62, 100, 255, 0.25);
-        }
-        .filter-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        /* Animasyonlar */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.9; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .recent-row {
-            border-left: 3px solid #3e64ff;
-        }
-
-        /* Responsive ayarlar */
-        @media (max-width: 768px) {
-            .summary-cards .col-md-3 {
-                margin-bottom: 15px;
-            }
-        }
-
-        /* Loading Overlay */
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        /* Varyasyon grafikler için stiller */
-        .varyasyon-grafik-card {
-            transition: all 0.2s;
-            border: 1px solid rgba(0,0,0,0.08);
-        }
-        .varyasyon-grafik-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .varyasyon-grafik-card .card-header {
-            padding: 8px 12px;
-            font-size: 0.9rem;
-        }
-    </style>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay">
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-            </div>
-            <div class="mt-2">Veriler yükleniyor...</div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
         </div>
+        <div class="mt-2">Veriler yükleniyor...</div>
     </div>
+</div>
 
-    <div class="container-fluid p-0">
+<div class="container-fluid p-0">
     <!-- Üst Başlık ve Geri Dönüş Butonu -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <div>
             <h3 class="mb-0"><?php echo $baslik; ?></h3>
             <p class="text-muted mb-0">
-                <i class="fas fa-warehouse me-1"></i> <?php echo htmlspecialchars($depo->name); ?>
+                <?php echo $depo->name; ?> deposu için stok hareketleri ve grafikleri
             </p>
         </div>
         <div class="d-flex gap-2">
@@ -284,8 +310,8 @@ echo $OUTPUT->header();
                 <i class="fas fa-arrow-left me-1"></i> Depoya Dön
             </a>
             <?php if ($urunid): ?>
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus me-1"></i> Stok Hareketi Ekle
+                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid]); ?>" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-layer-group me-1"></i> Tüm Hareketler
                 </a>
             <?php endif; ?>
         </div>
@@ -296,64 +322,60 @@ echo $OUTPUT->header();
         <div class="col-md-3">
             <div class="card summary-card border-0" style="border-left-color: #28a745!important;">
                 <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="counter text-success"><?php echo $giris_sayisi; ?></div>
-                            <div class="counter-label">Stok Girişi</div>
+                    <div class="d-flex align-items-center">
+                        <div class="icon-container bg-success bg-opacity-10 me-3">
+                            <i class="fas fa-arrow-up text-success"></i>
                         </div>
-                        <div class="icon-container bg-success bg-opacity-10">
-                            <i class="fas fa-sign-in-alt fa-lg text-success"></i>
+                        <div>
+                            <div class="counter"><?php echo $giris_sayisi; ?></div>
+                            <div class="counter-label">Toplam Giriş İşlemi</div>
                         </div>
                     </div>
-                    <div class="text-muted mt-2 small">Toplam: <?php echo $toplam_giris_miktari; ?> adet</div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card summary-card border-0" style="border-left-color: #dc3545!important;">
                 <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="counter text-danger"><?php echo $cikis_sayisi; ?></div>
-                            <div class="counter-label">Stok Çıkışı</div>
+                    <div class="d-flex align-items-center">
+                        <div class="icon-container bg-danger bg-opacity-10 me-3">
+                            <i class="fas fa-arrow-down text-danger"></i>
                         </div>
-                        <div class="icon-container bg-danger bg-opacity-10">
-                            <i class="fas fa-sign-out-alt fa-lg text-danger"></i>
+                        <div>
+                            <div class="counter"><?php echo $cikis_sayisi; ?></div>
+                            <div class="counter-label">Toplam Çıkış İşlemi</div>
                         </div>
                     </div>
-                    <div class="text-muted mt-2 small">Toplam: <?php echo $toplam_cikis_miktari; ?> adet</div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card summary-card border-0" style="border-left-color: #0d6efd!important;">
                 <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="counter text-primary"><?php echo count($hareketler); ?></div>
-                            <div class="counter-label">Toplam İşlem</div>
+                    <div class="d-flex align-items-center">
+                        <div class="icon-container bg-primary bg-opacity-10 me-3">
+                            <i class="fas fa-box text-primary"></i>
                         </div>
-                        <div class="icon-container bg-primary bg-opacity-10">
-                            <i class="fas fa-exchange-alt fa-lg text-primary"></i>
+                        <div>
+                            <div class="counter"><?php echo ($toplam_giris_miktari - $toplam_cikis_miktari); ?></div>
+                            <div class="counter-label">Net Stok Değişimi</div>
                         </div>
                     </div>
-                    <div class="text-muted mt-2 small">Son işlem: <?php echo !empty($hareketler) ? date('d.m.Y H:i', array_values($hareketler)[0]->tarih) : '-'; ?></div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card summary-card border-0" style="border-left-color: #ffc107!important;">
                 <div class="card-body p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="counter text-warning"><?php echo $son_24_saat; ?></div>
-                            <div class="counter-label">Son 24 Saat</div>
+                    <div class="d-flex align-items-center">
+                        <div class="icon-container bg-warning bg-opacity-10 me-3">
+                            <i class="fas fa-clock text-warning"></i>
                         </div>
-                        <div class="icon-container bg-warning bg-opacity-10">
-                            <i class="fas fa-clock fa-lg text-warning"></i>
+                        <div>
+                            <div class="counter"><?php echo $son_24_saat; ?></div>
+                            <div class="counter-label">Son 24 Saat İçinde</div>
                         </div>
                     </div>
-                    <div class="text-muted mt-2 small">Günlük ortalama: <?php echo count($hareketler) > 0 ? round(count($hareketler) / 30, 1) : 0; ?> işlem</div>
                 </div>
             </div>
         </div>
@@ -363,12 +385,13 @@ echo $OUTPUT->header();
     <div class="card stok-card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">
-                <i class="fas fa-chart-line me-2"></i>Genel Stok Grafiği
+                <i class="fas fa-chart-area me-2"></i>
+                <?php echo $urunid ? 'Stok Seviyesi Grafiği' : 'Stok Hareketleri Grafiği'; ?>
             </h5>
             <div>
                 <div class="btn-group btn-group-sm" role="group">
-                    <button id="haftalikGrafik" type="button" class="btn btn-outline-primary">Son 7 Gün</button>
-                    <button id="aylikGrafik" type="button" class="btn btn-outline-primary active">Son 30 Gün</button>
+                    <button id="haftalikGrafik" type="button" class="btn btn-outline-primary">7 Gün</button>
+                    <button id="aylikGrafik" type="button" class="btn btn-outline-primary active">30 Gün</button>
                 </div>
             </div>
         </div>
@@ -378,117 +401,149 @@ echo $OUTPUT->header();
     </div>
 
     <!-- Varyasyon Bazlı Mini Grafikler -->
-<?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
-    <div class="card stok-card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-chart-area me-2"></i>Varyasyon Bazlı Stok Grafikleri
-            </h5>
-            <div>
-                <div class="btn-group btn-group-sm" role="group">
-                    <button id="haftalikVaryasyonGrafik" type="button" class="btn btn-outline-primary">Son 7 Gün</button>
-                    <button id="aylikVaryasyonGrafik" type="button" class="btn btn-outline-primary active">Son 30 Gün</button>
+    <?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
+        <div class="card stok-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Varyasyon Bazlı Stok Grafikleri
+                </h5>
+                <div>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button id="haftalikVaryasyonGrafik" type="button" class="btn btn-outline-primary">7 Gün</button>
+                        <button id="aylikVaryasyonGrafik" type="button" class="btn btn-outline-primary active">30 Gün</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body py-4">
+                <div class="row g-3" id="varyasyonGrafikContainer">
+                    <?php
+                    $varyasyonlar = json_decode($urun->varyasyonlar, true);
+                    if (is_array($varyasyonlar)) {
+                        $index = 0;
+                        foreach ($varyasyonlar as $varyasyon) {
+                            if (!empty($varyasyon['renk']) || !empty($varyasyon['beden'])) {
+                                $renk = isset($varyasyon['renk']) ? $varyasyon['renk'] : '';
+                                $beden = isset($varyasyon['beden']) ? $varyasyon['beden'] : '';
+                                $stok = isset($varyasyon['stok']) ? $varyasyon['stok'] : 0;
+                                $canvasId = 'varyasyonGrafik_' . $index;
+                                $title = '';
+
+                                if (!empty($renk)) {
+                                    $title .= ucfirst($renk);
+                                    if (!empty($beden)) $title .= ' / ';
+                                }
+                                if (!empty($beden)) {
+                                    $title .= $beden;
+                                }
+                                ?>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="card varyasyon-grafik-card shadow-sm mb-0">
+                                        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <?php if (!empty($renk)): ?>
+                                                <span class="badge me-1" style="background-color: <?php echo getColorHex($renk); ?>">&nbsp;</span>
+                                            <?php endif; ?>
+                                            <?php echo $title; ?>
+                                        </span>
+                                            <span class="badge <?php echo $stok > 0 ? 'bg-success' : 'bg-danger'; ?>">
+                                            <?php echo $stok; ?> adet
+                                        </span>
+                                        </div>
+                                        <div class="card-body p-2">
+                                            <canvas id="<?php echo $canvasId; ?>" class="varyasyon-grafik" data-renk="<?php echo $renk; ?>" data-beden="<?php echo $beden; ?>" height="120"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php
+                                $index++;
+                            }
+                        }
+                    }
+                    ?>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row" id="varyasyonGrafikContainer">
-                <?php
-                $varyasyonlar = json_decode($urun->varyasyonlar, true);
-                if ($varyasyonlar) {
-                    $index = 0;
-                    foreach ($varyasyonlar as $renk => $bedenler) {
-                        foreach ($bedenler as $beden => $miktar) {
-                            $canvasId = 'varyasyonGrafik_' . $index;
-                            ?>
-                            <div class="col-md-3 mb-4">
-                                <div class="card varyasyon-grafik-card h-100">
-                                    <div class="card-header bg-light d-flex justify-content-between">
-                                        <div>
-                                            <span class="badge me-1" style="background-color: <?php echo getColorHex($renk); ?>">&nbsp;</span>
-                                            <?php echo htmlspecialchars($renk . ' / ' . $beden); ?>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-primary"><?php echo $miktar; ?></span>
-                                        </div>
-                                    </div>
-                                    <div class="card-body p-2">
-                                        <canvas id="<?php echo $canvasId; ?>" class="varyasyon-grafik" data-renk="<?php echo htmlspecialchars($renk); ?>" data-beden="<?php echo htmlspecialchars($beden); ?>" height="100"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php
-                            $index++;
-                        }
-                    }
-                }
-                ?>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
+    <?php endif; ?>
 
     <!-- Varyasyon Stokları -->
-<?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
-    <div class="card stok-card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-layer-group me-2"></i>Varyasyon Stok Durumu
-            </h5>
-            <span class="badge bg-light text-dark border">
-                    Toplam: <strong><?php echo $urun->adet; ?></strong> adet
-                </span>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Renk</th>
-                        <th>Beden</th>
-                        <th>Stok</th>
-                        <th>İşlemler</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    if ($varyasyonlar) {
-                        foreach ($varyasyonlar as $renk => $bedenler) {
-                            foreach ($bedenler as $beden => $miktar) {
-                                ?>
-                                <tr>
-                                    <td>
-                                        <span class="color-badge" style="background-color: <?php echo getColorHex($renk); ?>;"></span>
-                                        <?php echo htmlspecialchars($renk); ?>
-                                    </td>
-                                    <td><?php echo htmlspecialchars($beden); ?></td>
-                                    <td><strong><?php echo $miktar; ?></strong> adet</td>
-                                    <td>
-                                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', ['depoid' => $depoid, 'urunid' => $urunid, 'renk' => $renk, 'beden' => $beden]); ?>" class="btn btn-sm btn-outline-success me-1">
-                                            <i class="fas fa-plus-circle"></i> Giriş
-                                        </a>
-                                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', ['depoid' => $depoid, 'urunid' => $urunid, 'renk' => $renk, 'beden' => $beden, 'tip' => 'cikis']); ?>" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-minus-circle"></i> Çıkış
-                                        </a>
-                                    </td>
-                                </tr>
-                                <?php
-                            }
-                        }
-                    } else {
-                        ?>
+    <?php if ($urun && !empty($urun->varyasyonlar) && $urun->varyasyonlar !== '0'): ?>
+        <div class="card stok-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tags me-2"></i>Varyasyon Stokları
+                </h5>
+                <span class="badge bg-light text-dark border">
+                Toplam <?php echo $urun->adet; ?> adet
+            </span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
                         <tr>
-                            <td colspan="4" class="text-center py-3">Ürün varyasyonu bulunamadı</td>
+                            <th>Renk</th>
+                            <th>Beden</th>
+                            <th>Stok Durumu</th>
+                            <th>İşlemler</th>
                         </tr>
+                        </thead>
+                        <tbody>
                         <?php
-                    }
-                    ?>
-                    </tbody>
-                </table>
+                        $varyasyonlar = json_decode($urun->varyasyonlar, true);
+                        if (is_array($varyasyonlar) && count($varyasyonlar) > 0) {
+                            foreach ($varyasyonlar as $varyasyon) {
+                                if (!empty($varyasyon['renk']) || !empty($varyasyon['beden'])) {
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <?php if (!empty($varyasyon['renk'])): ?>
+                                                <span class="badge me-1" style="background-color: <?php echo getColorHex($varyasyon['renk']); ?>">&nbsp;</span>
+                                                <?php echo ucfirst($varyasyon['renk']); ?>
+                                            <?php else: ?>
+                                                -
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo !empty($varyasyon['beden']) ? $varyasyon['beden'] : '-'; ?>
+                                        </td>
+                                        <td>
+                                            <span class="badge <?php echo $varyasyon['stok'] > 0 ? 'bg-success' : 'bg-danger'; ?>">
+                                                <?php echo $varyasyon['stok']; ?> adet
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
+                                                'depoid' => $depoid,
+                                                'urunid' => $urunid,
+                                                'renk' => $varyasyon['renk'] ?? '',
+                                                'beden' => $varyasyon['beden'] ?? ''
+                                            ]); ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-exchange-alt me-1"></i> İşlem Yap
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            }
+                        } else {
+                            ?>
+                            <tr>
+                                <td colspan="4" class="text-center py-3">
+                                    <div class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Bu ürüne ait varyasyon tanımlanmamış.
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-<?php endif; ?>
+    <?php endif; ?>
 
     <!-- Filtreleme Formu -->
     <div class="card stok-card filter-card mb-4">
@@ -500,15 +555,17 @@ echo $OUTPUT->header();
                 <?php endif; ?>
 
                 <div class="col-md-3">
-                    <label for="tarih_baslangic" class="form-label small text-muted">Başlangıç Tarihi</label>
-                    <input type="date" class="form-control" id="tarih_baslangic" name="tarih_baslangic" value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
+                    <label for="tarih_baslangic" class="form-label">Başlangıç Tarihi</label>
+                    <input type="date" class="form-control" id="tarih_baslangic" name="tarih_baslangic"
+                           value="<?php echo $tarih_baslangic ? date('Y-m-d', $tarih_baslangic) : ''; ?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="tarih_bitis" class="form-label small text-muted">Bitiş Tarihi</label>
-                    <input type="date" class="form-control" id="tarih_bitis" name="tarih_bitis" value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
+                    <label for="tarih_bitis" class="form-label">Bitiş Tarihi</label>
+                    <input type="date" class="form-control" id="tarih_bitis" name="tarih_bitis"
+                           value="<?php echo $tarih_bitis ? date('Y-m-d', $tarih_bitis) : ''; ?>">
                 </div>
                 <div class="col-md-2">
-                    <label for="hareket_tipi" class="form-label small text-muted">İşlem Tipi</label>
+                    <label for="hareket_tipi" class="form-label">Hareket Tipi</label>
                     <select class="form-select" id="hareket_tipi" name="hareket_tipi">
                         <option value="">Tümü</option>
                         <option value="giris" <?php echo $hareket_tipi === 'giris' ? 'selected' : ''; ?>>Giriş</option>
@@ -516,18 +573,27 @@ echo $OUTPUT->header();
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label for="sira" class="form-label small text-muted">Sıralama</label>
+                    <label for="sira" class="form-label">Sıralama</label>
                     <select class="form-select" id="sira" name="sira">
-                        <option value="tarih_desc" <?php echo $sira === 'tarih_desc' ? 'selected' : ''; ?>>Tarihe Göre (Yeni-Eski)</option>
-                        <option value="tarih_asc" <?php echo $sira === 'tarih_asc' ? 'selected' : ''; ?>>Tarihe Göre (Eski-Yeni)</option>
-                        <option value="miktar_desc" <?php echo $sira === 'miktar_desc' ? 'selected' : ''; ?>>Miktara Göre (Azalan)</option>
-                        <option value="miktar_asc" <?php echo $sira === 'miktar_asc' ? 'selected' : ''; ?>>Miktara Göre (Artan)</option>
+                        <option value="tarih_desc" <?php echo $sira === 'tarih_desc' ? 'selected' : ''; ?>>Tarih (Son-İlk)</option>
+                        <option value="tarih_asc" <?php echo $sira === 'tarih_asc' ? 'selected' : ''; ?>>Tarih (İlk-Son)</option>
+                        <option value="miktar_desc" <?php echo $sira === 'miktar_desc' ? 'selected' : ''; ?>>Miktar (Çok-Az)</option>
+                        <option value="miktar_asc" <?php echo $sira === 'miktar_asc' ? 'selected' : ''; ?>>Miktar (Az-Çok)</option>
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
+                    <?php if ($urunid): ?>
+                        <input type="hidden" name="urunid" value="<?php echo $urunid; ?>">
+                    <?php endif; ?>
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter me-1"></i> Filtrele
+                        <i class="fas fa-filter me-1"></i>Filtrele
                     </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $urunid]); ?>" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-sync-alt me-1"></i>Sıfırla
+                    </a>
                 </div>
             </form>
         </div>
@@ -535,101 +601,113 @@ echo $OUTPUT->header();
 
     <!-- Stok Hareketleri Tablosu -->
     <div class="card stok-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">
-            <i class="fas fa-history me-2"></i>Stok Hareketleri
-        </h5>
-        <?php if (count($hareketler) > 0): ?>
-            <span class="badge bg-light text-dark border">
-                    Toplam: <?php echo count($hareketler); ?> kayıt
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-history me-2"></i>Stok Hareketleri
+            </h5>
+            <?php if (count($hareketler) > 0): ?>
+                <span class="badge bg-light text-dark border">
+                    Toplam <?php echo count($hareketler); ?> kayıt
                 </span>
-        <?php endif; ?>
-    </div>
+            <?php endif; ?>
+        </div>
 
-    <div class="card-body p-0">
-    <div class="table-responsive">
-    <table class="table table-hover mb-0">
-    <thead class="table-light">
-    <tr>
-        <th>Tarih</th>
-        <th><?php if (!$urunid): ?>Ürün<?php endif; ?></th>
-        <th>İşlem</th>
-        <th>Miktar</th>
-        <th>Varyasyon</th>
-        <th>İşlemi Yapan</th>
-        <th>Açıklama</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if (empty($hareketler)): ?>
-        <tr>
-            <td colspan="<?php echo $urunid ? '6' : '7'; ?>" class="text-center py-4">
-                <div class="text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Kayıtlı stok hareketi bulunamadı.
-                </div>
-            </td>
-        </tr>
-    <?php else: ?>
-        <?php foreach ($hareketler as $hareket): ?>
-            <tr class="<?php echo ($simdi - $hareket->tarih <= 86400) ? 'recent-row' : ''; ?>">
-                <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
-                <?php if (!$urunid): ?>
-                    <td>
-                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $hareket->urunid]); ?>">
-                            <?php echo htmlspecialchars($hareket->urun_adi); ?>
-                        </a>
-                    </td>
-                <?php endif; ?>
-                <td>
-                    <?php if ($hareket->hareket_tipi === 'giris'): ?>
-                        <span class="badge bg-success">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Tarih</th>
+                        <?php if (!$urunid): ?>
+                            <th>Ürün</th>
+                        <?php endif; ?>
+                        <th>İşlem</th>
+                        <th>Miktar</th>
+                        <th>Varyasyon</th>
+                        <th>İşlemi Yapan</th>
+                        <th>Açıklama</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php if (empty($hareketler)): ?>
+                        <tr>
+                            <td colspan="<?php echo $urunid ? '6' : '7'; ?>" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Kayıtlı stok hareketi bulunamadı.
+                                </div>
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($hareketler as $hareket): ?>
+                            <tr class="<?php echo ($simdi - $hareket->tarih <= 86400) ? 'recent-row' : ''; ?>">
+                                <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
+                                <?php if (!$urunid): ?>
+                                    <td>
+                                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $hareket->urunid]); ?>">
+                                            <?php echo htmlspecialchars($hareket->urun_adi); ?>
+                                        </a>
+                                    </td>
+                                <?php endif; ?>
+                                <td>
+                                    <?php if ($hareket->hareket_tipi === 'giris'): ?>
+                                        <span class="badge bg-success">
                                         <i class="fas fa-arrow-up me-1"></i> Giriş
                                     </span>
-                    <?php else: ?>
-                        <span class="badge bg-danger">
+                                    <?php else: ?>
+                                        <span class="badge bg-danger">
                                         <i class="fas fa-arrow-down me-1"></i> Çıkış
                                     </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo $hareket->miktar; ?></td>
+                                <td>
+                                    <?php
+                                    if (!empty($hareket->renk) || !empty($hareket->beden)) {
+                                        $varyasyon_detay = [];
+
+                                        if (!empty($hareket->renk)) {
+                                            $renk = $hareket->renk;
+                                            if (strpos($renk, '[') === 0) {
+                                                $renk = trim(str_replace(['"', "'", '[', ']'], '', $renk));
+                                            }
+                                            echo '<span class="color-badge" style="background-color: '.getColorHex($renk).';"></span>';
+                                            $varyasyon_detay[] = ucfirst($renk);
+                                        }
+
+                                        if (!empty($hareket->beden)) {
+                                            $beden = $hareket->beden;
+                                            if (strpos($beden, '[') === 0) {
+                                                $beden = trim(str_replace(['"', "'", '[', ']'], '', $beden));
+                                            }
+                                            $varyasyon_detay[] = $beden;
+                                        }
+
+                                        echo implode(' / ', $varyasyon_detay);
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($hareket->firstname . ' ' . $hareket->lastname); ?></td>
+                                <td>
+                                    <?php
+                                    if (!empty($hareket->aciklama)) {
+                                        echo htmlspecialchars($hareket->aciklama);
+                                    } else {
+                                        echo '<span class="text-muted">-</span>';
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     <?php endif; ?>
-                </td>
-                <td><?php echo $hareket->miktar; ?></td>
-                <td>
-                    <?php
-                    if (!empty($hareket->renk) || !empty($hareket->beden)) {
-                        if (!empty($hareket->renk)) {
-                            echo '<span class="color-badge" style="background-color: '.getColorHex($hareket->renk).';"></span>';
-                            echo htmlspecialchars($hareket->renk);
-                        }
-                        if (!empty($hareket->renk) && !empty($hareket->beden)) {
-                            echo ' / ';
-                        }
-                        if (!empty($hareket->beden)) {
-                            echo htmlspecialchars($hareket->beden);
-                        }
-                    } else {
-                        echo '-';
-                    }
-                    ?>
-                </td>
-                <td><?php echo htmlspecialchars($hareket->firstname . ' ' . $hareket->lastname); ?></td>
-                <td>
-                    <?php
-                    if (!empty($hareket->aciklama)) {
-                        echo nl2br(htmlspecialchars($hareket->aciklama));
-                    } else {
-                        echo '<span class="text-muted">-</span>';
-                    }
-                    ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -652,25 +730,18 @@ echo $OUTPUT->header();
             <?php endif; ?>
 
             fetch(url.toString())
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Ağ yanıtı başarısız oldu');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    console.log('Grafik verileri yüklendi:', data);
                     grafikCiz(data);
+                    document.getElementById('loadingOverlay').style.display = 'none';
                 })
                 .catch(error => {
+                    console.error('Grafik verisi alınırken hata oluştu:', error);
                     document.getElementById('loadingOverlay').style.display = 'none';
-                    console.error('Veri yükleme hatası:', error);
-                    alert('Grafik verileri yüklenirken bir hata oluştu: ' + error.message);
                 });
         }
 
-        // Grafik çizme fonksiyonu - profesyonel stil
+        // Grafik çizme fonksiyonu - tamamen yenilenmiş profesyonel stil
         function grafikCiz(data) {
             const ctx = document.getElementById('stokHareketleriGrafigi').getContext('2d');
 
@@ -683,18 +754,18 @@ echo $OUTPUT->header();
                 return;
             }
 
-            // Gradient arka plan oluştur
+            // Sofistike gradient arka planlar
             const gradientBlue = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientBlue.addColorStop(0, 'rgba(65, 105, 225, 0.6)');
-            gradientBlue.addColorStop(1, 'rgba(65, 105, 225, 0.1)');
+            gradientBlue.addColorStop(0, 'rgba(53, 97, 235, 0.4)');
+            gradientBlue.addColorStop(1, 'rgba(53, 97, 235, 0.02)');
 
             const gradientGreen = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientGreen.addColorStop(0, 'rgba(40, 167, 69, 0.5)');
-            gradientGreen.addColorStop(1, 'rgba(40, 167, 69, 0.1)');
+            gradientGreen.addColorStop(0, 'rgba(34, 183, 121, 0.4)');
+            gradientGreen.addColorStop(1, 'rgba(34, 183, 121, 0.02)');
 
             const gradientRed = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientRed.addColorStop(0, 'rgba(220, 53, 69, 0.5)');
-            gradientRed.addColorStop(1, 'rgba(220, 53, 69, 0.1)');
+            gradientRed.addColorStop(0, 'rgba(213, 54, 80, 0.4)');
+            gradientRed.addColorStop(1, 'rgba(213, 54, 80, 0.02)');
 
             // Grafik verilerini hazırla
             const datasets = [];
@@ -705,11 +776,17 @@ echo $OUTPUT->header();
                     label: 'Stok Seviyesi',
                     data: data.stokSeviyesi,
                     backgroundColor: gradientBlue,
-                    borderColor: 'rgba(65, 105, 225, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    pointRadius: 2,
-                    pointHoverRadius: 6,
+                    borderColor: 'rgba(53, 97, 235, 0.85)',
+                    borderWidth: 2.5,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: 'rgba(53, 97, 235, 1)',
+                    pointBorderWidth: 2,
+                    pointHoverBackgroundColor: 'rgba(53, 97, 235, 1)',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 2,
                     fill: true,
                     cubicInterpolationMode: 'monotone'
                 });
@@ -718,26 +795,45 @@ echo $OUTPUT->header();
             else if (data.girisler && data.cikislar) {
                 datasets.push(
                     {
-                        label: 'Giriş',
+                        label: 'Giriş İşlemleri',
                         data: data.girisler,
                         backgroundColor: gradientGreen,
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        pointRadius: 3
+                        borderColor: 'rgba(34, 183, 121, 0.85)',
+                        borderWidth: 2.5,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: 'rgba(34, 183, 121, 1)',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'rgba(34, 183, 121, 1)',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2,
+                        fill: true,
+                        cubicInterpolationMode: 'monotone'
                     },
                     {
-                        label: 'Çıkış',
+                        label: 'Çıkış İşlemleri',
                         data: data.cikislar,
                         backgroundColor: gradientRed,
-                        borderColor: 'rgba(220, 53, 69, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        pointRadius: 3
+                        borderColor: 'rgba(213, 54, 80, 0.85)',
+                        borderWidth: 2.5,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: 'rgba(213, 54, 80, 1)',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'rgba(213, 54, 80, 1)',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2,
+                        fill: true,
+                        cubicInterpolationMode: 'monotone'
                     }
                 );
             }
 
+            // Profesyonel Chart oluşturma
             stokChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -747,66 +843,105 @@ echo $OUTPUT->header();
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
+                        tooltip: {
+                            backgroundColor: 'rgba(33, 37, 41, 0.9)',
+                            titleFont: {
+                                size: 13,
+                                weight: 'bold',
+                                family: "'Segoe UI', Roboto, Arial, sans-serif"
+                            },
+                            bodyFont: {
+                                size: 12,
+                                family: "'Segoe UI', Roboto, Arial, sans-serif"
+                            },
+                            padding: 12,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            boxPadding: 4,
+                            usePointStyle: true,
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
                                 }
                             }
                         },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#333',
-                            borderColor: '#ddd',
-                            borderWidth: 1,
-                            padding: 10,
-                            cornerRadius: 6,
-                            usePointStyle: true
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15,
+                                font: {
+                                    family: "'Segoe UI', Roboto, Arial, sans-serif",
+                                    size: 12
+                                }
+                            }
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                color: '#666'
-                            },
+                        x: {
                             grid: {
-                                color: 'rgba(0,0,0,0.05)',
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.03)',
                                 drawBorder: false
                             },
-                            title: {
-                                display: true,
-                                text: 'Stok Miktarı',
-                                color: '#666'
+                            ticks: {
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', Roboto, Arial, sans-serif"
+                                },
+                                color: 'rgba(0, 0, 0, 0.6)'
                             }
                         },
-                        x: {
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                color: '#666'
-                            },
+                        y: {
+                            beginAtZero: true,
                             grid: {
-                                display: false,
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)',
                                 drawBorder: false
                             },
-                            title: {
-                                display: true,
-                                text: 'Tarih',
-                                color: '#666'
+                            ticks: {
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', Roboto, Arial, sans-serif"
+                                },
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                padding: 10
                             }
                         }
                     },
                     animation: {
                         duration: 1000,
-                        easing: 'easeOutQuart'
+                        easing: 'easeOutQuart',
+                        delay: (context) => {
+                            return context.raw * 10;
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round'
+                        },
+                        point: {
+                            hitRadius: 5,
+                            hoverRadius: 6
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 5,
+                            right: 5,
+                            left: 5,
+                            bottom: 5
+                        }
                     }
                 }
             });
@@ -851,7 +986,7 @@ echo $OUTPUT->header();
                         islemleriTamamla(index + 1);
                     })
                     .catch(error => {
-                        console.error(`Varyasyon grafik verisi yüklenirken hata: ${renk}/${beden}`, error);
+                        console.error('Varyasyon grafik verisi alınırken hata oluştu:', error);
                         islemleriTamamla(index + 1);
                     });
             };
@@ -859,6 +994,7 @@ echo $OUTPUT->header();
             islemleriTamamla(0);
         }
 
+        // Varyasyon grafiği çizme fonksiyonu - profesyonel stil
         function varyasyonGrafigiCiz(canvasId, data, renk, beden) {
             const ctx = document.getElementById(canvasId).getContext('2d');
 
@@ -866,71 +1002,90 @@ echo $OUTPUT->header();
                 varyasyonGrafikleri[canvasId].destroy();
             }
 
-            // Renk kodunu al ve gradient oluştur
+            // Renk kodunu al ve sophisticated gradient oluştur
             const renkHex = getColorHex(renk);
             const renkRgb = hexToRgb(renkHex);
 
+            // Ana renk ve tamamlayıcı renkler için daha zarif gradient
             const gradient = ctx.createLinearGradient(0, 0, 0, 120);
-            gradient.addColorStop(0, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.5)`);
-            gradient.addColorStop(1, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.1)`);
+            gradient.addColorStop(0, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.35)`);
+            gradient.addColorStop(1, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.03)`);
 
             varyasyonGrafikleri[canvasId] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: renk + '/' + beden,
+                        label: 'Stok',
                         data: data.stokSeviyesi,
                         backgroundColor: gradient,
-                        borderColor: renkHex,
+                        borderColor: `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.85)`,
                         borderWidth: 2,
-                        tension: 0.4,
+                        tension: 0.35,
+                        pointRadius: 2.5,
+                        pointHoverRadius: 4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.95)`,
+                        pointBorderWidth: 1.5,
                         fill: true,
-                        pointRadius: 0,
-                        pointHoverRadius: 4
+                        cubicInterpolationMode: 'monotone'
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#333',
-                            borderColor: '#ddd',
-                            borderWidth: 1,
-                            cornerRadius: 4,
-                            displayColors: false,
+                            backgroundColor: 'rgba(33, 37, 41, 0.9)',
+                            titleFont: {
+                                size: 12,
+                                weight: 'bold',
+                                family: "'Segoe UI', Roboto, Arial, sans-serif"
+                            },
+                            bodyFont: {
+                                size: 11,
+                                family: "'Segoe UI', Roboto, Arial, sans-serif"
+                            },
+                            padding: 10,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            boxWidth: 6,
+                            boxHeight: 6,
+                            usePointStyle: true,
                             callbacks: {
-                                title: function(tooltipItems) {
-                                    return tooltipItems[0].label;
+                                title: function(context) {
+                                    return context[0].label;
                                 },
                                 label: function(context) {
-                                    return `Stok: ${context.raw}`;
+                                    return `Stok: ${context.raw} adet`;
                                 }
                             }
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            display: false
-                        },
                         x: {
                             display: false
+                        },
+                        y: {
+                            display: false,
+                            beginAtZero: true
                         }
                     },
                     elements: {
                         line: {
-                            borderWidth: 2
+                            borderJoinStyle: 'round'
+                        },
+                        point: {
+                            hitRadius: 4,
+                            hoverRadius: 4
                         }
                     },
                     animation: {
-                        duration: 800
+                        duration: 800,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
