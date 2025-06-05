@@ -329,15 +329,32 @@ echo $OUTPUT->header();
                                             <?php endif; ?>
                                         </td>
                                         <td><strong><?php echo $hareket->miktar; ?></strong> adet</td>
+                                        // Yaklaşık 255. satırda:
                                         <td>
                                             <?php
                                             if (!empty($hareket->renk) || !empty($hareket->beden)) {
                                                 $varyasyon_detay = [];
+
+                                                // Renk JSON formatında gelebilir (["siyah"] gibi)
                                                 if (!empty($hareket->renk)) {
-                                                    echo '<span class="badge me-1" style="background-color: ' . getColorHex($hareket->renk) . '">&nbsp;</span>';
-                                                    $varyasyon_detay[] = $hareket->renk;
+                                                    $renk = $hareket->renk;
+                                                    if (strpos($renk, '[') === 0) {
+                                                        // JSON formatındaysa parse et
+                                                        $renk = trim(str_replace(['"', "'", '[', ']'], '', $renk));
+                                                    }
+                                                    echo '<span class="badge me-1" style="background-color: '.getColorHex($renk).'">&nbsp;</span>';
+                                                    $varyasyon_detay[] = $renk;
                                                 }
-                                                if (!empty($hareket->beden)) $varyasyon_detay[] = $hareket->beden;
+
+                                                // Beden JSON formatında gelebilir
+                                                if (!empty($hareket->beden)) {
+                                                    $beden = $hareket->beden;
+                                                    if (strpos($beden, '[') === 0) {
+                                                        $beden = trim(str_replace(['"', "'", '[', ']'], '', $beden));
+                                                    }
+                                                    $varyasyon_detay[] = $beden;
+                                                }
+
                                                 echo implode(' / ', $varyasyon_detay);
                                             } else {
                                                 echo '-';
@@ -409,8 +426,9 @@ echo $OUTPUT->header();
         });
 
         // Renk kodlarını al
-        function getColorHexJS(colorName) {
-            const colorMap = {
+        // Şu satırı bulun (yaklaşık 313. satırda):
+        function getColorHex(colorName) {
+            const colorMap = {  // Düzeltilmiş kısım
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
                 'siyah': '#212529',
