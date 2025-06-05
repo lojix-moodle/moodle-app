@@ -572,3 +572,87 @@ echo $OUTPUT->header();
                     </tbody>
                 </table>
             </div
+
+                <!-- JavaScript - Tarih filtrelerini ve tooltip işlemleri -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Tooltip'leri aktifleştir
+                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+                    // Tarih filtrelerini işle
+                    const tarihBaslangic = document.getElementById('tarih-baslangic');
+                    const tarihBitis = document.getElementById('tarih-bitis');
+                    const filterForm = document.getElementById('filterForm');
+
+                    filterForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        // Başlangıç tarihini unix timestamp'e dönüştür
+                        if (tarihBaslangic.value) {
+                            const baslangicDate = new Date(tarihBaslangic.value);
+                            const baslangicTimestamp = Math.floor(baslangicDate.getTime() / 1000);
+
+                            const hiddenBaslangic = document.createElement('input');
+                            hiddenBaslangic.type = 'hidden';
+                            hiddenBaslangic.name = 'tarih_baslangic';
+                            hiddenBaslangic.value = baslangicTimestamp;
+                            filterForm.appendChild(hiddenBaslangic);
+                        }
+
+                        // Bitiş tarihini unix timestamp'e dönüştür
+                        if (tarihBitis.value) {
+                            const bitisDate = new Date(tarihBitis.value);
+                            bitisDate.setHours(23, 59, 59); // Günün sonuna ayarla
+                            const bitisTimestamp = Math.floor(bitisDate.getTime() / 1000);
+
+                            const hiddenBitis = document.createElement('input');
+                            hiddenBitis.type = 'hidden';
+                            hiddenBitis.name = 'tarih_bitis';
+                            hiddenBitis.value = bitisTimestamp;
+                            filterForm.appendChild(hiddenBitis);
+                        }
+
+                        // Formu gönder
+                        filterForm.submit();
+                    });
+
+                    // Excel export işlemi
+                    const exportBtn = document.getElementById('exportBtn');
+                    if (exportBtn) {
+                        exportBtn.addEventListener('click', function() {
+                            const table = document.getElementById('stokHareketleriTable');
+                            const fileName = '<?php echo $baslik; ?> - Stok Hareketleri.xlsx';
+
+                            // TableExport kütüphanesi ile Excel export işlemi
+                            const exporter = new TableExport(table, {
+                                headers: true,
+                                footers: false,
+                                formats: ['xlsx'],
+                                filename: fileName,
+                                bootstrap: true,
+                                exportButtons: false,
+                                position: 'bottom',
+                                ignoreRows: null,
+                                ignoreCols: null,
+                                trimWhitespace: true,
+                                RTL: false,
+                                sheetname: 'Stok Hareketleri'
+                            });
+
+                            const exportData = exporter.getExportData()[table.id]['xlsx'];
+                            exporter.export2file(
+                                exportData.data,
+                                exportData.mimeType,
+                                exportData.filename,
+                                exportData.fileExtension
+                            );
+                        });
+                    }
+                });
+            </script>
+        </div> <!-- .container-fluid kapanış -->
+
+        <?php
+        echo $OUTPUT->footer();
+        ?>
