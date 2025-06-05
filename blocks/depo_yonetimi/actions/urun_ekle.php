@@ -65,6 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+    $raf = optional_param('raf', '', PARAM_TEXT);
+    $bolum = optional_param('bolum', '', PARAM_TEXT);
+
+    $ana_urun->raf = $raf;
+    $ana_urun->bolum = $bolum;
 
     // Ana ürünü ekle ve ID'sini al
     $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
@@ -412,6 +417,35 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen ürün adını girin.</div>
                             <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
+                        </div>
+
+                        <!-- Raf ve Bölüm Bilgileri -->
+                        <div class="row mb-4">
+                            <!-- Raf -->
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="raf" class="form-label">
+                                    <i class="fas fa-archive me-2 text-primary"></i>Raf
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+                                    <input type="text" class="form-control" id="raf" name="raf"
+                                           placeholder="Raf konumunu girin">
+                                </div>
+                                <div class="form-text">Ürünün bulunduğu rafı belirtin</div>
+                            </div>
+
+                            <!-- Bölüm -->
+                            <div class="col-md-6">
+                                <label for="bolum" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Bölüm
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-puzzle-piece"></i></span>
+                                    <input type="text" class="form-control" id="bolum" name="bolum"
+                                           placeholder="Bölüm bilgisini girin">
+                                </div>
+                                <div class="form-text">Ürünün bulunduğu bölümü belirtin</div>
+                            </div>
                         </div>
 
                         <!-- Minimum Stok Seviyesi -->

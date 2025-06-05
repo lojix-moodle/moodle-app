@@ -27,6 +27,8 @@
                 <FIELD NAME="colors" SEQUENCE="false" TYPE="char" NOTNULL="true" LENGTH="755" DEFAULT="0" COMMENT="Ürünrenkleri"/>
                 <FIELD NAME="sizes" SEQUENCE="false" TYPE="char" NOTNULL="true" LENGTH="255" DEFAULT="0" COMMENT="Ürünrenkleri"/>
                 <FIELD NAME="varyasyonlar" SEQUENCE="false" TYPE="char" NOTNULL="true" LENGTH="755" DEFAULT="0" COMMENT="Ürünvaryasyonları"/>
+                <FIELD NAME="raf" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Ürünün raf bilgisi"/>
+                <FIELD NAME="bolum" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Ürünün bulunduğu bölüm"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
