@@ -670,15 +670,33 @@ echo $OUTPUT->header();
             function grafikVerileriYukle() {
                 document.getElementById('loadingOverlay').style.display = 'flex';
 
-                // API'ye stok seviyesi için tip parametresi ekle
-                fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/stok_grafik_verileri.php?depoid=...')                    .then(response => response.json())
+                // Gerçek parametreleri URL'ye ekle
+                const url = new URL('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/stok_grafik_verileri.php');
+
+                // URL parametrelerini ekle
+                url.searchParams.append('depoid', <?php echo $depoid; ?>);
+                url.searchParams.append('gun', grafikSuresi);
+                <?php if ($urunid): ?>
+                url.searchParams.append('urunid', <?php echo $urunid; ?>);
+                url.searchParams.append('tip', 'stokseviye');
+                <?php endif; ?>
+
+                fetch(url.toString())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ağ yanıtı başarısız: ' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         document.getElementById('loadingOverlay').style.display = 'none';
+                        console.log('Grafik verileri yüklendi:', data); // Hata ayıklama
                         grafikCiz(data);
                     })
                     .catch(error => {
                         document.getElementById('loadingOverlay').style.display = 'none';
                         console.error('Veri yükleme hatası:', error);
+                        alert('Grafik verileri yüklenirken bir hata oluştu: ' + error.message);
                     });
             }
 
@@ -689,40 +707,67 @@ echo $OUTPUT->header();
                     stokChart.destroy();
                 }
 
-                // Stok seviyesi grafiği için veri yapısı
+                if (!data || !data.labels || data.labels.length === 0) {
+                    console.error('Grafik verileri boş veya hatalı format');
+                    return;
+                }
+
+                // Grafik verilerini hazırla
+                const datasets = [];
+
+                // Stok seviyesi grafiği
+                if (data.stokSeviyesi) {
+                    datasets.push({
+                        label: 'Stok Seviyesi',
+                        data: data.stokSeviyesi,
+                        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        fill: true,
+                        cubicInterpolationMode: 'monotone',
+                        pointBackgroundColor: function(context) {
+                            const index = context.dataIndex;
+                            const value = context.dataset.data[index];
+                            const previousValue = index > 0 ? context.dataset.data[index - 1] : value;
+                            return value >= previousValue ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
+                        },
+                        segment: {
+                            borderColor: function(context) {
+                                if (context.p1.parsed.y > context.p0.parsed.y) {
+                                    return 'rgba(40, 167, 69, 1)'; // Artışlar yeşil
+                                }
+                                return 'rgba(220, 53, 69, 1)';   // Azalışlar kırmızı
+                            }
+                        }
+                    });
+                }
+                // Giriş/çıkış hareketleri grafiği
+                else if (data.girisler && data.cikislar) {
+                    datasets.push(
+                        {
+                            label: 'Giriş',
+                            data: data.girisler,
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Çıkış',
+                            data: data.cikislar,
+                            backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            borderWidth: 2
+                        }
+                    );
+                }
+
                 stokChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'Stok Seviyesi',
-                                data: data.stokSeviyesi,
-                                backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                                borderColor: 'rgba(13, 110, 253, 1)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                pointRadius: 4,
-                                fill: true,
-                                cubicInterpolationMode: 'monotone',
-                                pointBackgroundColor: function(context) {
-                                    const index = context.dataIndex;
-                                    const value = context.dataset.data[index];
-                                    const previousValue = index > 0 ? context.dataset.data[index - 1] : value;
-
-                                    // Artış yeşil, azalış kırmızı
-                                    return value >= previousValue ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
-                                },
-                                segment: {
-                                    borderColor: function(context) {
-                                        if (context.p1.parsed.y > context.p0.parsed.y) {
-                                            return 'rgba(40, 167, 69, 1)'; // Artışlar yeşil
-                                        }
-                                        return 'rgba(220, 53, 69, 1)';   // Azalışlar kırmızı
-                                    }
-                                }
-                            }
-                        ]
+                        datasets: datasets
                     },
                     options: {
                         responsive: true,
@@ -732,12 +777,7 @@ echo $OUTPUT->header();
                             },
                             tooltip: {
                                 mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Stok: ' + context.raw + ' adet';
-                                    }
-                                }
+                                intersect: false
                             }
                         },
                         scales: {
@@ -748,7 +788,7 @@ echo $OUTPUT->header();
                                 },
                                 title: {
                                     display: true,
-                                    text: 'Stok Miktarı (adet)'
+                                    text: 'Miktar (adet)'
                                 }
                             },
                             x: {
@@ -762,12 +802,6 @@ echo $OUTPUT->header();
                             mode: 'nearest',
                             intersect: false,
                             axis: 'x'
-                        },
-                        elements: {
-                            point: {
-                                radius: 4,
-                                hoverRadius: 6
-                            }
                         }
                     }
                 });
