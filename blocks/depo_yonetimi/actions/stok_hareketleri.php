@@ -162,18 +162,18 @@ echo $OUTPUT->header();
     }
 
     .summary-card .counter {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 1.5rem; /* Daha önce 2rem idi, küçülttük */
+        font-weight: 600; /* 700'den 600'e düşürdük */
     }
 
     .icon-container {
-        width: 55px;
-        height: 55px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,.08);
     }
 
@@ -188,9 +188,9 @@ echo $OUTPUT->header();
     }
 
     .chart-container {
-        position: relative;
         height: 300px;
         width: 100%;
+        margin-bottom: 20px;
     }
 
     .loading-overlay {
@@ -367,6 +367,7 @@ echo $OUTPUT->header();
     </div>
 
     <!-- Filtreler -->
+    <!-- Filtreler -->
     <div class="card stok-card filter-card">
         <form method="get" action="" id="filterForm">
             <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
@@ -376,7 +377,7 @@ echo $OUTPUT->header();
 
             <div class="row g-3 align-items-end">
                 <!-- Tarih Aralığı -->
-                <div class="col-md-4">
+                <div class="col-md-3"> <!-- Genişliği azalttık -->
                     <div class="row">
                         <div class="col-md-6">
                             <label for="tarih-baslangic" class="form-label">Başlangıç Tarihi</label>
@@ -393,7 +394,7 @@ echo $OUTPUT->header();
                     </div>
                 </div>
 
-                <!-- İşlem Tipi -->
+                <!-- İşlem Tipi - Genişliği artırdık ve konumunu öne taşıdık -->
                 <div class="col-md-3">
                     <label for="hareket_tipi" class="form-label">İşlem Tipi</label>
                     <select name="hareket_tipi" id="hareket_tipi" class="form-select">
@@ -413,7 +414,7 @@ echo $OUTPUT->header();
                 </div>
 
                 <!-- Filtrele Butonu -->
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-filter me-1"></i> Filtrele
                     </button>
@@ -541,6 +542,7 @@ echo $OUTPUT->header();
     </div> <!-- .card kapanış -->
 
     <script>
+        // Grafikler için veri hazırlama
         // Grafikler için veri hazırlama
         document.addEventListener('DOMContentLoaded', function() {
             // Tooltip'leri aktifleştir
