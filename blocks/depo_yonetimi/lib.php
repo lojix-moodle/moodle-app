@@ -54,22 +54,48 @@ function block_depo_yonetimi_stok_hareketleri_getir($urunid, $depoid, $limit = 0
     $limit = (int)$limit;
 
     if ($urunid <= 0 || $depoid <= 0) {
-        return array(); // Geçersiz parametreler için boş dizi döndür
+        error_log("Geçersiz parametreler: urunid=$urunid, depoid=$depoid");
+        return array();
     }
 
     try {
-        $sql = "SELECT sh.*, u.firstname, u.lastname 
-                FROM {block_depo_yonetimi_stok_hareketleri} sh
-                LEFT JOIN {user} u ON sh.userid = u.id
-                WHERE sh.urunid = :urunid AND sh.depoid = :depoid
-                ORDER BY sh.tarih DESC";
+        $sql = "SELECT sh.*, u.firstname, u.lastname, ur.name as urun_adi
+        FROM {block_depo_yonetimi_stok_hareketleri} sh
+        INNER JOIN {user} u ON sh.userid = u.id
+        INNER JOIN {block_depo_yonetimi_urunler} ur ON ur.id = sh.urunid
+        WHERE sh.urunid = :urunid AND sh.depoid = :depoid
+        ORDER BY sh.tarih DESC";
 
-        return $DB->get_records_sql($sql, ['urunid' => $urunid, 'depoid' => $depoid], 0, $limit);
+        $params = ['urunid' => $urunid, 'depoid' => $depoid];
+        $sonuc = $DB->get_records_sql($sql, $params, 0, $limit);
+
+        if (empty($sonuc)) {
+            error_log("Stok hareketleri bulunamadı: urunid=$urunid, depoid=$depoid");
+        }
+
+        return $sonuc;
     } catch (Exception $e) {
-        // Hata durumunda boş bir dizi döndür ve hatayı logla
         error_log('Stok hareketleri sorgusu hatası: ' . $e->getMessage());
         return array();
     }
+}
+
+function block_depo_yonetimi_stok_hareketleri_debug($urunid, $depoid) {
+    global $DB;
+
+    // Ürün ve depo var mı kontrol et
+    $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid]);
+    $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
+
+    if (!$urun || !$depo) {
+        return "Ürün veya depo bulunamadı: urunid=$urunid, depoid=$depoid";
+    }
+
+    // Stok hareketleri tablosunda kayıt var mı kontrol et
+    $count = $DB->count_records('block_depo_yonetimi_stok_hareketleri',
+        ['urunid' => $urunid, 'depoid' => $depoid]);
+
+    return "Ürün: {$urun->name}, Depo: {$depo->name}, Hareket sayısı: $count";
 }
 
 /**
