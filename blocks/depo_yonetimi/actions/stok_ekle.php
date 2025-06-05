@@ -68,8 +68,6 @@ if ($data = data_submitted() && confirm_sesskey()) {
 $varyasyonlu = (!empty($urun->colors) && $urun->colors !== '0') && (!empty($urun->sizes) && $urun->sizes !== '0');
 $colors = $varyasyonlu ? json_decode($urun->colors) : [];
 $sizes = $varyasyonlu ? json_decode($urun->sizes) : [];
-if (empty($colors) || $colors == "0") $colors = [];
-if (empty($sizes) || $sizes == "0") $sizes = [];
 
 
 echo $OUTPUT->header();
