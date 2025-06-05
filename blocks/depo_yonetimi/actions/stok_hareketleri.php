@@ -304,8 +304,8 @@ echo $OUTPUT->header();
          * @param string $colorName Renk adı
          * @return string Renk hex kodu
          */
-        function getColorHex($colorName) {
-            $colorMap = [
+        function getColorHex(colorName) {
+            colorMap = [
                 'kirmizi' => '#dc3545',
                 'mavi' => '#0d6efd',
                 'siyah' => '#212529',
@@ -324,7 +324,7 @@ echo $OUTPUT->header();
                 'bordo' => '#800000'
         ];
 
-            return isset($colorMap[$colorName]) ? $colorMap[$colorName] : '#6c757d';
+            return colorMap[colorName] || '#6c757d';
         }
     </script>
 
