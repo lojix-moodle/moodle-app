@@ -419,8 +419,24 @@ echo $OUTPUT->header();
                             <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
                         </div>
 
+
+                        <!-- Minimum Stok Seviyesi -->
+                        <div class="mb-4">
+                            <label for="min_stok_seviyesi" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
+                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
+                                       value="0" placeholder="Minimum stok miktarı" min="0" required>
+                            </div>
+                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
+                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
+                        </div>
+
+
                         <!-- Raf ve Bölüm Bilgileri -->
-                        <div class="row mb-4">
+                        <div class="row mb-3">
                             <!-- Bölüm -->
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="bolum" class="form-label">Bölüm</label>
@@ -446,19 +462,7 @@ echo $OUTPUT->header();
                                 </select>
                             </div>
                         </div>
-                        <!-- Minimum Stok Seviyesi -->
-                        <div class="mb-4">
-                            <label for="min_stok_seviyesi" class="form-label">
-                                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Minimum Stok Seviyesi
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
-                                <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
-                                       value="0" placeholder="Minimum stok miktarı" min="0" required>
-                            </div>
-                            <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
-                            <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
-                        </div>
+                    </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
                         <div class="row mb-4">
