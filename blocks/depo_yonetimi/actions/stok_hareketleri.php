@@ -634,6 +634,7 @@ echo $OUTPUT->header();
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Stok hareketleri grafik değişkeni
+        // Stok hareketleri grafik değişkeni
         let stokChart = null;
         let grafikSuresi = 30; // Varsayılan 30 gün
 
@@ -683,33 +684,49 @@ echo $OUTPUT->header();
                 return;
             }
 
-            // Gradient arka plan oluştur
-            const gradientBlue = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientBlue.addColorStop(0, 'rgba(65, 105, 225, 0.6)');
-            gradientBlue.addColorStop(1, 'rgba(65, 105, 225, 0.1)');
+            // Profesyonel renk paleti
+            const primaryColor = '#4361ee';
+            const secondaryColor = '#3a0ca3';
+            const successColor = '#4cc9f0';
+            const warningColor = '#f72585';
 
-            const gradientGreen = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientGreen.addColorStop(0, 'rgba(40, 167, 69, 0.5)');
-            gradientGreen.addColorStop(1, 'rgba(40, 167, 69, 0.1)');
+            // Grafik arka planı için gelişmiş gradientler
+            const gradientPrimary = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientPrimary.addColorStop(0, 'rgba(67, 97, 238, 0.7)');
+            gradientPrimary.addColorStop(0.5, 'rgba(67, 97, 238, 0.3)');
+            gradientPrimary.addColorStop(1, 'rgba(67, 97, 238, 0.02)');
 
-            const gradientRed = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientRed.addColorStop(0, 'rgba(220, 53, 69, 0.5)');
-            gradientRed.addColorStop(1, 'rgba(220, 53, 69, 0.1)');
+            const gradientSuccess = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientSuccess.addColorStop(0, 'rgba(76, 201, 240, 0.6)');
+            gradientSuccess.addColorStop(0.6, 'rgba(76, 201, 240, 0.2)');
+            gradientSuccess.addColorStop(1, 'rgba(76, 201, 240, 0.02)');
+
+            const gradientWarning = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientWarning.addColorStop(0, 'rgba(247, 37, 133, 0.6)');
+            gradientWarning.addColorStop(0.6, 'rgba(247, 37, 133, 0.2)');
+            gradientWarning.addColorStop(1, 'rgba(247, 37, 133, 0.02)');
 
             // Grafik verilerini hazırla
             const datasets = [];
+            const fontFamily = "'Inter', 'Segoe UI', 'Roboto', 'Helvetica', sans-serif";
 
             // Stok seviyesi grafiği
             if (data.stokSeviyesi) {
                 datasets.push({
                     label: 'Stok Seviyesi',
                     data: data.stokSeviyesi,
-                    backgroundColor: gradientBlue,
-                    borderColor: 'rgba(65, 105, 225, 1)',
-                    borderWidth: 2,
+                    backgroundColor: gradientPrimary,
+                    borderColor: primaryColor,
+                    borderWidth: 3,
                     tension: 0.3,
                     pointRadius: 2,
-                    pointHoverRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#fff',
+                    pointHoverBackgroundColor: primaryColor,
+                    pointBorderColor: primaryColor,
+                    pointHoverBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverBorderWidth: 2,
                     fill: true,
                     cubicInterpolationMode: 'monotone'
                 });
@@ -720,20 +737,34 @@ echo $OUTPUT->header();
                     {
                         label: 'Giriş',
                         data: data.girisler,
-                        backgroundColor: gradientGreen,
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        pointRadius: 3
+                        backgroundColor: gradientSuccess,
+                        borderColor: successColor,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBackgroundColor: successColor,
+                        pointBorderColor: successColor,
+                        pointHoverBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 2,
                     },
                     {
                         label: 'Çıkış',
                         data: data.cikislar,
-                        backgroundColor: gradientRed,
-                        borderColor: 'rgba(220, 53, 69, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        pointRadius: 3
+                        backgroundColor: gradientWarning,
+                        borderColor: warningColor,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBackgroundColor: warningColor,
+                        pointBorderColor: warningColor,
+                        pointHoverBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 2,
                     }
                 );
             }
@@ -747,27 +778,61 @@ echo $OUTPUT->header();
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 10,
+                            right: 25,
+                            bottom: 10,
+                            left: 25
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
+                            align: 'end',
                             labels: {
                                 usePointStyle: true,
+                                pointStyleWidth: 10,
+                                boxWidth: 10,
+                                padding: 20,
                                 font: {
-                                    size: 12
+                                    family: fontFamily,
+                                    size: 12,
+                                    weight: '600'
                                 }
                             }
                         },
                         tooltip: {
+                            enabled: true,
                             mode: 'index',
                             intersect: false,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#333',
-                            bodyColor: '#333',
-                            borderColor: '#ddd',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#222',
+                            bodyColor: '#444',
+                            borderColor: 'rgba(0,0,0,0.05)',
                             borderWidth: 1,
-                            padding: 10,
-                            cornerRadius: 6,
-                            usePointStyle: true
+                            padding: 12,
+                            cornerRadius: 12,
+                            titleFont: {
+                                family: fontFamily,
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: fontFamily,
+                                size: 13
+                            },
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            callbacks: {
+                                labelPointStyle: function() {
+                                    return {
+                                        pointStyle: 'circle',
+                                        rotation: 0
+                                    };
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -775,40 +840,93 @@ echo $OUTPUT->header();
                             beginAtZero: true,
                             ticks: {
                                 precision: 0,
-                                color: '#666'
+                                color: '#666',
+                                font: {
+                                    family: fontFamily,
+                                    size: 11
+                                },
+                                padding: 10
                             },
                             grid: {
-                                color: 'rgba(0,0,0,0.05)',
-                                drawBorder: false
+                                color: 'rgba(200,200,200,0.08)',
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            border: {
+                                dash: [4, 4]
                             },
                             title: {
                                 display: true,
                                 text: 'Stok Miktarı',
-                                color: '#666'
+                                color: '#666',
+                                font: {
+                                    family: fontFamily,
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                padding: {bottom: 10}
                             }
                         },
                         x: {
                             ticks: {
                                 maxRotation: 45,
                                 minRotation: 45,
-                                color: '#666'
+                                color: '#666',
+                                font: {
+                                    family: fontFamily,
+                                    size: 10
+                                },
+                                padding: 8
                             },
                             grid: {
                                 display: false,
                                 drawBorder: false
                             },
+                            border: {
+                                display: false
+                            },
                             title: {
                                 display: true,
                                 text: 'Tarih',
-                                color: '#666'
+                                color: '#666',
+                                font: {
+                                    family: fontFamily,
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                padding: {top: 10}
                             }
                         }
                     },
                     animation: {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
+                        duration: 1200,
+                        easing: 'easeOutQuart',
+                        delay: function(context) {
+                            return context.dataIndex * 10;
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round',
+                            capBezierPoints: true
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     }
-                }
+                },
+                plugins: [{
+                    id: 'customCanvasBackgroundColor',
+                    beforeDraw: (chart) => {
+                        const ctx = chart.canvas.getContext('2d');
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                }]
             });
         }
 
@@ -866,13 +984,20 @@ echo $OUTPUT->header();
                 varyasyonGrafikleri[canvasId].destroy();
             }
 
-            // Renk kodunu al ve gradient oluştur
+            // Renk kodunu al ve gelişmiş gradient oluştur
             const renkHex = getColorHex(renk);
             const renkRgb = hexToRgb(renkHex);
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 120);
-            gradient.addColorStop(0, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.5)`);
-            gradient.addColorStop(1, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.1)`);
+            gradient.addColorStop(0, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.6)`);
+            gradient.addColorStop(0.5, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.2)`);
+            gradient.addColorStop(1, `rgba(${renkRgb.r}, ${renkRgb.g}, ${renkRgb.b}, 0.05)`);
+
+            // Daha koyu kenarlık rengi
+            const borderRgb = darkenColor(renkRgb, 20); // %20 daha koyu
+            const borderColor = `rgb(${borderRgb.r}, ${borderRgb.g}, ${borderRgb.b})`;
+
+            const fontFamily = "'Inter', 'Segoe UI', 'Roboto', 'Helvetica', sans-serif";
 
             varyasyonGrafikleri[canvasId] = new Chart(ctx, {
                 type: 'line',
@@ -882,35 +1007,60 @@ echo $OUTPUT->header();
                         label: renk + '/' + beden,
                         data: data.stokSeviyesi,
                         backgroundColor: gradient,
-                        borderColor: renkHex,
-                        borderWidth: 2,
-                        tension: 0.4,
+                        borderColor: borderColor,
+                        borderWidth: 2.5,
+                        tension: 0.35,
                         fill: true,
                         pointRadius: 0,
-                        pointHoverRadius: 4
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointHoverBackgroundColor: borderColor,
+                        pointBorderColor: borderColor,
+                        pointHoverBorderColor: '#fff',
+                        pointBorderWidth: 1.5,
+                        pointHoverBorderWidth: 2,
+                        cubicInterpolationMode: 'monotone'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    layout: {
+                        padding: {
+                            top: 5,
+                            right: 10,
+                            bottom: 5,
+                            left: 10
+                        }
+                    },
                     plugins: {
                         legend: {
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
                             titleColor: '#333',
                             bodyColor: '#333',
-                            borderColor: '#ddd',
+                            borderColor: 'rgba(0,0,0,0.05)',
                             borderWidth: 1,
-                            cornerRadius: 4,
+                            cornerRadius: 8,
                             displayColors: false,
+                            padding: 10,
+                            titleFont: {
+                                family: fontFamily,
+                                size: 13,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: fontFamily,
+                                size: 12
+                            },
                             callbacks: {
                                 title: function(tooltipItems) {
                                     return tooltipItems[0].label;
                                 },
                                 label: function(context) {
-                                    return `Stok: ${context.raw}`;
+                                    return `Stok: ${context.raw} adet`;
                                 }
                             }
                         }
@@ -926,14 +1076,44 @@ echo $OUTPUT->header();
                     },
                     elements: {
                         line: {
-                            borderWidth: 2
+                            borderWidth: 2.5,
+                            borderJoinStyle: 'round',
+                            capBezierPoints: true
                         }
                     },
                     animation: {
-                        duration: 800
+                        duration: 800,
+                        easing: 'easeOutQuart',
+                        delay: function(context) {
+                            return context.dataIndex * 5;
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     }
-                }
+                },
+                plugins: [{
+                    id: 'customCanvasBackgroundColor',
+                    beforeDraw: (chart) => {
+                        const ctx = chart.canvas.getContext('2d');
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                }]
             });
+        }
+
+        // Renk koyulaştırma fonksiyonu
+        function darkenColor(rgb, percent) {
+            return {
+                r: Math.max(0, Math.floor(rgb.r * (1 - percent / 100))),
+                g: Math.max(0, Math.floor(rgb.g * (1 - percent / 100))),
+                b: Math.max(0, Math.floor(rgb.b * (1 - percent / 100)))
+            };
         }
 
         // HEX renk kodunu RGB değerlere dönüştürme
@@ -954,28 +1134,28 @@ echo $OUTPUT->header();
             return { r, g, b };
         }
 
-        // Renk kodları
+        // Renk kodları - modern renk paleti ile güncellendi
         function getColorHex(colorName) {
             const colorMap = {
-                'kirmizi': '#dc3545',
-                'mavi': '#0d6efd',
-                'siyah': '#212529',
+                'kirmizi': '#e63946',
+                'mavi': '#4361ee',
+                'siyah': '#1d3557',
                 'beyaz': '#f8f9fa',
-                'yesil': '#198754',
-                'sari': '#ffc107',
-                'turuncu': '#fd7e14',
-                'mor': '#6f42c1',
-                'pembe': '#d63384',
-                'gri': '#6c757d',
+                'yesil': '#2ec4b6',
+                'sari': '#ffbe0b',
+                'turuncu': '#fb8500',
+                'mor': '#7b2cbf',
+                'pembe': '#ff006e',
+                'gri': '#8d99ae',
                 'bej': '#E4DAD2',
-                'lacivert': '#11098A',
-                'kahverengi': '#8B4513',
-                'haki': '#8A9A5B',
-                'vizon': '#A89F91',
-                'bordo': '#800000'
+                'lacivert': '#1a52b3',
+                'kahverengi': '#a05d34',
+                'haki': '#588157',
+                'vizon': '#9a8c7f',
+                'bordo': '#9d0208'
             };
 
-            return colorMap[colorName] || '#6c757d';
+            return colorMap[colorName] || '#8d99ae';
         }
 
         // Sayfa yüklendiğinde
