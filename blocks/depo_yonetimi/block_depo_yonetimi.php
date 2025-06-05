@@ -224,54 +224,50 @@
                     $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
                     $html .= '
-                                        <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
-                                            <td class="ps-4 align-middle">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-box text-primary me-2"></i>
-                                                    <strong>' . htmlspecialchars($urun->name) . '</strong>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle">
-                                                <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
+    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '">
+        <td class="ps-4 align-middle">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-box text-primary me-2"></i>
+                <strong>' . htmlspecialchars($urun->name) . '</strong>
+            </div>
+        </td>
+        <td class="align-middle">
+            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
+        </td>
+        <td class="align-middle">
+            <span class="badge bg-light text-dark border">' . (!empty($urun->raf) ? htmlspecialchars($urun->raf) : '-') . '</span>
+        </td>
+        <td class="align-middle">
+            <span class="badge bg-light text-dark border">' . (!empty($urun->bolum) ? htmlspecialchars($urun->bolum) : '-') . '</span>
+        </td>
+        <td class="text-center align-middle">
+            <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2">' .
                         $urun->adet . ' adet
-                                                </span>                                   
-                                            </td>
-                                            <td class="align-middle">
-    <span class="badge bg-light text-dark border"><?= !empty($urun->raf) ? htmlspecialchars($urun->raf) : '-' ?></span>
-</td>
-<td class="align-middle">
-    <span class="badge bg-light text-dark border"><?= !empty($urun->bolum) ? htmlspecialchars($urun->bolum) : '-' ?></span>
-</td>
-                                            
-                                                                                
-                                            <td class="text-end pe-4 align-middle">
-                                                <div class="btn-group">
-                                                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
+            </span>                                   
+        </td>
+        <td class="text-end pe-4 align-middle">
+            <div class="btn-group">
+                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]) . '" class="btn btn-sm btn-outline-success">
-    <i class="fas fa-cube"></i>
-</a>
-                                                                                    
-                                                
-                                                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
+                    <i class="fas fa-cube"></i>
+                </a>
+                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]) . '" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]) . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'Bu ürünü silmek istediğinize emin misiniz?\');">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>';
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </td>
+    </tr>';
                 }
             }
 
