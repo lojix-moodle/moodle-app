@@ -671,8 +671,7 @@ echo $OUTPUT->header();
                 document.getElementById('loadingOverlay').style.display = 'flex';
 
                 // API'ye stok seviyesi için tip parametresi ekle
-                fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/api/stok_grafik_verileri.php?depoid=<?php echo $depoid; ?>&gun=' + grafikSuresi + '&tip=' + grafikTipi + '<?php echo $urunid ? "&urunid=".$urunid : ""; ?>')
-                    .then(response => response.json())
+                fetch('<?php echo $CFG->wwwroot; ?>/blocks/depo_yonetimi/ajax/stok_grafik_verileri.php?depoid=...')                    .then(response => response.json())
                     .then(data => {
                         document.getElementById('loadingOverlay').style.display = 'none';
                         grafikCiz(data);
@@ -704,7 +703,24 @@ echo $OUTPUT->header();
                                 borderWidth: 2,
                                 tension: 0.3,
                                 pointRadius: 4,
-                                fill: true
+                                fill: true,
+                                cubicInterpolationMode: 'monotone',
+                                pointBackgroundColor: function(context) {
+                                    const index = context.dataIndex;
+                                    const value = context.dataset.data[index];
+                                    const previousValue = index > 0 ? context.dataset.data[index - 1] : value;
+
+                                    // Artış yeşil, azalış kırmızı
+                                    return value >= previousValue ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
+                                },
+                                segment: {
+                                    borderColor: function(context) {
+                                        if (context.p1.parsed.y > context.p0.parsed.y) {
+                                            return 'rgba(40, 167, 69, 1)'; // Artışlar yeşil
+                                        }
+                                        return 'rgba(220, 53, 69, 1)';   // Azalışlar kırmızı
+                                    }
+                                }
                             }
                         ]
                     },
@@ -740,6 +756,17 @@ echo $OUTPUT->header();
                                     display: true,
                                     text: 'Tarih'
                                 }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            intersect: false,
+                            axis: 'x'
+                        },
+                        elements: {
+                            point: {
+                                radius: 4,
+                                hoverRadius: 6
                             }
                         }
                     }
