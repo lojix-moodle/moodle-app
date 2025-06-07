@@ -627,16 +627,16 @@ echo $OUTPUT->header();
                                 <td class="py-3">
                                     <?php if ($urun->adet > 10): ?>
                                         <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 fw-medium">
-                                        <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
+            <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
+        </span>
                                     <?php elseif ($urun->adet > 0): ?>
                                         <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2 fw-medium">
-                                        <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
+            <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
+        </span>
                                     <?php else: ?>
                                         <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2 fw-medium">
-                                        <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
+            <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
+        </span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="bolum-cell py-3">
@@ -659,10 +659,12 @@ echo $OUTPUT->header();
                                         <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]); ?>"
-                                   class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3">
-                                    <i class="fa fa-edit me-1"></i> Düzenle
-                                </a>
+                                <td class="text-end pe-4">
+                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]); ?>"
+                                       class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3">
+                                        <i class="fa fa-edit me-1"></i> Düzenle
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
