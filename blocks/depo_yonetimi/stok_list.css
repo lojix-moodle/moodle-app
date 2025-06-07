@@ -222,6 +222,10 @@ table.table {
     font-size: 1.2rem;
 }
 
+.stok-hareket-btn:hover .stok-hareket-icon {
+    color: white !important;
+}
+
 /* Responsive */
 @media (max-width: 991.98px) {
     .card {
