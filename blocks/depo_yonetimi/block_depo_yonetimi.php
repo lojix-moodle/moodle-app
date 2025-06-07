@@ -257,18 +257,18 @@ class="btn btn-info">
                         ]) . '" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Stok Hareketi">
     <i class="fas fa-cube"></i>
 </a>
-                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
+                  <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
-                        ]) . '" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
+                        ]) . '" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ürün Düzenle">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_sil.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
-                        ]) . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'Bu ürünü silmek istediğinize emin misiniz?\');">
-                    <i class="fas fa-trash"></i>
-                </a>
+                        ]) . '" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Ürün Sil" onclick="return confirm(\'Bu ürünü silmek istediğinize emin misiniz?\');">
+            <i class="fas fa-trash"></i>
+        </a>
             </div>
         </td>
     </tr>';
