@@ -508,21 +508,17 @@ echo $OUTPUT->header();
                     <table class="table table-hover table-striped align-middle" id="urunlerTable">
                         <thead>
                         <tr>
-                            <th width="5%">SIRA</th>
-                            <th width="25%">ÜRÜN ADI</th>
+                            <th width="30%">ÜRÜN ADI</th>
                             <th width="15%">KATEGORİ</th>
                             <th width="10%">STOK</th>
-                            <th width="17%">BÖLÜM</th>
-                            <th width="18%">RAF</th>
-                            <th width="10%" class="text-end">İŞLEM</th>
+                            <th width="20%">BÖLÜM</th>
+                            <th width="20%">RAF</th>
+                            <th width="5%" class="text-end">İŞLEM</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($urunler as $index => $urun): ?>
                             <tr data-id="<?php echo $urun->id; ?>">
-                                <td class="text-center">
-                                    <?php echo $index + 1; ?>
-                                </td>
                                 <td>
                                     <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
                                     <?php if (!empty($urun->barkod)): ?>
@@ -532,12 +528,11 @@ echo $OUTPUT->header();
                                         </div>
                                     <?php endif; ?>
                                 </td>
-                                <!-- diğer sütunlar aynı kalacak -->
                                 <td>
                                     <?php if (!empty($urun->kategori_adi)): ?>
                                         <span class="badge bg-light text-dark border">
-                                            <?php echo htmlspecialchars($urun->kategori_adi); ?>
-                                        </span>
+                        <?php echo htmlspecialchars($urun->kategori_adi); ?>
+                    </span>
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
@@ -545,16 +540,16 @@ echo $OUTPUT->header();
                                 <td>
                                     <?php if ($urun->adet > 10): ?>
                                         <span class="badge bg-success">
-                                            <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
-                                        </span>
+                        <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
+                    </span>
                                     <?php elseif ($urun->adet > 0): ?>
                                         <span class="badge bg-warning text-dark">
-                                            <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
-                                        </span>
+                        <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
+                    </span>
                                     <?php else: ?>
                                         <span class="badge bg-danger">
-                                            <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
-                                        </span>
+                        <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
+                    </span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="bolum-cell">
