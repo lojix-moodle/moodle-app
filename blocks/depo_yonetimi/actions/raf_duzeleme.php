@@ -355,56 +355,198 @@ echo $OUTPUT->header();
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('rafForm');
-            const submitBtn = document.getElementById('submitBtn');
+            // Bootstrap Modal nesnesini oluşturma
+            let editModal = null;
+            const editModalElement = document.getElementById('editModal');
 
-            // Form doğrulama
-            form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+            if (typeof bootstrap !== 'undefined' && editModalElement) {
+                editModal = new bootstrap.Modal(editModalElement);
+            } else {
+                console.error('Bootstrap kütüphanesi yüklenemedi veya modal elemanı bulunamadı.');
+            }
 
-                    // Geçersiz alanları işaretle
-                    Array.from(form.elements).forEach(input => {
-                        if (input.type !== 'hidden' && input.type !== 'submit' && !input.checkValidity()) {
-                            input.classList.add('is-invalid');
-                        } else {
+            // Form elemanlarını seç
+            const form = document.querySelector('form');
+            const inputs = document.querySelectorAll('form .form-control, form .form-select');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const varyasyonBolumu = document.getElementById('varyasyonlar');
+            const varyasyonTablo = document.getElementById('varyasyonTablosu');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            if (form) {
+                // Input alanlarında değişiklik olduğunda geçerlilik kontrolü
+                inputs.forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        if (input.checkValidity()) {
                             input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
+                        } else {
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
                         }
                     });
 
-                    // Hata mesajı göster
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Form Hatası',
-                        text: 'Lütfen tüm zorunlu alanları doldurun!',
-                        confirmButtonText: 'Tamam',
-                        confirmButtonColor: '#3e64ff'
+                    input.addEventListener('blur', function() {
+                        if (input.value && input.checkValidity()) {
+                            input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
+                        } else if (input.required) {
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
+                        }
                     });
-                } else {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="bx bx-loader-circle bx-spin me-2"></i>İşleniyor...';
+                });
+
+                // Form gönderildiğinde
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        // Geçersiz alanları işaretle
+                        inputs.forEach(function(input) {
+                            if (!input.checkValidity()) {
+                                input.classList.add('is-invalid');
+                            }
+                        });
+
+                        // Hata mesajı göster
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Form Hatası',
+                            text: 'Lütfen zorunlu alanları doldurun!',
+                            confirmButtonText: 'Tamam',
+                            confirmButtonColor: '#3e64ff'
+                        });
+                    } else {
+                        // Form geçerliyse
+                        loadingOverlay.style.display = 'flex';
+                        submitBtn.disabled = true;
+                    }
+
+                    form.classList.add('was-validated');
+                });
+            }
+
+            // Raf ve bölüm seçildiğinde güncelleme
+            const bolumSelect = document.getElementById('bolum');
+            const rafSelect = document.getElementById('raf');
+
+            if (bolumSelect && rafSelect) {
+                bolumSelect.addEventListener('change', function() {
+                    updateRafOptions(this.value);
+                });
+
+                // Sayfa yüklendiğinde raf seçeneklerini güncelle
+                if (bolumSelect.value) {
+                    updateRafOptions(bolumSelect.value);
+                }
+            }
+
+            // Seçilen bölüme göre raf seçeneklerini günceller
+            function updateRafOptions(bolum) {
+                rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+                if (!bolum) return;
+
+                const raflar = {
+                    "Tişört": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
+                    "Gömlek": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
+                    "Pantolon": ["B1 Rafı", "B2 Rafı", "B3 Rafı"],
+                    "Ayakkabı": ["C1 Rafı", "C2 Rafı", "C3 Rafı", "C4 Rafı"],
+                    "Aksesuar": ["D1 Rafı", "D2 Rafı"],
+                    "Çanta": ["D1 Rafı", "D2 Rafı"]
+                };
+
+                const defaultRaflar = ["E1 Rafı", "E2 Rafı", "E3 Rafı"];
+                const secilenRaflar = raflar[bolum] || defaultRaflar;
+
+                secilenRaflar.forEach(function(raf) {
+                    const option = document.createElement('option');
+                    option.value = raf;
+                    option.text = raf;
+                    rafSelect.appendChild(option);
+                });
+
+                // Daha önce seçili bir raf varsa, onu tekrar seç
+                const eskiRaf = rafSelect.getAttribute('data-selected');
+                if (eskiRaf) {
+                    for (let i = 0; i < rafSelect.options.length; i++) {
+                        if (rafSelect.options[i].value === eskiRaf) {
+                            rafSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Aktif filtreleri göster
+            const filterForm = document.getElementById('filterForm');
+            const activeFilters = document.getElementById('activeFilters');
+            const filterCount = document.getElementById('filterCount');
+
+            if (filterForm && activeFilters) {
+                const searchInput = filterForm.querySelector('input[name="search"]');
+                const filterInputs = filterForm.querySelectorAll('select');
+                let activeFilterCount = 0;
+
+                // Aktif filtreleri göster
+                function showActiveFilters() {
+                    activeFilters.innerHTML = '';
+                    activeFilterCount = 0;
+
+                    if (searchInput && searchInput.value) {
+                        createFilterBadge('Arama', searchInput.value, function() {
+                            searchInput.value = '';
+                            filterForm.submit();
+                        });
+                        activeFilterCount++;
+                    }
+
+                    filterInputs.forEach(function(input) {
+                        if (input.value && input.value !== '0') {
+                            const label = input.options[input.selectedIndex].text;
+                            createFilterBadge(input.previousElementSibling.textContent.trim(), label, function() {
+                                input.value = input.options[0].value;
+                                filterForm.submit();
+                            });
+                            activeFilterCount++;
+                        }
+                    });
+
+                    if (filterCount) {
+                        filterCount.textContent = activeFilterCount;
+                    }
                 }
 
-                form.classList.add('was-validated');
-            });
+                function createFilterBadge(name, value, removeCallback) {
+                    const badge = document.createElement('div');
+                    badge.className = 'badge bg-light text-dark d-flex align-items-center ps-3 pe-2 py-2 border';
+                    badge.innerHTML = `
+                <small class="text-muted me-1">${name}:</small>
+                <span class="fw-medium">${value}</span>
+                <button type="button" class="btn btn-link text-dark p-0 ms-2" style="font-size: 18px; line-height: 1;">
+                    <i class="bx bx-x"></i>
+                </button>
+            `;
 
-            // Alan değişikliğinde doğrulama durumunu güncelle
-            Array.from(form.elements).forEach(input => {
-                if (input.type !== 'hidden' && input.type !== 'submit') {
-                    input.addEventListener('change', function() {
-                        if (this.checkValidity()) {
-                            this.classList.remove('is-invalid');
-                            this.classList.add('is-valid');
-                        } else {
-                            this.classList.remove('is-valid');
-                            this.classList.add('is-invalid');
-                        }
-                    });
+                    const removeBtn = badge.querySelector('button');
+                    removeBtn.addEventListener('click', removeCallback);
+
+                    activeFilters.appendChild(badge);
+                }
+
+                // Sayfa yüklendiğinde filtreleri göster
+                showActiveFilters();
+            }
+        });
                 }
             });
         });
     </script>
+    <!-- Sayfa sonuna ekleyin - Footer'dan önce -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <?php
 echo $OUTPUT->footer();
