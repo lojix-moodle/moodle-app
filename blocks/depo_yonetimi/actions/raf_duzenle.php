@@ -14,8 +14,15 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Raf ve Bölüm Düzenle');
 $PAGE->set_heading('Raf ve Bölüm Düzenle');
 
-// CSS dosyalarını ekle
+// CSS dosyalarını ekle - Moodle API kullanarak
 $PAGE->requires->css('/blocks/depo_yonetimi/assets/css/styles.css');
+// CDN kullanarak Bootstrap ve diğer CSS'leri ekle
+$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'));
+$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'));
+$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css'));
+
+// JavaScript bağımlılıkları (Bootstrap JS için)
+$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js'), true);
 
 // Ürün ve depo bilgisini al
 $urun = $DB->get_record('block_depo_yonetimi_urunler', ['id' => $urunid, 'depoid' => $depoid], '*', MUST_EXIST);
@@ -48,11 +55,6 @@ if (optional_param('islem', '', PARAM_ALPHA) === 'kaydet' && confirm_sesskey()) 
 // Sayfa çıktısı
 echo $OUTPUT->header();
 ?>
-
-    <!-- Modern CSS Kütüphaneleri -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
 
     <style>
         :root {
@@ -247,69 +249,71 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const bolumSelect = document.getElementById('edit_bolum');
-            const rafSelect = document.getElementById('edit_raf');
+<?php
+// Inline JavaScript daha güvenli bir şekilde eklemek için Moodle API'sini kullanıyoruz
+$js = "
+    document.addEventListener('DOMContentLoaded', function() {
+        const bolumSelect = document.getElementById('edit_bolum');
+        const rafSelect = document.getElementById('edit_raf');
 
-            // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
-            updateRaflar(bolumSelect.value, '<?php echo htmlspecialchars($urun->raf); ?>');
+        // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
+        updateRaflar(bolumSelect.value, '".addslashes($urun->raf)."');
 
-            // Bölüm değiştiğinde rafları güncelle
-            bolumSelect.addEventListener('change', function() {
-                updateRaflar(this.value);
-            });
+        // Bölüm değiştiğinde rafları güncelle
+        bolumSelect.addEventListener('change', function() {
+            updateRaflar(this.value);
+        });
 
-            // Rafları güncelleme fonksiyonu
-            function updateRaflar(bolum, selectedRaf) {
-                // Raf seçimini temizle
-                rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+        // Rafları güncelleme fonksiyonu
+        function updateRaflar(bolum, selectedRaf) {
+            // Raf seçimini temizle
+            rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
 
-                // Bölüme göre rafları ayarla
-                if (bolum === "Tişört" || bolum === "Gömlek") {
-                    addRafOption(rafSelect, "A1 Rafı");
-                    addRafOption(rafSelect, "A2 Rafı");
-                    addRafOption(rafSelect, "A3 Rafı");
-                } else if (bolum === "Pantolon") {
-                    addRafOption(rafSelect, "B1 Rafı");
-                    addRafOption(rafSelect, "B2 Rafı");
-                    addRafOption(rafSelect, "B3 Rafı");
-                } else if (bolum === "Ayakkabı") {
-                    addRafOption(rafSelect, "C1 Rafı");
-                    addRafOption(rafSelect, "C2 Rafı");
-                    addRafOption(rafSelect, "C3 Rafı");
-                    addRafOption(rafSelect, "C4 Rafı");
-                } else if (bolum === "Aksesuar" || bolum === "Çanta") {
-                    addRafOption(rafSelect, "D1 Rafı");
-                    addRafOption(rafSelect, "D2 Rafı");
-                } else if (bolum) {
-                    // Diğer tüm bölümler için
-                    addRafOption(rafSelect, "E1 Rafı");
-                    addRafOption(rafSelect, "E2 Rafı");
-                    addRafOption(rafSelect, "E3 Rafı");
-                }
+            // Bölüme göre rafları ayarla
+            if (bolum === \"Tişört\" || bolum === \"Gömlek\") {
+                addRafOption(rafSelect, \"A1 Rafı\");
+                addRafOption(rafSelect, \"A2 Rafı\");
+                addRafOption(rafSelect, \"A3 Rafı\");
+            } else if (bolum === \"Pantolon\") {
+                addRafOption(rafSelect, \"B1 Rafı\");
+                addRafOption(rafSelect, \"B2 Rafı\");
+                addRafOption(rafSelect, \"B3 Rafı\");
+            } else if (bolum === \"Ayakkabı\") {
+                addRafOption(rafSelect, \"C1 Rafı\");
+                addRafOption(rafSelect, \"C2 Rafı\");
+                addRafOption(rafSelect, \"C3 Rafı\");
+                addRafOption(rafSelect, \"C4 Rafı\");
+            } else if (bolum === \"Aksesuar\" || bolum === \"Çanta\") {
+                addRafOption(rafSelect, \"D1 Rafı\");
+                addRafOption(rafSelect, \"D2 Rafı\");
+            } else if (bolum) {
+                // Diğer tüm bölümler için
+                addRafOption(rafSelect, \"E1 Rafı\");
+                addRafOption(rafSelect, \"E2 Rafı\");
+                addRafOption(rafSelect, \"E3 Rafı\");
+            }
 
-                // Eğer önceden seçilmiş bir raf varsa onu seç
-                if (selectedRaf) {
-                    for(let i = 0; i < rafSelect.options.length; i++) {
-                        if(rafSelect.options[i].value === selectedRaf) {
-                            rafSelect.selectedIndex = i;
-                            break;
-                        }
+            // Eğer önceden seçilmiş bir raf varsa onu seç
+            if (selectedRaf) {
+                for(let i = 0; i < rafSelect.options.length; i++) {
+                    if(rafSelect.options[i].value === selectedRaf) {
+                        rafSelect.selectedIndex = i;
+                        break;
                     }
                 }
             }
+        }
 
-            // Raf seçeneği ekleme yardımcı fonksiyonu
-            function addRafOption(select, value) {
-                const option = document.createElement("option");
-                option.value = value;
-                option.text = value;
-                select.appendChild(option);
-            }
-        });
-    </script>
+        // Raf seçeneği ekleme yardımcı fonksiyonu
+        function addRafOption(select, value) {
+            const option = document.createElement(\"option\");
+            option.value = value;
+            option.text = value;
+            select.appendChild(option);
+        }
+    });
+";
+$PAGE->requires->js_init_code($js);
 
-<?php
 echo $OUTPUT->footer();
 ?>
