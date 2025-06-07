@@ -325,6 +325,61 @@ echo $OUTPUT->header();
         animation: fadeIn 0.5s ease;
     }
 
+    /* Tablo ve kart için modern stiller */
+    #urunlerTable {
+        font-size: 14px;
+    }
+
+    #urunlerTable thead th {
+        letter-spacing: 0.5px;
+        font-size: 12px;
+        border-bottom: none;
+    }
+
+    #urunlerTable tbody tr {
+        transition: all 0.2s;
+    }
+
+    #urunlerTable tbody tr:hover {
+        background-color: rgba(37, 99, 235, 0.05);
+    }
+
+    .badge {
+        font-weight: 500;
+        border-radius: 50px;
+    }
+
+    /* Bootstrap 5.3 için subtle renklerin desteği */
+    .bg-success-subtle {
+        background-color: rgba(16, 185, 129, 0.1);
+    }
+
+    .bg-warning-subtle {
+        background-color: rgba(245, 158, 11, 0.1);
+    }
+
+    .bg-danger-subtle {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    .bg-info-subtle {
+        background-color: rgba(6, 182, 212, 0.1);
+    }
+
+    .fs-7 {
+        font-size: 0.85rem;
+    }
+
+    .edit-btn:hover {
+        background-color: rgba(37, 99, 235, 0.1);
+        box-shadow: 0 3px 5px rgba(37, 99, 235, 0.1);
+        transform: translateY(-2px);
+    }
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -476,20 +531,24 @@ echo $OUTPUT->header();
     </div>
 
     <!-- Ana İçerik -->
-    <div class="card shadow-lg animate__animated animate__fadeIn" style="animation-delay: 0.3s">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <i class="bx bx-package text-primary me-2" style="font-size: 20px"></i>
-                <h5 class="mb-0">Ürün Konumları</h5>
-            </div>
-            <div class="d-flex align-items-center">
-                <button type="button" class="btn btn-sm btn-light me-2" id="refreshTable" title="Tabloyu Yenile">
-                    <i class="bx bx-refresh me-1"></i> Yenile
-                </button>
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
-                   class="btn btn-sm btn-primary">
-                    <i class="bx bx-plus me-1"></i> Yeni Ürün Ekle
-                </a>
+    <div class="card shadow-sm rounded-3 border-0 animate__animated animate__fadeIn" style="animation-delay: 0.3s">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="bx bx-package text-primary" style="font-size: 24px"></i>
+                    </div>
+                    <h5 class="mb-0 fw-bold">Ürün Konumları</h5>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-light me-2" id="refreshTable" title="Tabloyu Yenile">
+                        <i class="bx bx-refresh me-1"></i> Yenile
+                    </button>
+                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
+                       class="btn btn-sm btn-primary">
+                        <i class="bx bx-plus me-1"></i> Yeni Ürün Ekle
+                    </a>
+                </div>
             </div>
         </div>
         <div class="card-body p-0">
@@ -505,21 +564,21 @@ echo $OUTPUT->header();
                 </div>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle" id="urunlerTable">
-                        <thead>
+                    <table class="table table-borderless align-middle" id="urunlerTable">
+                        <thead class="bg-light">
                         <tr>
-                            <th width="30%">ÜRÜN ADI</th>
-                            <th width="15%">KATEGORİ</th>
-                            <th width="10%">STOK</th>
-                            <th width="20%">BÖLÜM</th>
-                            <th width="20%">RAF</th>
-                            <th width="5%" class="text-end">İŞLEM</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 px-4" width="30%">Ürün Adı</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="15%">Kategori</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="10%">Stok</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Bölüm</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Raf</th>
+                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 text-end pe-4" width="5%">İşlem</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($urunler as $index => $urun): ?>
-                            <tr data-id="<?php echo $urun->id; ?>">
-                                <td>
+                            <tr class="border-bottom" data-id="<?php echo $urun->id; ?>">
+                                <td class="ps-4 py-3">
                                     <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
                                     <?php if (!empty($urun->barkod)): ?>
                                         <div class="small text-muted">
@@ -528,54 +587,54 @@ echo $OUTPUT->header();
                                         </div>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="py-3">
                                     <?php if (!empty($urun->kategori_adi)): ?>
-                                        <div class="location-tag">
-                                            <i class="bx bx-category text-primary"></i>
+                                        <div class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal">
+                                            <i class="bx bx-category text-primary me-1"></i>
                                             <?php echo htmlspecialchars($urun->kategori_adi); ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted fst-italic">Kategori belirtilmemiş</span>
+                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="py-3">
                                     <?php if ($urun->adet > 10): ?>
-                                        <span class="badge bg-success">
-                        <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
-                    </span>
+                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 fw-medium">
+                                        <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
+                                    </span>
                                     <?php elseif ($urun->adet > 0): ?>
-                                        <span class="badge bg-warning text-dark">
-                        <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
-                    </span>
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2 fw-medium">
+                                        <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
+                                    </span>
                                     <?php else: ?>
-                                        <span class="badge bg-danger">
-                        <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
-                    </span>
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2 fw-medium">
+                                        <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
+                                    </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="bolum-cell">
+                                <td class="bolum-cell py-3">
                                     <?php if (!empty($urun->bolum)): ?>
-                                        <div class="location-tag">
-                                            <i class="bx bx-cabinet"></i>
+                                        <div class="badge rounded-pill bg-primary-subtle text-primary border px-3 py-2 fw-normal">
+                                            <i class="bx bx-cabinet me-1"></i>
                                             <?php echo htmlspecialchars($urun->bolum); ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted fst-italic">Bölüm belirtilmemiş</span>
+                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="raf-cell">
+                                <td class="raf-cell py-3">
                                     <?php if (!empty($urun->raf)): ?>
-                                        <div class="location-tag">
-                                            <i class="bx bx-server"></i>
+                                        <div class="badge rounded-pill bg-info-subtle text-info border px-3 py-2 fw-normal">
+                                            <i class="bx bx-server me-1"></i>
                                             <?php echo htmlspecialchars($urun->raf); ?>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-muted fst-italic">Raf belirtilmemiş</span>
+                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-end">
-                                    <button type="button" class="btn btn-sm btn-primary edit-btn">
-                                        <i class="bx bx-edit"></i> Düzenle
+                                <td class="text-end pe-4 py-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn">
+                                        <i class="bx bx-edit me-1"></i> Düzenle
                                     </button>
                                 </td>
                             </tr>
