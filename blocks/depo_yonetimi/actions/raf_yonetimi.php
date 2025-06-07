@@ -509,132 +509,131 @@ echo $OUTPUT->header();
 
 <!-- SweetAlert ve Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Bölüm ve raf seçimleri için
-        const editBolumSelect = document.getElementById("edit_bolum");
-        const editRafSelect = document.getElementById("edit_raf");
-        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-        const editForm = document.getElementById('editForm');
-        const saveChangesBtn = document.getElementById('save-changes');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bölüm ve raf seçimleri için
+            const editBolumSelect = document.getElementById("edit_bolum");
+            const editRafSelect = document.getElementById("edit_raf");
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            const editForm = document.getElementById('editForm');
+            const saveChangesBtn = document.getElementById('save-changes');
 
-        // Raf tanımları (her bölüm için olası raflar)
-        const rafTanimlari = {
-            "Tişört": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
-            "Gömlek": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
-            "Pantolon": ["B1 Rafı", "B2 Rafı", "B3 Rafı"],
-            "Ayakkabı": ["C1 Rafı", "C2 Rafı", "C3 Rafı", "C4 Rafı"],
-            "Aksesuar": ["D1 Rafı", "D2 Rafı"],
-            "Çanta": ["D1 Rafı", "D2 Rafı"],
-            "default": ["E1 Rafı", "E2 Rafı", "E3 Rafı"]
-        };
+            // Raf tanımları (her bölüm için olası raflar)
+            const rafTanimlari = {
+                "Tişört": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
+                "Gömlek": ["A1 Rafı", "A2 Rafı", "A3 Rafı"],
+                "Pantolon": ["B1 Rafı", "B2 Rafı", "B3 Rafı"],
+                "Ayakkabı": ["C1 Rafı", "C2 Rafı", "C3 Rafı", "C4 Rafı"],
+                "Aksesuar": ["D1 Rafı", "D2 Rafı"],
+                "Çanta": ["D1 Rafı", "D2 Rafı"],
+                "default": ["E1 Rafı", "E2 Rafı", "E3 Rafı"]
+            };
 
-        // Tüm ürün öğelerine tıklama olayı ekle
-        document.querySelectorAll('.product-item, .unassigned-product').forEach(item => {
-            item.addEventListener('click', function() {
-                const urunId = this.dataset.id;
-                const urunAdi = this.dataset.name;
-                const bolum = this.dataset.bolum || '';
-                const raf = this.dataset.raf || '';
+            // Tüm ürün öğelerine tıklama olayı ekle
+            document.querySelectorAll('.product-item, .unassigned-product').forEach(item => {
+                item.addEventListener('click', function() {
+                    const urunId = this.dataset.id;
+                    const urunAdi = this.dataset.name;
+                    const bolum = this.dataset.bolum || '';
+                    const raf = this.dataset.raf || '';
 
-                // Modal alanlarını doldur
-                document.getElementById('edit_urun_id').value = urunId;
-                document.getElementById('edit_urun_adi').value = urunAdi;
+                    // Modal alanlarını doldur
+                    document.getElementById('edit_urun_id').value = urunId;
+                    document.getElementById('edit_urun_adi').value = urunAdi;
 
-                // Bölüm seçimini ayarla
-                editBolumSelect.value = bolum;
+                    // Bölüm seçimini ayarla
+                    editBolumSelect.value = bolum;
 
-                // Raf seçeneklerini güncelle
-                updateRafOptions(bolum, raf);
+                    // Raf seçeneklerini güncelle
+                    updateRafOptions(bolum, raf);
 
-                // Modal'ı göster
-                editModal.show();
+                    // Modal'ı göster
+                    editModal.show();
+                });
             });
-        });
 
-        // Bölüm değiştiğinde rafları güncelle
-        editBolumSelect.addEventListener('change', function() {
-            updateRafOptions(this.value);
-        });
+            // Bölüm değiştiğinde rafları güncelle
+            editBolumSelect.addEventListener('change', function() {
+                updateRafOptions(this.value);
+            });
 
-        // Değişikliği kaydet butonu
-        saveChangesBtn.addEventListener('click', function() {
-            const formData = new FormData(editForm);
-            formData.append('action', 'update');
-            formData.append('depoid', <?php echo $depoid; ?>);
+            // Değişikliği kaydet butonu
+            saveChangesBtn.addEventListener('click', function() {
+                const formData = new FormData(editForm);
+                formData.append('action', 'update');
+                formData.append('depoid', <?php echo $depoid; ?>);
 
-            // AJAX ile verileri gönder
-            fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Başarılı!',
-                            text: 'Raf ve bölüm bilgileri güncellendi.',
-                            confirmButtonColor: '#3e64ff'
-                        }).then(() => {
-                            location.reload(); // Sayfayı yenile
-                        });
-                    } else {
+                // AJAX ile verileri gönder
+                fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı!',
+                                text: 'Raf ve bölüm bilgileri güncellendi.',
+                                confirmButtonColor: '#3e64ff'
+                            }).then(() => {
+                                location.reload(); // Sayfayı yenile
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: data.message || 'Bir hata oluştu.',
+                                confirmButtonColor: '#3e64ff'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Hata:', error);
                         Swal.fire({
                             icon: 'error',
-                            title: 'Hata!',
-                            text: data.message || 'Bir hata oluştu.',
+                            title: 'Bağlantı Hatası!',
+                            text: 'Sunucuyla bağlantı kurulamadı.',
                             confirmButtonColor: '#3e64ff'
                         });
-                    }
-                })
-                .catch(error => {
-                    console.error('Hata:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Bağlantı Hatası!',
-                        text: 'Sunucuyla bağlantı kurulamadı.',
-                        confirmButtonColor: '#3e64ff'
                     });
-                });
-        });
-
-        // Rafları güncelleme fonksiyonu
-        function updateRafOptions(bolum, selectedRaf = '') {
-            // Raf seçimini temizle
-            editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
-
-            // Bölüme göre rafları ayarla
-            let raflar = [];
-
-            if (bolum in rafTanimlari) {
-                raflar = rafTanimlari[bolum];
-            } else if (bolum) {
-                // Diğer tüm bölümler için varsayılan rafları kullan
-                raflar = ["E1 Rafı", "E2 Rafı", "E3 Rafı"];
-            }
-
-            // Rafları dropdown'a ekle
-            raflar.forEach(raf => {
-                const option = document.createElement("option");
-                option.value = raf;
-                option.text = raf;
-                editRafSelect.appendChild(option);
             });
 
-            // Eğer önceden seçilmiş bir raf varsa onu seç
-            if (selectedRaf) {
-                for(let i = 0; i < editRafSelect.options.length; i++) {
-                    if(editRafSelect.options[i].text === selectedRaf) {
-                        editRafSelect.selectedIndex = i;
-                        break;
+            // Rafları güncelleme fonksiyonu
+            function updateRafOptions(bolum, selectedRaf = '') {
+                // Raf seçimini temizle
+                editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+                // Bölüme göre rafları ayarla
+                let raflar = [];
+
+                if (bolum in rafTanimlari) {
+                    raflar = rafTanimlari[bolum];
+                } else if (bolum) {
+                    // Diğer tüm bölümler için varsayılan rafları kullan
+                    raflar = ["E1 Rafı", "E2 Rafı", "E3 Rafı"];
+                }
+
+                // Rafları dropdown'a ekle
+                raflar.forEach(raf => {
+                    const option = document.createElement("option");
+                    option.value = raf;
+                    option.text = raf;
+                    editRafSelect.appendChild(option);
+                });
+
+                // Eğer önceden seçilmiş bir raf varsa onu seç
+                if (selectedRaf) {
+                    for(let i = 0; i < editRafSelect.options.length; i++) {
+                        if(editRafSelect.options[i].text === selectedRaf) {
+                            editRafSelect.selectedIndex = i;
+                            break;
+                        }
                     }
                 }
             }
-        }
-    }
-    });
-</script>
+        });
+    </script>
 
 <?php
 echo $OUTPUT->footer();
