@@ -530,11 +530,12 @@ echo $OUTPUT->header();
                                 </td>
                                 <td>
                                     <?php if (!empty($urun->kategori_adi)): ?>
-                                        <span class="badge bg-light text-dark border">
-                        <?php echo htmlspecialchars($urun->kategori_adi); ?>
-                    </span>
+                                        <div class="location-tag">
+                                            <i class="bx bx-category text-primary"></i>
+                                            <?php echo htmlspecialchars($urun->kategori_adi); ?>
+                                        </div>
                                     <?php else: ?>
-                                        <span class="text-muted">-</span>
+                                        <span class="text-muted fst-italic">Kategori belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
