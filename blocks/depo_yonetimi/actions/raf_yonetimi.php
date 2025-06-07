@@ -78,7 +78,7 @@ if (!empty($search)) {
     $params['search'] = '%' . $search . '%';
 }
 
-// Ürünleri getir
+// Ürünleri getirrr
 $sql = "SELECT u.*, k.name as kategori_adi
         FROM {block_depo_yonetimi_urunler} u
         LEFT JOIN {block_depo_yonetimi_kategoriler} k ON u.kategoriid = k.id
