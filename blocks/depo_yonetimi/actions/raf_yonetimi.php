@@ -666,6 +666,7 @@ echo $OUTPUT->header();
                                     </a>
                                 </td>
                             </tr>
+
                         <?php endforeach; ?>
                         </tbody>
                     </table>
