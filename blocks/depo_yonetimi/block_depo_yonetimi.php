@@ -251,7 +251,7 @@ class="btn btn-info">
         </td>
         <td class="text-end pe-4 align-middle">
             <div class="btn-group">
-                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
+                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_list.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]) . '" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Stok Hareketi">
