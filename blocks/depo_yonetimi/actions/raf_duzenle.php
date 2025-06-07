@@ -199,7 +199,6 @@ echo $OUTPUT->header();
                                 <span>Stok Miktarı: <?php echo $urun->adet; ?> adet</span>
                             </div>
                         </div>
-
                         <!-- Düzenleme Formu -->
                         <form action="<?php echo $PAGE->url; ?>" method="post">
                             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
