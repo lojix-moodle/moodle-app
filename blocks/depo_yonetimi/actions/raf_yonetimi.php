@@ -508,7 +508,7 @@ echo $OUTPUT->header();
                     <table class="table table-hover table-striped align-middle" id="urunlerTable">
                         <thead>
                         <tr>
-                            <th width="5%">#</th>
+                            <th width="5%">SIRA</th>
                             <th width="25%">ÜRÜN ADI</th>
                             <th width="15%">KATEGORİ</th>
                             <th width="10%">STOK</th>
@@ -520,8 +520,8 @@ echo $OUTPUT->header();
                         <tbody>
                         <?php foreach ($urunler as $index => $urun): ?>
                             <tr data-id="<?php echo $urun->id; ?>">
-                                <td class="fw-semibold text-center">
-                                    <span class="badge rounded-pill bg-light text-dark border"><?php echo $index + 1; ?></span>
+                                <td class="text-center">
+                                    <?php echo $index + 1; ?>
                                 </td>
                                 <td>
                                     <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
@@ -532,6 +532,7 @@ echo $OUTPUT->header();
                                         </div>
                                     <?php endif; ?>
                                 </td>
+                                <!-- diğer sütunlar aynı kalacak -->
                                 <td>
                                     <?php if (!empty($urun->kategori_adi)): ?>
                                         <span class="badge bg-light text-dark border">
