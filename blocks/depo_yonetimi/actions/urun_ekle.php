@@ -498,6 +498,19 @@ echo $OUTPUT->header();
                             <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
+                        <!-- Barkod -->
+
+                        <div class="mb-4">
+                            <label for="barkod" class="form-label">Barkod</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="barkod" name="barkod" value="<?php echo $urun->barkod ?? ''; ?>">
+                                <button type="button" class="btn btn-outline-primary" id="barkodOlustur">
+                                    <i class="fas fa-barcode me-2"></i>Barkod Oluştur
+                                </button>
+                            </div>
+                            <small class="text-muted">Otomatik barkod oluşturmak için butona tıklayın veya manuel giriş yapın.</small>
+                        </div>
+
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
                         <div class="row mb-4">
                             <!-- Renkler - Sol Kolon -->
@@ -587,6 +600,17 @@ echo $OUTPUT->header();
                             <div>
                                 Seçtiğiniz renk ve boyut kombinasyonlarıyla varyasyonlar oluşturabilirsiniz.
                                 Varyasyonlar, aynı ürünün farklı versiyonlarını yönetmenize olanak tanır.
+                            </div>
+                        </div>
+
+                        <!-- Sağ Sütun - Varyasyonlar -->
+                        <div class="mb-3">
+                            <label for="varyasyon_barkod_${index}" class="form-label">Varyasyon Barkodu</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control varyasyon-barkod" id="varyasyon_barkod_${index}" name="varyasyonlar[${index}][barkod]" value="">
+                                <button type="button" class="btn btn-outline-secondary varyasyon-barkod-olustur" data-index="${index}">
+                                    <i class="fas fa-barcode me-1"></i>Barkod
+                                </button>
                             </div>
                         </div>
 
@@ -979,10 +1003,124 @@ echo $OUTPUT->header();
             select.appendChild(option);
         }
     });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const barkodBtn = document.getElementById('barkodOlustur');
+        const barkodInput = document.getElementById('barkod');
+
+        if (barkodBtn && barkodInput) {
+            barkodBtn.addEventListener('click', function() {
+                // Benzersiz barkod oluştur
+                const barkod = generateUniqueBarkod();
+                barkodInput.value = barkod;
+
+                // Görsel feedback
+                barkodBtn.classList.add('btn-success');
+                barkodBtn.innerHTML = '<i class="fas fa-check me-2"></i>Oluşturuldu';
+
+                setTimeout(() => {
+                    barkodBtn.classList.remove('btn-success');
+                    barkodBtn.innerHTML = '<i class="fas fa-barcode me-2"></i>Barkod Oluştur';
+                }, 1500);
+            });
+        }
+
+        // Benzersiz barkod oluşturma fonksiyonu
+        function generateUniqueBarkod() {
+            // Depo ID'sini al (eğer URL'de varsa)
+            const urlParams = new URLSearchParams(window.location.search);
+            const depoId = urlParams.get('depoid') || '0';
+
+            // Tarih damgası ve rastgele sayı ile benzersiz bir kod oluşturma
+            const timestamp = new Date().getTime().toString().slice(-6);
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+
+            // Depo ID + Tarih damgası + Rastgele sayı
+            return `DEP${depoId}-${timestamp}${random}`;
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('varyasyon-barkod-olustur') ||
+                e.target.closest('.varyasyon-barkod-olustur')) {
+
+                const btn = e.target.classList.contains('varyasyon-barkod-olustur') ?
+                    e.target : e.target.closest('.varyasyon-barkod-olustur');
+
+                const index = btn.dataset.index;
+                const input = document.getElementById(`varyasyon_barkod_${index}`);
+
+                if (input) {
+                    // Ana barkodu al
+                    const anaBarkod = document.getElementById('barkod').value || generateUniqueBarkod();
+
+                    // Varyasyon için benzersiz barkod oluştur (ana barkod + varyasyon numarası)
+                    const varyasyonBarkod = `${anaBarkod}-V${index}`;
+
+                    input.value = varyasyonBarkod;
+
+                    // Görsel feedback
+                    btn.classList.add('btn-success');
+                    btn.innerHTML = '<i class="fas fa-check me-1"></i>OK';
+
+                    setTimeout(() => {
+                        btn.classList.remove('btn-success');
+                        btn.innerHTML = '<i class="fas fa-barcode me-1"></i>Barkod';
+                    }, 1500);
+                }
+            }
+        });
+
+        // Barkod görselleştirme
+        function renderBarcode(value) {
+            // Eğer barkod canvas yoksa oluştur
+            let barcodeContainer = document.getElementById('barcodeContainer');
+            if (!barcodeContainer) {
+                barcodeContainer = document.createElement('div');
+                barcodeContainer.id = 'barcodeContainer';
+                barcodeContainer.classList.add('text-center', 'mt-3', 'mb-4', 'p-3', 'border', 'rounded', 'bg-light');
+
+                const canvas = document.createElement('canvas');
+                canvas.id = 'barcodeCanvas';
+                barcodeContainer.appendChild(canvas);
+
+                // Barkod alanının altına ekle
+                const barkodDiv = document.getElementById('barkod').closest('.mb-4');
+                barkodDiv.appendChild(barcodeContainer);
+            }
+
+            try {
+                JsBarcode("#barcodeCanvas", value, {
+                    format: "CODE128",
+                    displayValue: true,
+                    fontSize: 16,
+                    margin: 10
+                });
+                barcodeContainer.style.display = 'block';
+            } catch(e) {
+                barcodeContainer.style.display = 'none';
+            }
+        }
+
+        // Barkod oluşturulduğunda veya değiştiğinde görselleştir
+        if (barkodInput) {
+            barkodBtn.addEventListener('click', function() {
+                renderBarcode(barkodInput.value);
+            });
+
+            barkodInput.addEventListener('input', function() {
+                if (this.value.length > 3) {
+                    renderBarcode(this.value);
+                }
+            });
+        }
+    });
     </script>
 
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 
 <?php
 echo $OUTPUT->footer();
