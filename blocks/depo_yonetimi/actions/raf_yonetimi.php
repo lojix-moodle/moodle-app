@@ -520,7 +520,9 @@ echo $OUTPUT->header();
                         <tbody>
                         <?php foreach ($urunler as $index => $urun): ?>
                             <tr data-id="<?php echo $urun->id; ?>">
-                                <td class="fw-semibold"><?php echo $index + 1; ?></td>
+                                <td class="fw-semibold text-center">
+                                    <span class="badge rounded-pill bg-light text-dark border"><?php echo $index + 1; ?></span>
+                                </td>
                                 <td>
                                     <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
                                     <?php if (!empty($urun->barkod)): ?>
