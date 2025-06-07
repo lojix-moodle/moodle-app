@@ -38,9 +38,13 @@ if (optional_param('islem', '', PARAM_ALPHA) === 'kaydet' && confirm_sesskey()) 
         $urun->raf = $yeni_raf;
         $DB->update_record('block_depo_yonetimi_urunler', $urun);
 
-        // Başarı mesajı
-        $message = 'Raf ve bölüm bilgileri başarıyla güncellendi.';
-        $message_type = 'success';
+        // Başarı mesajı ile raf yönetimi sayfasına yönlendir
+        redirect(
+            new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php', ['depoid' => $depoid]),
+            'Raf ve bölüm bilgileri başarıyla güncellendi.',
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     } catch (Exception $e) {
         $message = 'Hata: ' . $e->getMessage();
         $message_type = 'danger';
