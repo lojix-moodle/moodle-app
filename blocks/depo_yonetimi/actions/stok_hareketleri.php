@@ -548,84 +548,84 @@ echo $OUTPUT->header();
 
     <div class="card-body p-0">
     <div class="table-responsive">
-    <table class="table table-hover mb-0">
-    <thead class="table-light">
-    <tr>
-        <th>Tarih</th>
-        <th><?php if (!$urunid): ?>Ürün<?php endif; ?></th>
-        <th>İşlem</th>
-        <th>Miktar</th>
-        <th>Varyasyon</th>
-        <th>İşlemi Yapan</th>
-        <th>Açıklama</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if (empty($hareketler)): ?>
-        <tr>
-            <td colspan="<?php echo $urunid ? '6' : '7'; ?>" class="text-center py-4">
-                <div class="text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Kayıtlı stok hareketi bulunamadı.
-                </div>
-            </td>
-        </tr>
-    <?php else: ?>
-        <?php foreach ($hareketler as $hareket): ?>
-            <tr class="<?php echo ($simdi - $hareket->tarih <= 86400) ? 'recent-row' : ''; ?>">
-                <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
-                <?php if (!$urunid): ?>
-                    <td>
-                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $hareket->urunid]); ?>">
-                            <?php echo htmlspecialchars($hareket->urun_adi); ?>
-                        </a>
-                    </td>
-                <?php endif; ?>
-                <td>
-                    <?php if ($hareket->hareket_tipi === 'giris'): ?>
-                        <span class="badge bg-success">
-                                        <i class="fas fa-arrow-up me-1"></i> Giriş
-                                    </span>
-                    <?php else: ?>
-                        <span class="badge bg-danger">
-                                        <i class="fas fa-arrow-down me-1"></i> Çıkış
-                                    </span>
-                    <?php endif; ?>
-                </td>
-                <td><?php echo $hareket->miktar; ?></td>
-                <td>
-                    <?php
-                    if (!empty($hareket->renk) || !empty($hareket->beden)) {
-                        if (!empty($hareket->renk)) {
-                            echo '<span class="color-badge" style="background-color: '.getColorHex($hareket->renk).';"></span>';
-                            echo htmlspecialchars($hareket->renk);
-                        }
-                        if (!empty($hareket->renk) && !empty($hareket->beden)) {
-                            echo ' / ';
-                        }
-                        if (!empty($hareket->beden)) {
-                            echo htmlspecialchars($hareket->beden);
-                        }
-                    } else {
-                        echo '-';
-                    }
-                    ?>
-                </td>
-                <td><?php echo htmlspecialchars($hareket->firstname . ' ' . $hareket->lastname); ?></td>
-                <td>
-                    <?php
-                    if (!empty($hareket->aciklama)) {
-                        echo nl2br(htmlspecialchars($hareket->aciklama));
-                    } else {
-                        echo '<span class="text-muted">-</span>';
-                    }
-                    ?>
-                </td>
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+            <tr>
+                <th>Tarih</th>
+                <?php if (!$urunid): ?><th>Ürün</th><?php endif; ?>
+                <th>İşlem</th>
+                <th>Miktar</th>
+                <th>Varyasyon</th>
+                <th>İşlemi Yapan</th>
+                <th>Açıklama</th>
             </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <?php if (empty($hareketler)): ?>
+                <tr>
+                    <td colspan="<?php echo $urunid ? '6' : '7'; ?>" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Kayıtlı stok hareketi bulunamadı.
+                        </div>
+                    </td>
+                </tr>
+            <?php else: ?>
+                <?php foreach ($hareketler as $hareket): ?>
+                    <tr class="<?php echo ($simdi - $hareket->tarih <= 86400) ? 'recent-row' : ''; ?>">
+                        <td><?php echo date('d.m.Y H:i', $hareket->tarih); ?></td>
+                        <?php if (!$urunid): ?>
+                            <td>
+                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_hareketleri.php', ['depoid' => $depoid, 'urunid' => $hareket->urunid]); ?>">
+                                    <?php echo htmlspecialchars($hareket->urun_adi); ?>
+                                </a>
+                            </td>
+                        <?php endif; ?>
+                        <td>
+                            <?php if ($hareket->hareket_tipi === 'giris'): ?>
+                                <span class="badge bg-success">
+                        <i class="fas fa-arrow-up me-1"></i> Giriş
+                    </span>
+                            <?php else: ?>
+                                <span class="badge bg-danger">
+                        <i class="fas fa-arrow-down me-1"></i> Çıkış
+                    </span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo $hareket->miktar; ?></td>
+                        <td>
+                            <?php
+                            if (!empty($hareket->renk) || !empty($hareket->beden)) {
+                                if (!empty($hareket->renk)) {
+                                    echo '<span class="color-badge" style="background-color: '.getColorHex($hareket->renk).';"></span>';
+                                    echo htmlspecialchars($hareket->renk);
+                                }
+                                if (!empty($hareket->renk) && !empty($hareket->beden)) {
+                                    echo ' / ';
+                                }
+                                if (!empty($hareket->beden)) {
+                                    echo htmlspecialchars($hareket->beden);
+                                }
+                            } else {
+                                echo '-';
+                            }
+                            ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($hareket->firstname . ' ' . $hareket->lastname); ?></td>
+                        <td>
+                            <?php
+                            if (!empty($hareket->aciklama)) {
+                                echo nl2br(htmlspecialchars($hareket->aciklama));
+                            } else {
+                                echo '<span class="text-muted">-</span>';
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
     </div>
     </div>
     </div>
