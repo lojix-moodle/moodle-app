@@ -114,8 +114,26 @@ $PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/aos@2.3.4/dist
 $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'));
 $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js'), true);
 
-// Özel CSS stil tanımlamaları
-$custom_css = '
+$siteformatoptions = course_get_format($SITE)->get_format_options();
+$modinfo = get_fast_modinfo($SITE);
+$modnamesused = $modinfo->get_used_module_names();
+
+// The home page can have activities in the block aside. We should
+// initialize the course editor before the page structure is rendered.
+include_course_ajax($SITE, $modnamesused);
+
+$courserenderer = $PAGE->get_renderer('core', 'course');
+
+if ($hassiteconfig) {
+    $editurl = new moodle_url('/course/view.php', ['id' => SITEID, 'sesskey' => sesskey()]);
+    $editbutton = $OUTPUT->edit_button($editurl);
+    $PAGE->set_button($editbutton);
+}
+
+echo $OUTPUT->header();
+
+// CSS stil tanımlamaları doğrudan HTML içerisine ekleniyor
+echo '<style>
 /* Modern ana sayfa tasarımı */
 body.path-site .card {
     border-radius: 12px;
@@ -285,12 +303,10 @@ body.path-site .card:hover {
         grid-template-columns: 1fr;
     }
 }
-';
+</style>';
 
-$PAGE->requires->css_code($custom_css);
-
-// AOS animasyon kütüphanesini başlatmak için JavaScript
-$custom_js = '
+// JavaScript kodları doğrudan HTML içerisine ekleniyor
+echo '<script>
 document.addEventListener("DOMContentLoaded", function() {
     // AOS animasyon kütüphanesini başlat
     AOS.init({
@@ -338,27 +354,7 @@ document.addEventListener("DOMContentLoaded", function() {
         observer.observe(counter);
     });
 });
-';
-
-$PAGE->requires->js_init_code($custom_js);
-
-$siteformatoptions = course_get_format($SITE)->get_format_options();
-$modinfo = get_fast_modinfo($SITE);
-$modnamesused = $modinfo->get_used_module_names();
-
-// The home page can have activities in the block aside. We should
-// initialize the course editor before the page structure is rendered.
-include_course_ajax($SITE, $modnamesused);
-
-$courserenderer = $PAGE->get_renderer('core', 'course');
-
-if ($hassiteconfig) {
-    $editurl = new moodle_url('/course/view.php', ['id' => SITEID, 'sesskey' => sesskey()]);
-    $editbutton = $OUTPUT->edit_button($editurl);
-    $PAGE->set_button($editbutton);
-}
-
-echo $OUTPUT->header();
+</script>';
 
 // Hero bölümü ekle
 echo '<div class="site-hero" data-aos="fade-down">';
