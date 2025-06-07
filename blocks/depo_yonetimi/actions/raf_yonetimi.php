@@ -107,286 +107,286 @@ $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 echo $OUTPUT->header();
 ?>
 
-<!-- Modern CSS Kütüphaneleri -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <!-- Modern CSS Kütüphaneleri -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 
-<style>
-    :root {
-        --primary: #2563eb;
-        --primary-light: #dbeafe;
-        --primary-dark: #1e40af;
-        --secondary: #475569;
-        --success: #10b981;
-        --danger: #ef4444;
-        --warning: #f59e0b;
-        --info: #06b6d4;
-        --light: #f8fafc;
-        --dark: #1e293b;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --border-radius: 0.5rem;
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --transition: all 0.3s ease;
-    }
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --primary-dark: #1e40af;
+            --secondary: #475569;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --border-radius: 0.5rem;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
 
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f8fafc;
-        color: var(--dark);
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+        }
 
-    /* Modern Card Styles */
-    .card {
-        border: none;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-md);
-        transition: var(--transition);
-        overflow: hidden;
-    }
+        /* Modern Card Styles */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            overflow: hidden;
+        }
 
-    .card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-3px);
-    }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+        }
 
-    .card-header {
-        background-color: white;
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--gray-200);
-    }
+        .card-header {
+            background-color: white;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
 
-    .app-header {
-        background-image: linear-gradient(135deg, var(--primary-dark), var(--primary));
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-        color: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-lg);
-    }
+        .app-header {
+            background-image: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
 
-    /* Buttons */
-    .btn {
-        border-radius: 0.375rem;
-        font-weight: 500;
-        padding: 0.625rem 1rem;
-        transition: var(--transition);
-    }
+        /* Buttons */
+        .btn {
+            border-radius: 0.375rem;
+            font-weight: 500;
+            padding: 0.625rem 1rem;
+            transition: var(--transition);
+        }
 
-    .btn-primary {
-        background-color: var(--primary);
-        border-color: var(--primary);
-    }
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
 
-    .btn-primary:hover, .btn-primary:focus {
-        background-color: var(--primary-dark);
-        border-color: var(--primary-dark);
-    }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
 
-    .btn-outline-primary {
-        color: var(--primary);
-        border-color: var(--primary);
-    }
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
 
-    .btn-outline-primary:hover {
-        background-color: var(--primary);
-        color: white;
-    }
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
 
-    /* Stats Cards */
-    .stat-card {
-        position: relative;
-        overflow: hidden;
-        padding: 1rem;
-        border-radius: var(--border-radius);
-        transition: var(--transition);
-        box-shadow: var(--shadow-md);
-    }
+        /* Stats Cards */
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
 
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-    }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
 
-    .stat-card .stat-icon {
-        position: absolute;
-        right: -15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 5rem;
-        opacity: 0.1;
-    }
+        .stat-card .stat-icon {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 5rem;
+            opacity: 0.1;
+        }
 
-    .stat-card .stat-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
+        .stat-card .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
 
-    .stat-card .stat-label {
-        text-transform: uppercase;
-        font-size: 0.875rem;
-        font-weight: 600;
-        opacity: 0.8;
-        margin-bottom: 0.75rem;
-    }
+        .stat-card .stat-label {
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            font-weight: 600;
+            opacity: 0.8;
+            margin-bottom: 0.75rem;
+        }
 
-    /* Table Styles */
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
-        width: 100%;
-    }
+        /* Table Styles */
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
 
-    .table th {
-        background-color: var(--gray-100);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-    }
+        .table th {
+            background-color: var(--gray-100);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
 
-    .table-hover tbody tr {
-        transition: var(--transition);
-    }
+        .table-hover tbody tr {
+            transition: var(--transition);
+        }
 
-    .table-hover tbody tr:hover {
-        background-color: var(--primary-light);
-    }
+        .table-hover tbody tr:hover {
+            background-color: var(--primary-light);
+        }
 
-    /* Badge */
-    .badge {
-        padding: 0.35em 0.65em;
-        font-weight: 600;
-        border-radius: 0.25rem;
-    }
+        /* Badge */
+        .badge {
+            padding: 0.35em 0.65em;
+            font-weight: 600;
+            border-radius: 0.25rem;
+        }
 
-    /* Location Tags */
-    .location-tag {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 0.75rem;
-        background-color: var(--gray-100);
-        border-radius: var(--border-radius);
-        font-weight: 500;
-        color: var(--secondary);
-        border: 1px solid var(--gray-300);
-        transition: var(--transition);
-    }
+        /* Location Tags */
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background-color: var(--gray-100);
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            color: var(--secondary);
+            border: 1px solid var(--gray-300);
+            transition: var(--transition);
+        }
 
-    .location-tag i {
-        margin-right: 0.5rem;
-        color: var(--primary);
-    }
+        .location-tag i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
 
-    /* Forms */
-    .form-control, .form-select {
-        border-radius: var(--border-radius);
-        padding: 0.625rem 0.75rem;
-        border-color: var(--gray-300);
-    }
+        /* Forms */
+        .form-control, .form-select {
+            border-radius: var(--border-radius);
+            padding: 0.625rem 0.75rem;
+            border-color: var(--gray-300);
+        }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.1);
-    }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.1);
+        }
 
-    .input-group-text {
-        background-color: var(--gray-100);
-        border-color: var(--gray-300);
-    }
+        .input-group-text {
+            background-color: var(--gray-100);
+            border-color: var(--gray-300);
+        }
 
-    /* Modal */
-    .modal-content {
-        border: none;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-lg);
-    }
+        /* Modal */
+        .modal-content {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
 
-    .modal-header {
-        border-bottom: 1px solid var(--gray-200);
-        background-color: var(--gray-100);
-    }
+        .modal-header {
+            border-bottom: 1px solid var(--gray-200);
+            background-color: var(--gray-100);
+        }
 
-    .modal-footer {
-        border-top: 1px solid var(--gray-200);
-    }
+        .modal-footer {
+            border-top: 1px solid var(--gray-200);
+        }
 
-    /* Animasyonlar */
-    .fade-in {
-        animation: fadeIn 0.5s ease;
-    }
+        /* Animasyonlar */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
 
-    /* Tablo ve kart için modern stiller */
-    #urunlerTable {
-        font-size: 14px;
-    }
+        /* Tablo ve kart için modern stiller */
+        #urunlerTable {
+            font-size: 14px;
+        }
 
-    #urunlerTable thead th {
-        letter-spacing: 0.5px;
-        font-size: 12px;
-        border-bottom: none;
-    }
+        #urunlerTable thead th {
+            letter-spacing: 0.5px;
+            font-size: 12px;
+            border-bottom: none;
+        }
 
-    #urunlerTable tbody tr {
-        transition: all 0.2s;
-    }
+        #urunlerTable tbody tr {
+            transition: all 0.2s;
+        }
 
-    #urunlerTable tbody tr:hover {
-        background-color: rgba(37, 99, 235, 0.05);
-    }
+        #urunlerTable tbody tr:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
 
-    .badge {
-        font-weight: 500;
-        border-radius: 50px;
-    }
+        .badge {
+            font-weight: 500;
+            border-radius: 50px;
+        }
 
-    /* Bootstrap 5.3 için subtle renklerin desteği */
-    .bg-success-subtle {
-        background-color: rgba(16, 185, 129, 0.1);
-    }
+        /* Bootstrap 5.3 için subtle renklerin desteği */
+        .bg-success-subtle {
+            background-color: rgba(16, 185, 129, 0.1);
+        }
 
-    .bg-warning-subtle {
-        background-color: rgba(245, 158, 11, 0.1);
-    }
+        .bg-warning-subtle {
+            background-color: rgba(245, 158, 11, 0.1);
+        }
 
-    .bg-danger-subtle {
-        background-color: rgba(239, 68, 68, 0.1);
-    }
+        .bg-danger-subtle {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
 
-    .bg-primary-subtle {
-        background-color: rgba(37, 99, 235, 0.1);
-    }
+        .bg-primary-subtle {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
 
-    .bg-info-subtle {
-        background-color: rgba(6, 182, 212, 0.1);
-    }
+        .bg-info-subtle {
+            background-color: rgba(6, 182, 212, 0.1);
+        }
 
-    .fs-7 {
-        font-size: 0.85rem;
-    }
+        .fs-7 {
+            font-size: 0.85rem;
+        }
 
-    .edit-btn:hover {
-        background-color: rgba(37, 99, 235, 0.1);
-        box-shadow: 0 3px 5px rgba(37, 99, 235, 0.1);
-        transform: translateY(-2px);
-    }
+        .edit-btn:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+            box-shadow: 0 3px 5px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 
-<div class="container-fluid py-4">
+    <div class="container-fluid py-4">
     <!-- Ana Başlık -->
     <div class="app-header mb-5 fade-in animate__animated animate__fadeIn">
         <div class="container">
@@ -461,30 +461,42 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <!-- Filtreler -->
-    <div class="card mb-5 animate__animated animate__fadeIn" style="animation-delay: 0.2s">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <i class="bx bx-filter-alt text-primary me-2"></i>
-                <h5 class="mb-0">Gelişmiş Filtreleme</h5>
+    <!-- Modern Filtreler -->
+    <div class="card border-0 shadow-sm rounded-3 mb-5 animate__animated animate__fadeIn" style="animation-delay: 0.1s">
+        <div class="card-header bg-white p-3 border-bottom-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                <span class="p-2 rounded-circle bg-primary-subtle me-2">
+                    <i class="bx bx-filter text-primary"></i>
+                </span>
+                    <h5 class="fw-semibold mb-0">Ürün Filtreleri</h5>
+                    <span class="badge bg-primary rounded-pill ms-2 px-3 py-1" id="filterCount">0</span>
+                </div>
+                <button class="btn btn-sm btn-light rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                    <i class="bx bx-chevron-down me-1"></i>
+                    <span class="d-none d-sm-inline">Filtreler</span>
+                </button>
             </div>
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
-                <i class="bx bx-chevron-down"></i>
-            </button>
         </div>
-        <div class="card-body collapse show" id="filterCollapse">
+
+        <div class="card-body pt-0 pb-3 collapse show" id="filterCollapse">
             <form method="get" id="filterForm" class="row g-3">
                 <input type="hidden" name="depoid" value="<?php echo $depoid; ?>">
 
+                <!-- Arama kutusu -->
                 <div class="col-lg-4">
+                    <label class="form-label small text-muted fw-semibold mb-1"><i class="bx bx-search me-1"></i> ÜRÜN ARAMA</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0"><i class="bx bx-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0" placeholder="Ürün ara..." name="search" value="<?php echo htmlspecialchars($search); ?>">
+                        <span class="input-group-text bg-white border-end-0"><i class="bx bx-search-alt text-primary"></i></span>
+                        <input type="text" class="form-control border-start-0 form-control-lg shadow-none"
+                               placeholder="Ürün adı, barkod..." name="search" value="<?php echo htmlspecialchars($search); ?>">
                     </div>
                 </div>
 
+                <!-- Bölüm filtresi -->
                 <div class="col-md-6 col-lg-2">
-                    <select class="form-select" name="filter_bolum">
+                    <label class="form-label small text-muted fw-semibold mb-1"><i class="bx bx-cabinet me-1"></i> BÖLÜM</label>
+                    <select class="form-select form-select-lg" name="filter_bolum">
                         <option value="">Tüm Bölümler</option>
                         <?php foreach ($tum_bolumler as $bolum_item): ?>
                             <option value="<?php echo htmlspecialchars($bolum_item->bolum); ?>"
@@ -495,8 +507,10 @@ echo $OUTPUT->header();
                     </select>
                 </div>
 
+                <!-- Raf filtresi -->
                 <div class="col-md-6 col-lg-2">
-                    <select class="form-select" name="filter_raf">
+                    <label class="form-label small text-muted fw-semibold mb-1"><i class="bx bx-server me-1"></i> RAF</label>
+                    <select class="form-select form-select-lg" name="filter_raf">
                         <option value="">Tüm Raflar</option>
                         <?php foreach ($tum_raflar as $raf_item): ?>
                             <option value="<?php echo htmlspecialchars($raf_item->raf); ?>"
@@ -507,8 +521,10 @@ echo $OUTPUT->header();
                     </select>
                 </div>
 
+                <!-- Kategori filtresi -->
                 <div class="col-md-6 col-lg-2">
-                    <select class="form-select" name="filter_kategori">
+                    <label class="form-label small text-muted fw-semibold mb-1"><i class="bx bx-category me-1"></i> KATEGORİ</label>
+                    <select class="form-select form-select-lg" name="filter_kategori">
                         <option value="0">Tüm Kategoriler</option>
                         <?php foreach ($kategoriler as $kategori): ?>
                             <option value="<?php echo $kategori->id; ?>"
@@ -519,12 +535,23 @@ echo $OUTPUT->header();
                     </select>
                 </div>
 
+                <!-- Filtre butonları -->
                 <div class="col-md-6 col-lg-2">
+                    <label class="form-label text-white small fw-semibold mb-1">.</label>
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bx bx-filter me-1"></i> Filtrele
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bx bx-filter-alt me-1"></i> Uygula
                         </button>
+                        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php', ['depoid' => $depoid]); ?>"
+                           class="btn btn-light btn-lg border" title="Filtreleri Temizle">
+                            <i class="bx bx-reset"></i>
+                        </a>
                     </div>
+                </div>
+
+                <!-- Aktif filtreler -->
+                <div class="col-12 mt-2">
+                    <div class="active-filters d-flex flex-wrap gap-2" id="activeFilters"></div>
                 </div>
             </form>
         </div>
@@ -532,368 +559,304 @@ echo $OUTPUT->header();
 
     <!-- Ana İçerik -->
     <div class="card shadow-sm rounded-3 border-0 animate__animated animate__fadeIn" style="animation-delay: 0.3s">
-        <div class="card-header bg-white py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                        <i class="bx bx-package text-primary" style="font-size: 24px"></i>
-                    </div>
-                    <h5 class="mb-0 fw-bold">Ürün Konumları</h5>
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                    <i class="bx bx-package text-primary" style="font-size: 24px"></i>
                 </div>
-                <div class="d-flex align-items-center">
-                    <button type="button" class="btn btn-sm btn-light me-2" id="refreshTable" title="Tabloyu Yenile">
-                        <i class="bx bx-refresh me-1"></i> Yenile
-                    </button>
-                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
-                       class="btn btn-sm btn-primary">
-                        <i class="bx bx-plus me-1"></i> Yeni Ürün Ekle
-                    </a>
-                </div>
+                <h5 class="mb-0 fw-bold">Ürün Konumları</h5>
+            </div>
+            <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-sm btn-light me-2" id="refreshTable" title="Tabloyu Yenile">
+                    <i class="bx bx-refresh me-1"></i> Yenile
+                </button>
+                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
+                   class="btn btn-sm btn-primary">
+                    <i class="bx bx-plus me-1"></i> Yeni Ürün Ekle
+                </a>
             </div>
         </div>
-        <div class="card-body p-0">
-            <?php if (empty($urunler)): ?>
-                <div class="p-5 text-center">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6598/6598519.png" alt="Boş Depo" style="max-width: 120px; opacity: 0.3">
-                    <h4 class="mt-3">Bu depoda henüz ürün bulunmuyor</h4>
-                    <p class="text-muted">veya filtrelere uygun ürün yok</p>
-                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
-                       class="btn btn-primary mt-3">
-                        <i class="bx bx-plus me-2"></i> Yeni Ürün Ekle
-                    </a>
-                </div>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle" id="urunlerTable">
-                        <thead class="bg-light">
-                        <tr>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 px-4" width="30%">Ürün Adı</th>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="15%">Kategori</th>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="10%">Stok</th>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Bölüm</th>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Raf</th>
-                            <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 text-end pe-4" width="5%">İşlem</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($urunler as $index => $urun): ?>
-                            <tr class="border-bottom" data-id="<?php echo $urun->id; ?>">
-                                <td class="ps-4 py-3">
-                                    <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
-                                    <?php if (!empty($urun->barkod)): ?>
-                                        <div class="small text-muted">
-                                            <i class="bx bx-barcode-reader me-1"></i>
-                                            <?php echo htmlspecialchars($urun->barkod); ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="py-3">
-                                    <?php if (!empty($urun->kategori_adi)): ?>
-                                        <div class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal">
-                                            <i class="bx bx-category text-primary me-1"></i>
-                                            <?php echo htmlspecialchars($urun->kategori_adi); ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="py-3">
-                                    <?php if ($urun->adet > 10): ?>
-                                        <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 fw-medium">
-                                        <i class="bx bx-check me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
-                                    <?php elseif ($urun->adet > 0): ?>
-                                        <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2 fw-medium">
-                                        <i class="bx bx-error me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
-                                    <?php else: ?>
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2 fw-medium">
-                                        <i class="bx bx-x me-1"></i><?php echo $urun->adet; ?> adet
-                                    </span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="bolum-cell py-3">
-                                    <?php if (!empty($urun->bolum)): ?>
-                                        <div class="badge rounded-pill bg-primary-subtle text-primary border px-3 py-2 fw-normal">
-                                            <i class="bx bx-cabinet me-1"></i>
-                                            <?php echo htmlspecialchars($urun->bolum); ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="raf-cell py-3">
-                                    <?php if (!empty($urun->raf)): ?>
-                                        <div class="badge rounded-pill bg-info-subtle text-info border px-3 py-2 fw-normal">
-                                            <i class="bx bx-server me-1"></i>
-                                            <?php echo htmlspecialchars($urun->raf); ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="text-muted fst-italic">Belirtilmemiş</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-end pe-4 py-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn">
-                                        <i class="bx bx-edit me-1"></i> Düzenle
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
+    </div>
+    <div class="card-body p-0">
+<?php if (empty($urunler)): ?>
+    <div class="p-5 text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/6598/6598519.png" alt="Boş Depo" style="max-width: 120px; opacity: 0.3">
+        <h4 class="mt-3">Bu depoda henüz ürün bulunmuyor</h4>
+        <p class="text-muted">veya filtrelere uygun ürün yok</p>
+        <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]); ?>"
+           class="btn btn-primary mt-3">
+            <i class="bx bx-plus me-2"></i> Yeni Ürün Ekle
+        </a>
+    </div>
+<?php else: ?>
+    <div class="table-responsive">
+    <table class="table table-borderless align-middle" id="urunlerTable">
+    <thead class="bg-light">
+    <tr>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 px-4" width="30%">Ürün Adı</th>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="15%">Kategori</th>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="10%">Stok</th>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Bölüm</th>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7" width="20%">Raf</th>
+        <th class="py-3 text-uppercase text-secondary fw-semibold fs-7 text-end pe-4" width="5%">İşlem</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($urunler as $index => $urun): ?>
+    <tr class="border-bottom" data-id="<?php echo $urun->id; ?>">
+        <td class="ps-4 py-3">
+            <div class="fw-medium"><?php echo htmlspecialchars($urun->name); ?></div>
+            <?php if (!empty($urun->barkod)): ?>
+                <div class="small text-muted">
+                    <i class="bx bx-barcode-reader me-1"></i>
+                    <?php echo htmlspecialchars($urun->barkod); ?>
                 </div>
             <?php endif; ?>
+        </td>
+        <td class="py-3">
+            <?php if (!empty($urun->kategori_adi)): ?>
+                <div class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-normal">
+                    <i class="bx bx-category text-primary me-1"></i>
+                    <?php echo htmlspecialchars($urun->kategori_adi); ?>
+                </div>
+            <?php else: ?>
+                <span class="text-muted fst-italic">Belirtilmemiş</span>
+            <?php endif; ?>
+        </td>
+        <td class="py-3">
+        <?php if ($urun->adet > 10): ?>
+            <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 fw-medium">
+                                            <i class="bx bx-check-circle me-1"></i>
+            <?php echo $urun->adet; ?> adet
+                                        </span>
+        <?php elseif ($urun->adet > 0): ?>
+            <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2 fw-medium">
+                                            <i class="bx bx-error-circle me-1"></i>
+                                            <?php echo $urun->adet; ?> adet
+                                        </span>
+        <?php else: ?>
+            <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2 fw-medium">
+                                            <i class="bx bx-x-circle me-1"></i>
+                                            <?php echo $urun->adet; ?> adet
+                                        </span>
+        <?php endif; ?>
+        </td>
+        <td class="bolum-cell py-3">
+            <?php if (!empty($urun->bolum)): ?>
+                <div class="badge rounded-pill bg-primary-subtle text-primary border px-3 py-2 fw-normal">
+                    <i class="bx bx-cabinet me-1"></i>
+                    <?php echo htmlspecialchars($urun->bolum); ?>
+                </div>
+            <?php else: ?>
+                <span class="text-muted fst-italic">Belirtilmemiş</span>
+            <?php endif; ?>
+        </td>
+        <td class="raf-cell py-3">
+            <?php if (!empty($urun->raf)): ?>
+                <div class="badge rounded-pill bg-info-subtle text-info border px-3 py-2 fw-normal">
+                    <i class="bx bx-server me-1"></i>
+                    <?php echo htmlspecialchars($urun->raf); ?>
+                </div>
+            <?php else: ?>
+                <span class="text-muted fst-italic">Belirtilmemiş</span>
+            <?php endif; ?>
+        </td>
+        <td class="text-end pe-4 py-3">
+            <button type="button" class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn">
+                <i class="bx bx-edit me-1"></i> Düzenle
+            </button>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+    </tbody>
+    </table>
+    </div>
+<?php endif; ?>
+    </div>
+    </div>
+    </div>
+
+    <!-- Ürün Konum Düzenleme Modal -->
+    <div class="modal fade" id="urunDuzenleModal" tabindex="-1" aria-labelledby="urunDuzenleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="urunDuzenleModalLabel">Ürün Konumu Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="konumDuzenleForm">
+                        <input type="hidden" id="urunId" name="urunid">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
+
+                        <div class="mb-3">
+                            <label for="urunAdi" class="form-label">Ürün Adı</label>
+                            <input type="text" class="form-control" id="urunAdi" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bolumInput" class="form-label">Bölüm</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bx bx-cabinet"></i></span>
+                                <input type="text" class="form-control" id="bolumInput" name="bolum" list="bolumList" placeholder="Bölüm adı girin...">
+                                <datalist id="bolumList">
+                                    <?php foreach($tum_bolumler as $bolum_item): ?>
+                                    <option value="<?php echo htmlspecialchars($bolum_item->bolum); ?>">
+                                        <?php endforeach; ?>
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="rafInput" class="form-label">Raf</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bx bx-server"></i></span>
+                                <input type="text" class="form-control" id="rafInput" name="raf" list="rafList" placeholder="Raf adı girin...">
+                                <datalist id="rafList">
+                                    <?php foreach($tum_raflar as $raf_item): ?>
+                                    <option value="<?php echo htmlspecialchars($raf_item->raf); ?>">
+                                        <?php endforeach; ?>
+                                </datalist>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" id="konumKaydet">Kaydet</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Düzenleme Modalı -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="editModalLabel">
-                    <i class="bx bx-edit me-2"></i>Raf ve Bölüm Düzenle
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    <input type="hidden" id="edit_urun_id" name="urunid">
-                    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-
-                    <div class="mb-4">
-                        <label for="edit_urun_adi" class="form-label text-muted small text-uppercase fw-semibold">Ürün Adı</label>
-                        <input type="text" class="form-control form-control-lg" id="edit_urun_adi" disabled>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="edit_bolum" class="form-label text-muted small text-uppercase fw-semibold">Bölüm</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text bg-white"><i class="bx bx-cabinet text-primary"></i></span>
-                            <select class="form-select" id="edit_bolum" name="bolum">
-                                <option value="">-- Bölüm Seçin --</option>
-                                <option value="Tişört">Tişört</option>
-                                <option value="Pantolon">Pantolon</option>
-                                <option value="Ayakkabı">Ayakkabı</option>
-                                <option value="Gömlek">Gömlek</option>
-                                <option value="Elbise">Elbise</option>
-                                <option value="Ceket">Ceket</option>
-                                <option value="Aksesuar">Aksesuar</option>
-                                <option value="Çanta">Çanta</option>
-                                <option value="İç Giyim">İç Giyim</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="edit_raf" class="form-label text-muted small text-uppercase fw-semibold">Raf</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text bg-white"><i class="bx bx-server text-primary"></i></span>
-                            <select class="form-select" id="edit_raf" name="raf">
-                                <option value="">-- Önce Bölüm Seçin --</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">İptal</button>
-                <button type="button" class="btn btn-primary" id="save-changes">Kaydet</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Bootstrap Modal ve SweetAlert için gerekli JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Bootstrap Modal nesnesini oluşturma
-            let editModal;
-            if (typeof bootstrap !== 'undefined') {
-                editModal = new bootstrap.Modal(document.getElementById('editModal'));
-            } else {
-                console.error('Bootstrap kütüphanesi yüklenemedi.');
+            // Aktif filtreleri say ve göster
+            const search = "<?php echo htmlspecialchars($search); ?>";
+            const filterBolum = "<?php echo htmlspecialchars($filter_bolum); ?>";
+            const filterRaf = "<?php echo htmlspecialchars($filter_raf); ?>";
+            const filterKategori = "<?php echo intval($filter_kategori); ?>";
+            const filterKategoriText = filterKategori > 0 ?
+                document.querySelector('select[name="filter_kategori"] option[value="'+filterKategori+'"]')?.textContent : '';
+
+            const activeFilters = document.getElementById('activeFilters');
+            const filterCountBadge = document.getElementById('filterCount');
+            let filterCount = 0;
+
+            // Arama filtresi
+            if (search) {
+                addFilterTag('Arama: ' + search, 'search');
+                filterCount++;
             }
 
-            const editBolumSelect = document.getElementById("edit_bolum");
-            const editRafSelect = document.getElementById("edit_raf");
-            const editForm = document.getElementById('editForm');
-            const saveChangesBtn = document.getElementById('save-changes');
+            // Bölüm filtresi
+            if (filterBolum) {
+                addFilterTag('Bölüm: ' + filterBolum, 'filter_bolum');
+                filterCount++;
+            }
+
+            // Raf filtresi
+            if (filterRaf) {
+                addFilterTag('Raf: ' + filterRaf, 'filter_raf');
+                filterCount++;
+            }
+
+            // Kategori filtresi
+            if (filterKategori > 0 && filterKategoriText) {
+                addFilterTag('Kategori: ' + filterKategoriText, 'filter_kategori');
+                filterCount++;
+            }
+
+            // Filtre sayısını güncelle
+            filterCountBadge.textContent = filterCount;
+
+            // Filtre etiketi ekleme fonksiyonu
+            function addFilterTag(text, param) {
+                const tag = document.createElement('span');
+                tag.className = 'badge rounded-pill bg-light text-dark border px-3 py-2 d-flex align-items-center';
+                tag.innerHTML = `
+                    ${text}
+                    <a href="#" class="ms-2 text-danger" data-param="${param}" onclick="removeFilter(event, '${param}')">
+                        <i class="bx bx-x"></i>
+                    </a>
+                `;
+                activeFilters.appendChild(tag);
+            }
+
+            // Modal işlemleri
+            const modal = new bootstrap.Modal(document.getElementById('urunDuzenleModal'));
+            const editButtons = document.querySelectorAll('.edit-btn');
             const refreshBtn = document.getElementById('refreshTable');
 
-            // Yenile butonu tıklandığında
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', function() {
-                    location.reload();
-                });
-            }
-
-            // Düzenleme butonu tıklandığında
-            document.querySelectorAll('.edit-btn').forEach(button => {
+            editButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const row = this.closest('tr');
                     const urunId = row.dataset.id;
-                    const urunAdi = row.querySelector('td:nth-child(2) div').textContent.trim();
-                    const bolumCell = row.querySelector('.bolum-cell');
-                    const rafCell = row.querySelector('.raf-cell');
+                    const urunAdi = row.querySelector('td:first-child .fw-medium').textContent;
+                    const bolum = row.querySelector('.bolum-cell .badge') ?
+                        row.querySelector('.bolum-cell .badge').textContent.trim() : '';
+                    const raf = row.querySelector('.raf-cell .badge') ?
+                        row.querySelector('.raf-cell .badge').textContent.trim() : '';
 
-                    // Bölüm ve raf değerlerini al
-                    let bolum = '-';
-                    let raf = '-';
+                    document.getElementById('urunId').value = urunId;
+                    document.getElementById('urunAdi').value = urunAdi;
+                    document.getElementById('bolumInput').value = bolum;
+                    document.getElementById('rafInput').value = raf;
 
-                    if (bolumCell) {
-                        const bolumSpan = bolumCell.querySelector('span.raf-badge');
-                        bolum = bolumSpan ? bolumSpan.textContent.trim() : '';
-                    }
-
-                    if (rafCell) {
-                        const rafSpan = rafCell.querySelector('span.raf-badge');
-                        raf = rafSpan ? rafSpan.textContent.trim() : '';
-                    }
-
-                    if (bolum === '-') bolum = '';
-                    if (raf === '-') raf = '';
-
-                    // Modal alanlarını doldur
-                    document.getElementById('edit_urun_id').value = urunId;
-                    document.getElementById('edit_urun_adi').value = urunAdi;
-
-                    // Bölüm seçimini ayarla
-                    for(let i = 0; i < editBolumSelect.options.length; i++) {
-                        if(editBolumSelect.options[i].text === bolum) {
-                            editBolumSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
-
-                    // Raf seçeneklerini güncelle ve seçimi ayarla
-                    updateRaflar.call(editBolumSelect, raf);
-
-                    // Modal'ı göster
-                    if (editModal) {
-                        editModal.show();
-                    } else {
-                        alert('Modal açılamadı. Sayfayı yenileyin veya tarayıcınızı güncelleyin.');
-                    }
+                    modal.show();
                 });
             });
 
-            // Bölüm değiştiğinde rafları güncelle
-            if (editBolumSelect) {
-                editBolumSelect.addEventListener("change", updateRaflar);
-            }
+            // Konum kaydetme
+            document.getElementById('konumKaydet').addEventListener('click', function() {
+                const urunId = document.getElementById('urunId').value;
+                const bolum = document.getElementById('bolumInput').value;
+                const raf = document.getElementById('rafInput').value;
+                const sesskey = document.querySelector('input[name="sesskey"]').value;
 
-            // Değişikliği kaydet butonu
-            if (saveChangesBtn) {
-                saveChangesBtn.addEventListener('click', function() {
-                    const formData = new FormData(editForm);
-                    formData.append('action', 'update');
-                    formData.append('depoid', <?php echo $depoid; ?>);
-
-                    // AJAX ile verileri gönder
-                    fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                if (typeof Swal !== 'undefined') {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Başarılı!',
-                                        text: 'Raf bilgileri güncellendi.',
-                                        confirmButtonColor: '#3e64ff'
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                } else {
-                                    alert('Başarılı! Raf bilgileri güncellendi.');
-                                    location.reload();
-                                }
-                            } else {
-                                if (typeof Swal !== 'undefined') {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Hata!',
-                                        text: data.message || 'Bir hata oluştu.',
-                                        confirmButtonColor: '#3e64ff'
-                                    });
-                                } else {
-                                    alert('Hata: ' + (data.message || 'Bir hata oluştu.'));
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Hata:', error);
-                            if (typeof Swal !== 'undefined') {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Bağlantı Hatası!',
-                                    text: 'Sunucuyla bağlantı kurulamadı.',
-                                    confirmButtonColor: '#3e64ff'
-                                });
-                            } else {
-                                alert('Bağlantı Hatası! Sunucuyla bağlantı kurulamadı.');
-                            }
-                        });
-                });
-            }
-
-            // Rafları güncelleme fonksiyonu
-            function updateRaflar(selectedRaf) {
-                const bolum = this.value;
-
-                // Raf seçimini temizle
-                editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
-
-                // Bölüme göre rafları ayarla
-                if (bolum === "Tişört" || bolum === "Gömlek") {
-                    addRafOption(editRafSelect, "A1 Rafı");
-                    addRafOption(editRafSelect, "A2 Rafı");
-                    addRafOption(editRafSelect, "A3 Rafı");
-                } else if (bolum === "Pantolon") {
-                    addRafOption(editRafSelect, "B1 Rafı");
-                    addRafOption(editRafSelect, "B2 Rafı");
-                    addRafOption(editRafSelect, "B3 Rafı");
-                } else if (bolum === "Ayakkabı") {
-                    addRafOption(editRafSelect, "C1 Rafı");
-                    addRafOption(editRafSelect, "C2 Rafı");
-                    addRafOption(editRafSelect, "C3 Rafı");
-                    addRafOption(editRafSelect, "C4 Rafı");
-                } else if (bolum === "Aksesuar" || bolum === "Çanta") {
-                    addRafOption(editRafSelect, "D1 Rafı");
-                    addRafOption(editRafSelect, "D2 Rafı");
-                } else if (bolum) {
-                    // Diğer tüm bölümler için
-                    addRafOption(editRafSelect, "E1 Rafı");
-                    addRafOption(editRafSelect, "E2 Rafı");
-                    addRafOption(editRafSelect, "E3 Rafı");
-                }
-
-                // Eğer önceden seçilmiş bir raf varsa onu seç
-                if (selectedRaf) {
-                    for(let i = 0; i < editRafSelect.options.length; i++) {
-                        if(editRafSelect.options[i].text === selectedRaf) {
-                            editRafSelect.selectedIndex = i;
-                            break;
+                fetch('<?php echo $PAGE->url; ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=update&urunid=${urunId}&bolum=${encodeURIComponent(bolum)}&raf=${encodeURIComponent(raf)}&sesskey=${sesskey}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            modal.hide();
+                            // Sayfayı yenile
+                            location.reload();
+                        } else {
+                            alert('Hata: ' + data.message);
                         }
-                    }
-                }
-            }
+                    })
+                    .catch(error => {
+                        console.error('Hata:', error);
+                        alert('İşlem sırasında bir hata oluştu.');
+                    });
+            });
 
-            // Raf seçeneği ekleme yardımcı fonksiyonu
-            function addRafOption(select, value) {
-                const option = document.createElement("option");
-                option.value = value;
-                option.text = value;
-                select.appendChild(option);
-            }
+            // Tabloyu yenileme
+            refreshBtn.addEventListener('click', function() {
+                location.reload();
+            });
         });
+
+        // Global fonksiyon olarak tanımla
+        window.removeFilter = function(event, param) {
+            event.preventDefault();
+            // Mevcut URL'yi al
+            const url = new URL(window.location.href);
+            // İlgili parametreyi kaldır
+            url.searchParams.delete(param);
+            // Sayfayı yeniden yükle
+            window.location.href = url.toString();
+        };
     </script>
 
 <?php
 echo $OUTPUT->footer();
-?>
