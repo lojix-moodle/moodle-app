@@ -457,6 +457,38 @@ echo $OUTPUT->header();
                             <div class="form-text">Depoya eklemek istediğiniz ürünün adını girin</div>
                         </div>
 
+                        <!-- Barkod bileşeni -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0"><i class="fas fa-barcode me-2"></i>Ürün Barkodu</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="barkod" class="form-label">Barkod:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="barkod" name="barkod" class="form-control" placeholder="Barkod numarası girin veya otomatik oluşturun">
+                                                <button type="button" class="btn btn-outline-secondary" id="generate-random-barcode">Otomatik Oluştur</button>
+                                            </div>
+                                            <div class="form-text text-muted">Benzersiz bir barkod numarası girin veya otomatik oluşturun.</div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" id="generate-barcode">Barkod Görüntüle</button>
+                                    </div>
+                                    <div class="col-md-6 text-center">
+                                        <div class="mb-3">
+                                            <div class="p-3 border rounded bg-white">
+                                                <svg id="barcode-svg"></svg>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary" id="print-barcode" disabled>
+                                            <i class="fas fa-print me-2"></i>Yazdır
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Raf ve Bölüm Bilgileri -->
                         <div class="row mb-4">
                             <!-- Bölüm -->
@@ -980,6 +1012,82 @@ echo $OUTPUT->header();
         }
     });
     </script>
+
+<!-- JSBarcode kütüphanesi -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const barkodInput = document.getElementById('barkod');
+        const generateRandomBtn = document.getElementById('generate-random-barcode');
+        const generateBtn = document.getElementById('generate-barcode');
+        const printBtn = document.getElementById('print-barcode');
+
+        // Rastgele barkod oluştur
+        generateRandomBtn.addEventListener('click', function() {
+            // EAN-13 formatı için 12 haneli rakam oluştur (13. hane kontrol karakteri)
+            let randomBarcode = '';
+            for (let i = 0; i < 12; i++) {
+                randomBarcode += Math.floor(Math.random() * 10);
+            }
+            barkodInput.value = randomBarcode;
+
+            // Barkodu görselleştir
+            generateBtn.click();
+        });
+
+        // Barkod görselleştirme
+        generateBtn.addEventListener('click', function() {
+            if (barkodInput.value.trim() !== '') {
+                try {
+                    JsBarcode("#barcode-svg", barkodInput.value.trim(), {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                    printBtn.disabled = false;
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Geçersiz barkod formatı: ' + e.message
+                    });
+                    printBtn.disabled = true;
+                }
+            } else {
+                document.getElementById('barcode-svg').innerHTML = '';
+                printBtn.disabled = true;
+            }
+        });
+
+        // Barkod yazdırma
+        printBtn.addEventListener('click', function() {
+            const productName = document.getElementById('name').value || 'Yeni Ürün';
+
+            const printWindow = window.open('', '', 'height=400,width=600');
+            printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h3>' + productName + '</h3>');
+            printWindow.document.write(document.getElementById('barcode-svg').outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+
+        // Ürün adı değiştiğinde barkod yazdırma butonunu güncelle
+        document.getElementById('name').addEventListener('input', function() {
+            if (document.getElementById('barcode-svg').innerHTML !== '') {
+                printBtn.disabled = false;
+            }
+        });
+    });
+</script>
 
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
