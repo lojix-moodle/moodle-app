@@ -441,6 +441,100 @@ echo $OUTPUT->header();
                             <div class="form-text">Depodaki ürünün adını girin</div>
                         </div>
 
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod Oluşturma</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="barcode-type" class="form-label">Barkod Türü:</label>
+                                            <select id="barcode-type" class="form-select">
+                                                <option value="code128">Code 128</option>
+                                                <option value="code39">Code 39</option>
+                                                <option value="ean13">EAN-13</option>
+                                                <option value="ean8">EAN-8</option>
+                                                <option value="upc">UPC</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="barcode-value" class="form-label">Barkod Değeri:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="barcode-value" class="form-control" value="<?php echo htmlspecialchars($urun->barkod ?: ''); ?>" placeholder="Barkod değeri veya ürün kodu">
+                                                <button class="btn btn-primary" id="generate-barcode">Oluştur</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-center">
+                                        <div class="mb-3">
+                                            <label class="form-label">Önizleme:</label>
+                                            <div class="barcode-container p-3 border rounded bg-white">
+                                                <svg id="barcode-svg"></svg>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-outline-primary" id="print-barcode">
+                                            <i class="fas fa-print me-2"></i>Yazdır
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const generateBtn = document.getElementById('generate-barcode');
+                                const printBtn = document.getElementById('print-barcode');
+                                const barcodeType = document.getElementById('barcode-type');
+                                const barcodeValue = document.getElementById('barcode-value');
+
+                                // Barkod oluştur
+                                generateBtn.addEventListener('click', function() {
+                                    if (barcodeValue.value.trim() !== '') {
+                                        try {
+                                            JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
+                                                format: barcodeType.value,
+                                                lineColor: "#000",
+                                                width: 2,
+                                                height: 100,
+                                                displayValue: true
+                                            });
+                                        } catch (e) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Hata!',
+                                                text: 'Barkod oluşturulamadı: ' + e.message
+                                            });
+                                        }
+                                    }
+                                });
+
+                                // Barkod yazdırma
+                                printBtn.addEventListener('click', function() {
+                                    const printWindow = window.open('', '', 'height=500,width=800');
+                                    printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+                                    printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
+                                    printWindow.document.write('</head><body>');
+                                    printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
+                                    printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
+                                    printWindow.document.write('</body></html>');
+                                    printWindow.document.close();
+                                    printWindow.focus();
+
+                                    // Kısa gecikme sonrası yazdır
+                                    setTimeout(() => {
+                                        printWindow.print();
+                                        printWindow.close();
+                                    }, 500);
+                                });
+
+                                // Sayfa yüklendiğinde varsayılan barkod oluştur
+                                if (barcodeValue.value.trim() !== '') {
+                                    generateBtn.click();
+                                }
+                            });
+                        </script>
+
                         <!-- Minimum Stok Seviyesi -->
                         <div class="mb-4">
                             <label for="min_stok_seviyesi" class="form-label">

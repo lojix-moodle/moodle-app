@@ -14,6 +14,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Raf ve Bölüm Düzenle');
 $PAGE->set_heading('Raf ve Bölüm Düzenle');
 
+
 // Moodle'un kendi CSS ve JS sistemini kullan
 $PAGE->requires->css('/blocks/depo_yonetimi/assets/css/styles.css');
 // Bootstrap'i harici kaynaktan yükleme girişimini kaldırıyoruz
@@ -54,6 +55,37 @@ if (optional_param('islem', '', PARAM_ALPHA) === 'kaydet' && confirm_sesskey()) 
 // Sayfa çıktısı
 echo $OUTPUT->header();
 ?>
+
+
+    <!-- Barkod tarayıcı bileşenini ekleyelim -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod Oluşturma</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Mevcut Barkod:</label>
+                        <input type="text" id="barcode-value" class="form-control"
+                               value="<?php echo htmlspecialchars($urun->barkod ?: ''); ?>"
+                               placeholder="Barkod değeri giriniz">
+                    </div>
+                    <button class="btn btn-primary" id="generate-barcode">Barkod Oluştur</button>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="mb-3">
+                        <div class="p-3 border rounded bg-white">
+                            <svg id="barcode-svg"></svg>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary" id="print-barcode">
+                        <i class="fas fa-print me-2"></i>Yazdır
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <style>
         :root {
@@ -255,6 +287,149 @@ echo $OUTPUT->header();
         </div>
     </div>
 
+    <!-- Barkod kütüphaneleri -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Barkod tarama işlevleri
+            const startScannerBtn = document.getElementById('start-scanner');
+            const stopScannerBtn = document.getElementById('stop-scanner');
+            const scanResult = document.getElementById('scan-result');
+            const barkodInput = document.getElementById('barkod-input');
+            const barkodAraBtn = document.getElementById('barkod-ara');
+
+            let isScanning = false;
+
+            // Taramayı başlat
+            startScannerBtn.addEventListener('click', function() {
+                if (!isScanning) {
+                    startScanner();
+                    startScannerBtn.setAttribute('disabled', 'disabled');
+                    stopScannerBtn.removeAttribute('disabled');
+                }
+            });
+
+            // Taramayı durdur
+            stopScannerBtn.addEventListener('click', function() {
+                if (isScanning) {
+                    stopScanner();
+                    startScannerBtn.removeAttribute('disabled');
+                    stopScannerBtn.setAttribute('disabled', 'disabled');
+                }
+            });
+
+            // Manuel barkod arama
+            barkodAraBtn.addEventListener('click', function() {
+                if (barkodInput.value.trim() !== '') {
+                    aramaYap(barkodInput.value.trim());
+                }
+            });
+
+            // Quagga kütüphanesi ile barkod tarama
+            function startScanner() {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector('#video')
+                    },
+                    decoder: {
+                        readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_93_reader", "upc_reader", "upc_e_reader"]
+                    }
+                }, function(err) {
+                    if (err) {
+                        console.error(err);
+                        scanResult.innerHTML = '<span class="text-danger">Kamera başlatılamadı!</span>';
+                        return;
+                    }
+                    Quagga.start();
+                    isScanning = true;
+                });
+
+                // Barkod okunduğunda
+                Quagga.onDetected(function(result) {
+                    var code = result.codeResult.code;
+                    scanResult.innerHTML = '<span class="text-success fw-bold">' + code + '</span>';
+                    // Barkod ile arama yap
+                    aramaYap(code);
+                    // Otomatik durdur
+                    stopScanner();
+                    startScannerBtn.removeAttribute('disabled');
+                    stopScannerBtn.setAttribute('disabled', 'disabled');
+                });
+            }
+
+            function stopScanner() {
+                if (isScanning) {
+                    Quagga.stop();
+                    isScanning = false;
+                }
+            }
+
+            // Barkod ile arama yap
+            function aramaYap(code) {
+                // Mevcut ürünün barkodu ile karşılaştır
+                const mevcutBarkod = '<?php echo $urun->barkod; ?>';
+
+                if (code === mevcutBarkod) {
+                    // Barkod eşleşti, ürün bilgilerini vurgula
+                    document.querySelector('.product-info').classList.add('bg-success-subtle');
+                    setTimeout(() => {
+                        document.querySelector('.product-info').classList.remove('bg-success-subtle');
+                    }, 2000);
+                } else {
+                    // Barkod eşleşmedi
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Ürün Eşleşmedi',
+                        text: 'Bu barkod mevcut ürün ile eşleşmiyor. Farklı bir ürün aramak ister misiniz?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Raf Yönetimine Git',
+                        cancelButtonText: 'İptal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '<?php echo new moodle_url("/blocks/depo_yonetimi/actions/raf_yonetimi.php", ["depoid" => $depoid]); ?>';
+                        }
+                    });
+                }
+            }
+        });
+
+
+        // Barkod oluşturma ve yazdırma
+        document.getElementById('generate-barcode').addEventListener('click', function() {
+            const value = document.getElementById('barcode-value').value.trim();
+            if (value) {
+                JsBarcode("#barcode-svg", value, {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 2,
+                    height: 100,
+                    displayValue: true
+                });
+            }
+        });
+
+        document.getElementById('print-barcode').addEventListener('click', function() {
+            const printWindow = window.open('', '', 'height=400,width=600');
+            printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h3><?php echo htmlspecialchars($urun->name); ?></h3>');
+            printWindow.document.write(document.querySelector('#barcode-svg').outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+    </script>
+    <!-- SweetAlert2 kütüphanesini ekleyin -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <?php
 // JavaScript'i Moodle API'si ile ekle
 $js = "
@@ -320,6 +495,11 @@ $js = "
     });
 ";
 
-$PAGE->requires->js_init_code($js);
+
+$PAGE->requires->js_amd_inline($js);
+// Harici kütüphaneleri ekle
+$PAGE->requires->js_external('https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js');
+$PAGE->requires->js_external('https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js');
+$PAGE->requires->js_external('https://cdn.jsdelivr.net/npm/sweetalert2@11');
 echo $OUTPUT->footer();
 ?>
