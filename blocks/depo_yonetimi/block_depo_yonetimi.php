@@ -254,7 +254,7 @@ class="btn btn-info">
                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/stok_ekle.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
-                        ]) . '" class="btn btn-sm btn-outline-success">
+                        ]) . '" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Stok Hareketi">
     <i class="fas fa-cube"></i>
 </a>
                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
@@ -284,6 +284,7 @@ class="btn btn-info">
                 </div>
     
                 <script>
+                
                 document.addEventListener("DOMContentLoaded", function() {
                     // Arama fonksiyonu
                     const searchInput = document.getElementById("urunArama");
@@ -307,6 +308,12 @@ class="btn btn-info">
     
                     searchInput.addEventListener("input", filterTable);
                     kategoriSelect.addEventListener("change", filterTable);
+                    
+                     // Tooltip\'leri başlatmak için
+    if (typeof bootstrap !== \'undefined\') {
+        const tooltipTriggerList = document.querySelectorAll(\'[data-bs-toggle="tooltip"]\');
+        [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
+    }
                 });
                 </script>';
 
