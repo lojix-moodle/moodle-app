@@ -659,11 +659,10 @@ echo $OUTPUT->header();
                                         <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-end pe-4 py-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn">
-                                        <i class="bx bx-edit me-1"></i> Düzenle
-                                    </button>
-                                </td>
+                                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]); ?>"
+                                   class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3">
+                                    <i class="fa fa-edit me-1"></i> Düzenle
+                                </a>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
