@@ -152,11 +152,11 @@
                                     <i class="fas fa-plus"></i> Yeni Ürün Ekle
                                 </a>
                                 
-                                <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php', ['depoid' => $secili_depo->id]) . '" 
-                class="btn btn-info">
-                <i class="fas fa-th-list me-2"></i> Raf Yönetimi
-            </a>
-                            </div>
+                               <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php', ['depoid' => $depo->id]) . '" 
+class="btn btn-info">
+<i class="fas fa-th-list me-2"></i> Raf Yönetimi
+</a>
+      </div>
                         </div>
                     </div>
     
@@ -255,8 +255,8 @@
                             'depoid' => $depoid,
                             'urunid' => $urun->id
                         ]) . '" class="btn btn-sm btn-outline-success">
-                    <i class="fas fa-cube"></i>
-                </a>
+    <i class="fas fa-cube"></i>
+</a>
                 <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/urun_duzenle.php', [
                             'depoid' => $depoid,
                             'urunid' => $urun->id
