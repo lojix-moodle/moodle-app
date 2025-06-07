@@ -187,7 +187,6 @@ echo $OUTPUT->header();
                             <h3 class="product-title"><?php echo htmlspecialchars($urun->name); ?></h3>
                             <div class="detail">
                                 <i class="bx bx-barcode"></i>
-
                                 <span><?php echo !empty($urun->barkod) ? htmlspecialchars($urun->barkod) : 'Barkod belirtilmemiş'; ?></span>
                             </div>
                             <div class="detail">
