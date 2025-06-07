@@ -623,5 +623,5 @@ echo '<script>
     AOS.init();
 </script>';
 
-echo $OUTPUT->footer();
+echo $OUTPUT->footer() ;
 ?>
