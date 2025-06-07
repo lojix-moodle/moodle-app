@@ -22,9 +22,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../../config.php');
+// Doğru config.php yolu kontrol edilmeli
+if (file_exists(__DIR__ . '/../../config.php')) {
+    require_once(__DIR__ . '/../../config.php');
+} else {
+    // Eğer farklı bir konumdaysa
+    require_once('../config.php');
+}
+
+global $CFG, $PAGE, $SITE, $OUTPUT, $DB; // Değişkenleri global olarak tanımla
+
+// Gerekli kütüphaneleri dahil et
 require_once($CFG->dirroot .'/course/lib.php');
 require_once($CFG->libdir .'/filelib.php');
+
+// Geri kalan kod...
 
 redirect_if_major_upgrade_required();
 
@@ -338,6 +350,7 @@ body.path-site .card:hover {
 </style>';
 
 // JavaScript kodları doğrudan HTML içerisine ekleniyor
+// JavaScript kodları doğrudan HTML içerisine ekleniyor
 echo '<script>
 document.addEventListener("DOMContentLoaded", function() {
     // AOS animasyon kütüphanesini başlat
@@ -358,10 +371,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const updateCounter = () => {
             current += step;
             if (current < target) {
-                counter.innerText = current.toLocaleString();
-                window.requestAnimationFrame(updateCounter);
+                counter.textContent = current;
+                setTimeout(updateCounter, 16);
             } else {
-                counter.innerText = target.toLocaleString();
+                counter.textContent = target;
             }
         };
 
@@ -382,28 +395,19 @@ document.addEventListener("DOMContentLoaded", function() {
             type: "line",
             data: {
                 labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
-                datasets: [
-                    {
-                        label: "Giriş",
-                        data: [450, 380, 520, 490, 600, 530],
-                        backgroundColor: "rgba(46, 125, 50, 0.2)",
-                        borderColor: "rgba(46, 125, 50, 1)",
-                        borderWidth: 2,
-                        pointBackgroundColor: "#fff",
-                        pointBorderColor: "rgba(46, 125, 50, 1)",
-                        pointRadius: 5
-                    },
-                    {
-                        label: "Çıkış",
-                        data: [400, 340, 480, 450, 560, 480],
-                        backgroundColor: "rgba(211, 47, 47, 0.2)",
-                        borderColor: "rgba(211, 47, 47, 1)",
-                        borderWidth: 2,
-                        pointBackgroundColor: "#fff",
-                        pointBorderColor: "rgba(211, 47, 47, 1)",
-                        pointRadius: 5
-                    }
-                ]
+                datasets: [{
+                    label: "Stok Girişi",
+                    data: [65, 78, 52, 91, 43, 87],
+                    borderColor: "#4caf50",
+                    backgroundColor: "rgba(76, 175, 80, 0.1)",
+                    tension: 0.4
+                }, {
+                    label: "Stok Çıkışı",
+                    data: [42, 55, 49, 70, 40, 65],
+                    borderColor: "#f44336",
+                    backgroundColor: "rgba(244, 67, 54, 0.1)",
+                    tension: 0.4
+                }]
             },
             options: {
                 responsive: true,
@@ -411,10 +415,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 plugins: {
                     legend: {
                         position: "top"
-                    },
-                    tooltip: {
-                        mode: "index",
-                        intersect: false
                     }
                 },
                 scales: {
@@ -434,7 +434,7 @@ document.addEventListener("DOMContentLoaded", function() {
             data: {
                 labels: ["Giyim", "Ayakkabı", "Aksesuar", "Çanta", "Elektronik"],
                 datasets: [{
-                    data: [35, 25, 20, 15, 5],
+                    data: [35, 25, 15, 10, 15],
                     backgroundColor: [
                         "#4caf50",
                         "#2196f3",
@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: "right"
+                        position: "bottom"
                     }
                 }
             }
