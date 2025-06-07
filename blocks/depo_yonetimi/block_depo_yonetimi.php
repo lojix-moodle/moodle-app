@@ -201,6 +201,7 @@ class="btn btn-info">
                                 <table class="table table-hover urun-tablosu mb-0">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>Barkod</th> <!-- Yeni sütun -->
                                             <th class="ps-4">Ürün Adı</th>
                                             <th>Kategori</th>
                                             <th>Raf</th>
