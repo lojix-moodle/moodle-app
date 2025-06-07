@@ -16,7 +16,7 @@ $PAGE->set_title('Raf Yönetimi');
 $PAGE->set_heading('Raf Yönetimi');
 
 // CSS ve JS ekle
-$PAGE->requires->css_theme_url('/blocks/depo_yonetimi/assets/css/styles.css');
+$PAGE->requires->css('/blocks/depo_yonetimi/assets/css/styles.css');
 $PAGE->requires->js_call_amd('block_depo_yonetimi/raf_yonetimi', 'init');
 
 // Depo bilgisini al
