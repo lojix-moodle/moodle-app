@@ -355,35 +355,53 @@ echo $OUTPUT->header();
     </div>
 
     <!-- İstatistikler -->
-    <div class="row mb-5 animate__animated animate__fadeIn" style="animation-delay: 0.1s">
+    <div class="row mb-4">
         <div class="col-md-4 mb-4">
-            <div class="stat-card bg-gradient-primary text-white">
-                <div class="stat-icon">
-                    <i class="bx bx-package"></i>
+            <div class="card bg-info text-white shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2">Toplam Ürün</h6>
+                            <h2 class="mb-0 fw-bold"><?php echo count($urunler); ?></h2>
+                            <small>Bu depodaki toplam ürün sayısı</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-box-open fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-label">Toplam Ürün</div>
-                <div class="stat-value"><?php echo count($urunler); ?></div>
-                <div class="stat-description">Bu depodaki toplam ürün sayısı</div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="stat-card bg-gradient-success text-white">
-                <div class="stat-icon">
-                    <i class="bx bx-cabinet"></i>
+            <div class="card bg-primary text-white shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2">Bölümler</h6>
+                            <h2 class="mb-0 fw-bold"><?php echo count($tum_bolumler); ?></h2>
+                            <small>Farklı bölüm sayısı</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-th-large fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-label">Bölümler</div>
-                <div class="stat-value"><?php echo count($tum_bolumler); ?></div>
-                <div class="stat-description">Farklı bölüm sayısı</div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="stat-card bg-gradient-info text-white">
-                <div class="stat-icon">
-                    <i class="bx bx-server"></i>
+            <div class="card bg-success text-white shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2">Raflar</h6>
+                            <h2 class="mb-0 fw-bold"><?php echo count($tum_raflar); ?></h2>
+                            <small>Farklı raf sayısı</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-layer-group fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-label">Raflar</div>
-                <div class="stat-value"><?php echo count($tum_raflar); ?></div>
-                <div class="stat-description">Farklı raf sayısı</div>
             </div>
         </div>
     </div>
