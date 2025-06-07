@@ -15,569 +15,796 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Depo Yönetim Sistemi - Profesyonel Ana Sayfa
+ * Depo Yönetimi ana sayfa dosyası.
  *
  * @package    block_depo_yonetimi
- * @copyright  2023 Depo Yönetim Sistemi
+ * @copyright  2023 Moodle Depo Yönetimi
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (!file_exists('./config.php')) {
+    header('Location: install.php');
+    die;
+}
+
 require_once('config.php');
-require_login();
-global $DB, $PAGE, $OUTPUT, $CFG, $USER;
+require_once($CFG->dirroot .'/course/lib.php');
+require_once($CFG->libdir .'/filelib.php');
 
-$PAGE->set_url('/blocks/depo_yonetimi/view.php');
-$PAGE->set_pagelayout('standard');
-$PAGE->set_title(get_string('pluginname', 'block_depo_yonetimi'));
-$PAGE->set_heading(get_string('pluginname', 'block_depo_yonetimi'));
+redirect_if_major_upgrade_required();
 
-// Modern kütüphaneleri ekle
-$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'));
-$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'));
+// Redirect logged-in users to homepage if required.
+$redirect = optional_param('redirect', 1, PARAM_BOOL);
+
+$urlparams = array();
+if (!empty($CFG->defaulthomepage) &&
+    ($CFG->defaulthomepage == HOMEPAGE_MY || $CFG->defaulthomepage == HOMEPAGE_MYCOURSES) &&
+    $redirect === 0
+) {
+    $urlparams['redirect'] = 0;
+}
+$PAGE->set_url('/', $urlparams);
+$PAGE->set_pagelayout('frontpage');
+$PAGE->add_body_class('limitedwidth');
+$PAGE->set_other_editing_capability('moodle/course:update');
+$PAGE->set_other_editing_capability('moodle/course:manageactivities');
+$PAGE->set_other_editing_capability('moodle/course:activityvisibility');
+
+// Prevent caching of this page to stop confusion when changing page after making AJAX changes.
+$PAGE->set_cacheable(false);
+
+require_course_login($SITE);
+
+$hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', context_system::instance());
+
+// If the site is currently under maintenance, then print a message.
+if (!empty($CFG->maintenance_enabled) and !$hasmaintenanceaccess) {
+    print_maintenance_message();
+}
+
+$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+
+if ($hassiteconfig && moodle_needs_upgrading()) {
+    redirect($CFG->wwwroot .'/'. $CFG->admin .'/index.php');
+}
+
+// If site registration needs updating, redirect.
+\core\hub\registration::registration_reminder('/index.php');
+
+$homepage = get_home_page();
+if ($homepage != HOMEPAGE_SITE) {
+    // Burada mevcut yönlendirme kodları yer alıyor
+}
+
+// Trigger event.
+course_view(context_course::instance(SITEID));
+
+$PAGE->set_pagetype('site-index');
+$PAGE->set_docs_path('');
+$editing = $PAGE->user_is_editing();
+$PAGE->set_title('Depo Yönetimi Sistemi');
+$PAGE->set_heading('Depo Yönetimi Sistemi');
+$PAGE->set_secondary_active_tab('depoyonetimi');
+
+// Modern tasarım için ek CSS ve JavaScript kütüphanelerini ekle
 $PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css'));
-$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/glider-js@1.7.8/glider.min.css'));
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'), true);
+$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'));
 $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js'), true);
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/glider-js@1.7.8/glider.min.js'), true);
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js'), true);
+$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/chart.js'), true);
+
+$siteformatoptions = course_get_format($SITE)->get_format_options();
+$modinfo = get_fast_modinfo($SITE);
+$modnamesused = $modinfo->get_used_module_names();
+
+include_course_ajax($SITE, $modnamesused);
+
+$courserenderer = $PAGE->get_renderer('core', 'course');
+
+if ($hassiteconfig) {
+    $editurl = new moodle_url('/course/view.php', ['id' => SITEID, 'sesskey' => sesskey()]);
+    $editbutton = $OUTPUT->edit_button($editurl);
+    $PAGE->set_button($editbutton);
+}
 
 echo $OUTPUT->header();
 
-// Özel CSS Stilleri
+// CSS stil tanımlamaları doğrudan HTML içerisine ekleniyor
 echo '<style>
-:root {
-    --primary-color: #4361ee;
-    --secondary-color: #3f37c9;
-    --accent-color: #4895ef;
-    --dark-color: #1b263b;
-    --light-color: #f8f9fa;
-    --success-color: #4cc9f0;
-    --warning-color: #f8961e;
-    --danger-color: #f94144;
-    --border-radius: 12px;
-    --box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    --transition: all 0.3s ease;
+/* Modern depo yönetimi tasarımı */
+body.path-site .card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
 }
 
-/* Ana Layout */
-.depo-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+body.path-site .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Hero Bölümü */
-.depo-hero {
-    background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+/* Hero bölümü */
+.site-hero {
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
     color: white;
-    padding: 80px 20px;
-    border-radius: var(--border-radius);
+    padding: 80px 0;
     margin-bottom: 40px;
     position: relative;
     overflow: hidden;
-    text-align: center;
+    border-radius: 0 0 30px 30px;
 }
 
-.depo-hero::before {
+.site-hero::before {
     content: "";
     position: absolute;
     top: -50px;
     right: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255,255,255,0.05);
+    width: 300px;
+    height: 300px;
     border-radius: 50%;
+    background: rgba(255,255,255,0.1);
 }
 
-.depo-hero::after {
+.site-hero::after {
     content: "";
     position: absolute;
-    bottom: -30px;
-    left: -30px;
-    width: 150px;
-    height: 150px;
-    background: rgba(255,255,255,0.05);
+    bottom: -70px;
+    left: -70px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
+    background: rgba(255,255,255,0.1);
 }
 
-.depo-hero h1 {
+.site-hero h1 {
     font-size: 3rem;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 20px;
-    position: relative;
-    z-index: 2;
 }
 
-.depo-hero p {
-    font-size: 1.2rem;
+.site-hero p {
+    font-size: 1.3rem;
     max-width: 700px;
-    margin: 0 auto 30px;
     opacity: 0.9;
-    position: relative;
-    z-index: 2;
 }
 
-/* Özellik Kartları */
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    margin: 40px 0;
-}
-
+/* Animasyonlu içerik kartları */
 .feature-card {
-    background: white;
-    border-radius: var(--border-radius);
     padding: 30px;
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
-    border: 1px solid rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
+    text-align: center;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
 .feature-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
 .feature-card i {
-    font-size: 2.5rem;
-    color: var(--accent-color);
+    font-size: 3rem;
     margin-bottom: 20px;
-    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #2e7d32;
 }
 
-.feature-card h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: var(--dark-color);
+/* Ürün listesi */
+.product-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 40px 0;
 }
 
-.feature-card p {
-    color: #6c757d;
-    margin-bottom: 20px;
+.product-item {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
-.feature-card .btn {
-    border-radius: 50px;
-    padding: 8px 20px;
+.product-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.product-item .product-image {
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-item .product-image i {
+    font-size: 4rem;
+    color: #2e7d32;
+}
+
+.product-item .product-content {
+    padding: 20px;
+}
+
+.product-item h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 
-/* İstatistikler */
-.stats-section {
-    background: var(--light-color);
-    border-radius: var(--border-radius);
-    padding: 50px 20px;
-    margin: 50px 0;
-}
-
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.stat-item {
-    text-align: center;
+/* Sayaç bileşenleri */
+.counter-container {
     padding: 20px;
     background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
 }
 
-.stat-item:hover {
+.counter-container:hover {
     transform: translateY(-5px);
 }
 
-.stat-item i {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    color: var(--primary-color);
+.counter-container i {
+    color: #2e7d32;
 }
 
-.stat-number {
+.counter-container h2 {
     font-size: 2.5rem;
     font-weight: 700;
     margin: 10px 0;
-    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #333;
 }
 
-.stat-label {
-    color: #6c757d;
-    font-size: 1rem;
-}
-
-/* Hızlı Erişim Butonları */
-.quick-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+/* Duyuru bölümü */
+.announcements-section {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
     margin: 40px 0;
 }
 
-.quick-action {
-    display: inline-flex;
-    align-items: center;
-    padding: 12px 25px;
-    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-    color: white;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: var(--transition);
-    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+/* İstatistik grafikleri */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin: 20px 0;
 }
 
-.quick-action i {
+/* Kritik stok uyarısı */
+.critical-stock {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.critical-stock h3 {
+    color: #d32f2f;
+    margin-top: 0;
+}
+
+/* Hızlı erişim butonları */
+.action-button {
+    display: inline-block;
+    margin: 10px;
+    padding: 15px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.action-button.primary {
+    background: #2e7d32;
+    color: white;
+}
+
+.action-button.secondary {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.action-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    text-decoration: none;
+}
+
+.action-button i {
     margin-right: 10px;
 }
 
-.quick-action:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
-    color: white;
+/* Genel düzenlemeler */
+.frontpage-block {
+    margin-bottom: 40px;
 }
 
-/* Grafik Bölümü */
-.chart-section {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 40px;
-    margin: 50px 0;
-    box-shadow: var(--box-shadow);
-}
-
-.chart-container {
-    position: relative;
-    height: 400px;
-    width: 100%;
-}
-
-/* Carousel */
-.glider-contain {
-    margin: 40px 0;
-}
-
-.glider-slide {
-    padding: 15px;
-}
-
-.testimonial-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 30px;
-    box-shadow: var(--box-shadow);
-    text-align: center;
-}
-
-.testimonial-card img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin: 0 auto 20px;
-    border: 3px solid var(--light-color);
-}
-
-.testimonial-card p {
-    font-style: italic;
-    color: #6c757d;
-    margin-bottom: 20px;
-}
-
-.testimonial-card h5 {
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-.testimonial-card .position {
-    color: var(--accent-color);
-    font-size: 0.9rem;
-}
-
-/* Responsive Düzen */
+/* Responsive düzenlemeler */
 @media (max-width: 768px) {
-    .depo-hero {
-        padding: 60px 20px;
+    .site-hero {
+        padding: 40px 0;
     }
-    
-    .depo-hero h1 {
-        font-size: 2.2rem;
-    }
-    
-    .stats-container {
-        grid-template-columns: 1fr 1fr;
-    }
-}
 
-@media (max-width: 576px) {
-    .stats-container {
+    .site-hero h1 {
+        font-size: 2rem;
+    }
+
+    .product-list-container {
         grid-template-columns: 1fr;
     }
-    
-    .quick-actions {
-        flex-direction: column;
-        align-items: center;
+
+    .chart-container {
+        height: 250px;
     }
-    
-    .quick-action {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+}
+
+/* Stok durumu göstergeleri */
+.stock-indicator {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.stock-high {
+    background-color: #4caf50;
+}
+
+.stock-medium {
+    background-color: #ff9800;
+}
+
+.stock-low {
+    background-color: #f44336;
+}
+
+/* Barkod tarayıcı bölümü */
+.barcode-scanner-container {
+    background: #f5f5f5;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.barcode-scanner-container i {
+    font-size: 3rem;
+    color: #2e7d32;
+    margin-bottom: 15px;
+}
+
+.barcode-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    margin: 15px auto;
+    font-size: 1.1rem;
+    text-align: center;
 }
 </style>';
 
-// Hero Bölümü
-echo '<div class="depo-container">';
-echo '<div class="depo-hero" data-aos="fade-down">';
-echo '<h1>Depo Yönetim Sisteminiz</h1>';
-echo '<p>Profesyonel depo yönetimi çözümü ile stoklarınızı kolayca takip edin, raporlar oluşturun ve verimliliğinizi artırın</p>';
-echo '<div class="quick-actions">';
-echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/dashboard.php" class="quick-action"><i class="fas fa-tachometer-alt"></i> Kontrol Paneli</a>';
-echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/products.php" class="quick-action"><i class="fas fa-boxes"></i> Ürünler</a>';
-echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/reports.php" class="quick-action"><i class="fas fa-chart-pie"></i> Raporlar</a>';
-echo '</div>';
-echo '</div>';
-
-// Özellikler Bölümü
-echo '<h2 class="text-center mb-4" data-aos="fade-up">Sistem Özellikleri</h2>';
-echo '<div class="feature-grid">';
-
-$features = [
-    [
-        'icon' => 'fas fa-box-open',
-        'title' => 'Ürün Yönetimi',
-        'desc' => 'Tüm ürünlerinizi detaylı şekilde kaydedin, kategorilere ayırın ve kolayca yönetin',
-        'link' => 'products.php',
-        'btn' => 'Ürünleri Görüntüle'
-    ],
-    [
-        'icon' => 'fas fa-warehouse',
-        'title' => 'Depo Yönetimi',
-        'desc' => 'Birden fazla deponuzu tek sistemde yönetin, raf ve bölüm bilgilerini kaydedin',
-        'link' => 'warehouses.php',
-        'btn' => 'Depoları Görüntüle'
-    ],
-    [
-        'icon' => 'fas fa-exchange-alt',
-        'title' => 'Stok Hareketleri',
-        'desc' => 'Giriş ve çıkış işlemlerinizi kaydedin, stok hareket geçmişini takip edin',
-        'link' => 'movements.php',
-        'btn' => 'Hareketleri Görüntüle'
-    ],
-    [
-        'icon' => 'fas fa-chart-line',
-        'title' => 'Detaylı Raporlar',
-        'desc' => 'Özelleştirilebilir raporlar oluşturun ve stok analizleri yapın',
-        'link' => 'reports.php',
-        'btn' => 'Raporları Görüntüle'
-    ],
-    [
-        'icon' => 'fas fa-barcode',
-        'title' => 'Barkod Sistemi',
-        'desc' => 'Ürünleriniz için barkod oluşturun ve kolayca stok takibi yapın',
-        'link' => 'barcodes.php',
-        'btn' => 'Barkod Oluştur'
-    ],
-    [
-        'icon' => 'fas fa-bell',
-        'title' => 'Stok Uyarıları',
-        'desc' => 'Kritik stok seviyeleri için otomatik uyarılar alın',
-        'link' => 'alerts.php',
-        'btn' => 'Uyarıları Görüntüle'
-    ]
-];
-
-foreach ($features as $index => $feature) {
-    echo '<div class="feature-card" data-aos="fade-up" data-aos-delay="'.($index*100).'">';
-    echo '<i class="'.$feature['icon'].'"></i>';
-    echo '<h3>'.$feature['title'].'</h3>';
-    echo '<p>'.$feature['desc'].'</p>';
-    echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/'.$feature['link'].'" class="btn btn-outline-primary">'.$feature['btn'].'</a>';
-    echo '</div>';
-}
-
-echo '</div>';
-
-// İstatistikler Bölümü
-echo '<div class="stats-section" data-aos="fade-up">';
-echo '<h2 class="text-center mb-5">Sistem İstatistikleri</h2>';
-echo '<div class="stats-container">';
-
-$stats = [
-    ['icon' => 'fas fa-users', 'number' => $DB->count_records('user'), 'label' => 'Kullanıcı'],
-    ['icon' => 'fas fa-warehouse', 'number' => $DB->count_records('block_depo_yonetimi_depolar'), 'label' => 'Depo'],
-    ['icon' => 'fas fa-boxes', 'number' => $DB->count_records('block_depo_yonetimi_urunler'), 'label' => 'Ürün'],
-    ['icon' => 'fas fa-exchange-alt', 'number' => $DB->count_records('block_depo_yonetimi_hareketler'), 'label' => 'Hareket']
-];
-
-foreach ($stats as $stat) {
-    echo '<div class="stat-item">';
-    echo '<i class="'.$stat['icon'].'"></i>';
-    echo '<div class="stat-number">'.$stat['number'].'</div>';
-    echo '<div class="stat-label">'.$stat['label'].'</div>';
-    echo '</div>';
-}
-
-echo '</div>';
-echo '</div>';
-
-// Grafik Bölümü
-echo '<div class="chart-section" data-aos="fade-up">';
-echo '<h2 class="text-center mb-4">Stok Hareket Analizi</h2>';
-echo '<div class="chart-container">';
-echo '<canvas id="stockChart"></canvas>';
-echo '</div>';
-echo '</div>';
-
-// Referanslar Bölümü
-echo '<h2 class="text-center my-5" data-aos="fade-up">Müşteri Görüşleri</h2>';
-echo '<div class="glider-contain" data-aos="fade-up">';
-echo '<div class="glider">';
-
-$testimonials = [
-    [
-        'name' => 'Ahmet Yılmaz',
-        'position' => 'Depo Müdürü - ABC Şirketi',
-        'comment' => 'Bu sistem sayesinde depo operasyonlarımız %40 daha verimli hale geldi. Kullanımı çok kolay ve raporlama özellikleri mükemmel.',
-        'image' => 'https://randomuser.me/api/portraits/men/32.jpg'
-    ],
-    [
-        'name' => 'Ayşe Kaya',
-        'position' => 'Lojistik Sorumlusu - XYZ A.Ş.',
-        'comment' => 'Stok takibindeki karmaşadan kurtulduk. Artık gerçek zamanlı stok bilgisine anında ulaşabiliyoruz.',
-        'image' => 'https://randomuser.me/api/portraits/women/44.jpg'
-    ],
-    [
-        'name' => 'Mehmet Demir',
-        'position' => 'Operasyon Müdürü - DEF Ltd.',
-        'comment' => 'Birden fazla depomuzu tek sistemde yönetebilmek bizim için büyük kolaylık oldu. Ekip olarak çok memnunuz.',
-        'image' => 'https://randomuser.me/api/portraits/men/75.jpg'
-    ]
-];
-
-foreach ($testimonials as $testimonial) {
-    echo '<div class="glider-slide">';
-    echo '<div class="testimonial-card">';
-    echo '<img src="'.$testimonial['image'].'" alt="'.$testimonial['name'].'">';
-    echo '<p>"'.$testimonial['comment'].'"</p>';
-    echo '<h5>'.$testimonial['name'].'</h5>';
-    echo '<div class="position">'.$testimonial['position'].'</div>';
-    echo '</div>';
-    echo '</div>';
-}
-
-echo '</div>';
-echo '<button aria-label="Previous" class="glider-prev"><i class="fas fa-chevron-left"></i></button>';
-echo '<button aria-label="Next" class="glider-next"><i class="fas fa-chevron-right"></i></button>';
-echo '<div role="tablist" class="dots"></div>';
-echo '</div>';
-
-// Son Çağrı Bölümü
-echo '<div class="text-center my-5" data-aos="fade-up">';
-echo '<h2 class="mb-4">Depo Yönetim Sisteminizi Bugün Kullanmaya Başlayın</h2>';
-echo '<p class="mb-4">Profesyonel çözümümüzle depo operasyonlarınızı optimize edin ve verimliliğinizi artırın</p>';
-echo '<div class="quick-actions">';
-echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/dashboard.php" class="quick-action"><i class="fas fa-rocket"></i> Hemen Başla</a>';
-echo '<a href="'.$CFG->wwwroot.'/blocks/depo_yonetimi/demo.php" class="quick-action" style="background: var(--dark-color);"><i class="fas fa-play-circle"></i> Demo İzle</a>';
-echo '</div>';
-echo '</div>';
-
-echo '</div>'; // Container kapatma
-
-// JavaScript Kodları
+// JavaScript kodları doğrudan HTML içerisine ekleniyor
 echo '<script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Animasyonları başlat
+    // AOS animasyon kütüphanesini başlat
     AOS.init({
         duration: 800,
         easing: "ease-in-out",
         once: true
     });
-    
-    // Carousel başlatma
-    new Glider(document.querySelector(".glider"), {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        draggable: true,
-        dots: ".dots",
-        arrows: {
-            prev: ".glider-prev",
-            next: ".glider-next"
-        },
-        responsive: [
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1
-                }
+
+    // Hero bölümü için parallax efekti
+    const hero = document.querySelector(".site-hero");
+    if (hero) {
+        window.addEventListener("scroll", function() {
+            const scrolled = window.scrollY;
+            hero.style.backgroundPosition = "center " + (scrolled * 0.4) + "px";
+        });
+    }
+
+    // Sayaç animasyonları
+    const counters = document.querySelectorAll(".counter");
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute("data-count"));
+        const duration = 2000;
+        const step = Math.ceil(target / (duration / 16));
+        let current = 0;
+
+        const updateCounter = () => {
+            current += step;
+            if (current < target) {
+                counter.innerText = current;
+                setTimeout(updateCounter, 16);
+            } else {
+                counter.innerText = target;
+            }
+        };
+
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                updateCounter();
+                observer.unobserve(counter);
+            }
+        });
+
+        observer.observe(counter);
+    });
+
+    // Stok hareketleri grafiği
+    const ctxMovement = document.getElementById("stockMovementChart");
+    if (ctxMovement) {
+        new Chart(ctxMovement, {
+            type: "line",
+            data: {
+                labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
+                datasets: [
+                    {
+                        label: "Stok Girişi",
+                        data: [120, 190, 150, 210, 180, 250],
+                        borderColor: "#4caf50",
+                        backgroundColor: "rgba(76, 175, 80, 0.1)",
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: "Stok Çıkışı",
+                        data: [90, 110, 130, 140, 160, 200],
+                        borderColor: "#f44336",
+                        backgroundColor: "rgba(244, 67, 54, 0.1)",
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
             },
-            {
-                breakpoint: 992,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        ]
-    });
-    
-    // Grafik oluşturma
-    const ctx = document.getElementById("stockChart").getContext("2d");
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
-            datasets: [
-                {
-                    label: "Stok Girişi",
-                    data: [65, 59, 80, 81, 56, 72],
-                    backgroundColor: "rgba(67, 97, 238, 0.7)",
-                    borderColor: "rgba(67, 97, 238, 1)",
-                    borderWidth: 1
-                },
-                {
-                    label: "Stok Çıkışı",
-                    data: [28, 48, 40, 19, 86, 27],
-                    backgroundColor: "rgba(72, 149, 239, 0.7)",
-                    borderColor: "rgba(72, 149, 239, 1)",
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+        });
+    }
+
+    // Ürün kategorileri grafiği
+    const ctxCategories = document.getElementById("productCategoriesChart");
+    if (ctxCategories) {
+        new Chart(ctxCategories, {
+            type: "doughnut",
+            data: {
+                labels: ["Giyim", "Ayakkabı", "Aksesuar", "Çanta", "Diğer"],
+                datasets: [
+                    {
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            "#4caf50",
+                            "#2196f3",
+                            "#ff9800",
+                            "#9c27b0",
+                            "#607d8b"
+                        ]
+                    }
+                ]
             },
-            plugins: {
-                legend: {
-                    position: "top"
-                },
-                tooltip: {
-                    mode: "index",
-                    intersect: false
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "right"
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+    
+    // Barkod tarayıcı simülasyonu
+    const barcodeInput = document.getElementById("barcodeInput");
+    if (barcodeInput) {
+        barcodeInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const barcodeValue = this.value.trim();
+                if (barcodeValue) {
+                    window.location.href = "' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/barkod_ara.php?code=" + barcodeValue;
+                }
+            }
+        });
+    }
 });
 </script>';
 
+// Hero bölümü ekle
+echo '<div class="site-hero" data-aos="fade-down">';
+echo '<div class="container">';
+echo '<h1 data-aos="fade-up" data-aos-delay="200">Depo Yönetimi Sistemi</h1>';
+echo '<p data-aos="fade-up" data-aos-delay="400">Stok takibi, ürün yönetimi ve depo operasyonları için modern ve kullanıcı dostu bir platform.</p>';
+echo '<div class="mt-4" data-aos="fade-up" data-aos-delay="600">';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/products.php" class="btn btn-light btn-lg mr-3">Ürünleri Görüntüle</a>';
+echo '<a href="#features" class="btn btn-outline-light btn-lg">Özellikler</a>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Barkod tarayıcı alanı
+echo '<div class="container">';
+echo '<div class="barcode-scanner-container" data-aos="fade-up">';
+echo '<i class="fas fa-barcode"></i>';
+echo '<h3>Hızlı Ürün Arama</h3>';
+echo '<p>Barkod numarasını girin veya tarayıcı ile okutun</p>';
+echo '<input type="text" id="barcodeInput" class="barcode-input" placeholder="Barkod numarası" autofocus>';
+echo '</div>';
+echo '</div>';
+
+// İstatistik sayaçları
+echo '<div class="container mt-5" id="stats">';
+echo '<div class="row text-center" data-aos="fade-up">';
+echo '<div class="col-md-4 mb-4">';
+echo '<div class="counter-container">';
+echo '<i class="fa fa-box fa-3x mb-3 text-primary"></i>';
+echo '<h2 class="counter" data-count="1250">0</h2>';
+echo '<p>Toplam Ürün</p>';
+echo '</div>';
+echo '</div>';
+echo '<div class="col-md-4 mb-4">';
+echo '<div class="counter-container">';
+echo '<i class="fa fa-warehouse fa-3x mb-3 text-primary"></i>';
+echo '<h2 class="counter" data-count="8">0</h2>';
+echo '<p>Depo Bölümü</p>';
+echo '</div>';
+echo '</div>';
+echo '<div class="col-md-4 mb-4">';
+echo '<div class="counter-container">';
+echo '<i class="fa fa-exchange-alt fa-3x mb-3 text-primary"></i>';
+echo '<h2 class="counter" data-count="3540">0</h2>';
+echo '<p>Aylık İşlem</p>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Kritik stok uyarısı
+echo '<div class="container mt-4">';
+echo '<div class="critical-stock" data-aos="fade-up">';
+echo '<h3><i class="fas fa-exclamation-triangle"></i> Kritik Stok Uyarısı</h3>';
+echo '<p>5 ürünün stok seviyesi kritik eşiğin altında. Lütfen kontrol edin ve gerekli sipariş işlemlerini başlatın.</p>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/products.php?filter=critical" class="btn btn-danger">Kritik Ürünleri Görüntüle</a>';
+echo '</div>';
+echo '</div>';
+
+// Özellikler bölümü
+echo '<div class="container mt-5" id="features">';
+echo '<h2 class="text-center mb-5" data-aos="fade-up">Sistem Özellikleri</h2>';
+echo '<div class="row">';
+echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="200">';
+echo '<div class="feature-card">';
+echo '<i class="fa fa-boxes"></i>';
+echo '<h3>Stok Takibi</h3>';
+echo '<p>Gelişmiş stok takip sistemi ile ürünlerinizin miktarını, yerini ve durumunu anlık olarak izleyin</p>';
+echo '</div>';
+echo '</div>';
+echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="400">';
+echo '<div class="feature-card">';
+echo '<i class="fa fa-barcode"></i>';
+echo '<h3>Barkod Sistemi</h3>';
+echo '<p>Ürünleri hızlı tanımlamak için barkod sistemi ve otomatik etiket basım özellikleri</p>';
+echo '</div>';
+echo '</div>';
+echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="600">';
+echo '<div class="feature-card">';
+echo '<i class="fa fa-chart-line"></i>';
+echo '<h3>Raporlama</h3>';
+echo '<p>Detaylı raporlar ve analizlerle stok hareketlerini ve ürün performansını takip edin</p>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Grafik ve analiz bölümü
+echo '<div class="container mt-5">';
+echo '<div class="row">';
+echo '<div class="col-md-6" data-aos="fade-up">';
+echo '<div class="card">';
+echo '<div class="card-body">';
+echo '<h4 class="card-title">Stok Hareketleri</h4>';
+echo '<div class="chart-container">';
+echo '<canvas id="stockMovementChart"></canvas>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+echo '<div class="col-md-6" data-aos="fade-up" data-aos-delay="200">';
+echo '<div class="card">';
+echo '<div class="card-body">';
+echo '<h4 class="card-title">Ürün Kategorileri</h4>';
+echo '<div class="chart-container">';
+echo '<canvas id="productCategoriesChart"></canvas>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Son işlemler bölümü
+echo '<div class="container mt-5">';
+echo '<div class="row">';
+echo '<div class="col-md-6" data-aos="fade-up">';
+echo '<div class="card">';
+echo '<div class="card-body">';
+echo '<h4 class="card-title">Son Eklenen Ürünler</h4>';
+echo '<div class="list-group list-group-flush">';
+
+// Son eklenen 5 ürün
+$lastProducts = array(
+    array('id' => 112, 'name' => 'Beyaz Gömlek L Beden', 'date' => '22.06.2023', 'category' => 'Gömlek'),
+    array('id' => 111, 'name' => 'Spor Çanta', 'date' => '20.06.2023', 'category' => 'Çanta'),
+    array('id' => 110, 'name' => 'Kadın Bot 38 Numara', 'date' => '19.06.2023', 'category' => 'Ayakkabı'),
+    array('id' => 109, 'name' => 'Deri Cüzdan', 'date' => '18.06.2023', 'category' => 'Aksesuar'),
+    array('id' => 108, 'name' => 'Slim Fit Jean 32 Beden', 'date' => '17.06.2023', 'category' => 'Pantolon')
+);
+
+foreach ($lastProducts as $product) {
+    echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/urun_detay.php?id=' . $product['id'] . '" class="list-group-item list-group-item-action">';
+    echo '<div class="d-flex w-100 justify-content-between">';
+    echo '<h5 class="mb-1">' . $product['name'] . '</h5>';
+    echo '<small class="text-muted">' . $product['date'] . '</small>';
+    echo '</div>';
+    echo '<small class="text-muted">' . $product['category'] . '</small>';
+    echo '</a>';
+}
+
+echo '</div>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/products.php?sort=newest" class="btn btn-outline-primary mt-3">Tümünü Görüntüle</a>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+echo '<div class="col-md-6" data-aos="fade-up" data-aos-delay="200">';
+echo '<div class="card">';
+echo '<div class="card-body">';
+echo '<h4 class="card-title">Son Stok Hareketleri</h4>';
+echo '<div class="list-group list-group-flush">';
+
+// Son stok hareketleri
+$lastMovements = array(
+    array('id' => 245, 'product' => 'Siyah Tişört L Beden', 'type' => 'Giriş', 'quantity' => '+10', 'date' => '23.06.2023', 'class' => 'success'),
+    array('id' => 244, 'product' => 'Kot Pantolon 34 Beden', 'type' => 'Çıkış', 'quantity' => '-3', 'date' => '22.06.2023', 'class' => 'danger'),
+    array('id' => 243, 'product' => 'Deri Kemer', 'type' => 'Giriş', 'quantity' => '+15', 'date' => '21.06.2023', 'class' => 'success'),
+    array('id' => 242, 'product' => 'Spor Ayakkabı 42 Numara', 'type' => 'Çıkış', 'quantity' => '-2', 'date' => '20.06.2023', 'class' => 'danger'),
+    array('id' => 241, 'product' => 'Beyaz Gömlek L Beden', 'type' => 'Giriş', 'quantity' => '+20', 'date' => '19.06.2023', 'class' => 'success')
+);
+
+foreach ($lastMovements as $movement) {
+    echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/hareket_detay.php?id=' . $movement['id'] . '" class="list-group-item list-group-item-action">';
+    echo '<div class="d-flex w-100 justify-content-between">';
+    echo '<h5 class="mb-1">' . $movement['product'] . '</h5>';
+    echo '<span class="badge badge-' . $movement['class'] . '">' . $movement['quantity'] . '</span>';
+    echo '</div>';
+    echo '<small>' . $movement['type'] . ' - ' . $movement['date'] . '</small>';
+    echo '</a>';
+}
+
+echo '</div>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/movements.php" class="btn btn-outline-primary mt-3">Tümünü Görüntüle</a>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Hızlı işlemler bölümü
+echo '<div class="container frontpage-block text-center" data-aos="fade-up">';
+echo '<h2 class="mb-4">Hızlı İşlemler</h2>';
+echo '<div class="row justify-content-center">';
+echo '<div class="col-md-8">';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/urun_ekle.php" class="action-button primary"><i class="fa fa-box-open"></i> Yeni Ürün</a>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/stok_giris.php" class="action-button primary"><i class="fa fa-arrow-down"></i> Stok Girişi</a>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/stok_cikis.php" class="action-button primary"><i class="fa fa-arrow-up"></i> Stok Çıkışı</a>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/reports.php" class="action-button secondary"><i class="fa fa-chart-pie"></i> Raporlar</a>';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/settings.php" class="action-button secondary"><i class="fa fa-cog"></i> Ayarlar</a>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// Kritik stoklu ürünler listesi
+echo '<div class="container mt-5">';
+echo '<h2 class="mb-4" data-aos="fade-up">Kritik Stoklu Ürünler</h2>';
+echo '<div class="row">';
+
+// Örnek kritik stoklu ürünler
+$criticalProducts = array(
+    array('id' => 105, 'name' => 'Beyaz Tişört M Beden', 'stock' => 3, 'min' => 10, 'category' => 'Tişört'),
+    array('id' => 87, 'name' => 'Siyah Spor Ayakkabı 40 Numara', 'stock' => 2, 'min' => 5, 'category' => 'Ayakkabı'),
+    array('id' => 94, 'name' => 'Kot Pantolon 30 Beden', 'stock' => 4, 'min' => 8, 'category' => 'Pantolon')
+);
+
+foreach ($criticalProducts as $product) {
+    echo '<div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="200">';
+    echo '<div class="card h-100">';
+    echo '<div class="card-body">';
+    echo '<h5 class="card-title">' . $product['name'] . '</h5>';
+    echo '<div class="d-flex justify-content-between align-items-center">';
+    echo '<span class="badge badge-danger">Stok: ' . $product['stock'] . '</span>';
+    echo '<span>Min.: ' . $product['min'] . '</span>';
+    echo '</div>';
+    echo '<p class="card-text mt-2"><small class="text-muted">' . $product['category'] . '</small></p>';
+    echo '<div class="d-flex justify-content-between mt-3">';
+    echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/urun_detay.php?id=' . $product['id'] . '" class="btn btn-sm btn-info">Detay</a>';
+    echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/actions/stok_giris.php?id=' . $product['id'] . '" class="btn btn-sm btn-secondary">Stok Hareketi</a>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+}
+
+echo '</div>';
+echo '<div class="text-center">';
+echo '<a href="' . $CFG->wwwroot . '/blocks/depo_yonetimi/products.php?filter=critical" class="btn btn-warning mt-3">Tüm Kritik Ürünleri Görüntüle</a>';
+echo '</div>';
+echo '</div>';
+
+// Yaklaşan ürün giriş/çıkışları
+echo '<div class="container mt-5">';
+echo '<h2 class="mb-4" data-aos="fade-up">Yaklaşan İşlemler</h2>';
+echo '<div class="card" data-aos="fade-up" data-aos-delay="200">';
+echo '<div class="card-body">';
+echo '<table class="table table-hover">';
+echo '<thead>';
+echo '<tr>';
+echo '<th>İşlem</th>';
+echo '<th>Ürün</th>';
+echo '<th>Miktar</th>';
+echo '<th>Tarih</th>';
+echo '<th>Durum</th>';
+echo '</tr>';
+echo '</thead>';
+echo '<tbody>';
+
+// Örnek yaklaşan işlemler
+$upcomingTasks = array(
+    array('id' => 1, 'type' => 'Giriş', 'product' => 'Erkek Tişört Paketi', 'quantity' => 50, 'date' => '25.06.2023', 'status' => 'Bekliyor'),
+    array('id' => 2, 'type' => 'Çıkış', 'product' => 'Kadın Ayakkabı Siparişi', 'quantity' => 15, 'date' => '26.06.2023', 'status' => 'Hazırlanıyor'),
+    array('id' => 3, 'type' => 'Giriş', 'product' => 'Aksesuar Koleksiyonu', 'quantity' => 30, 'date' => '28.06.2023', 'status' => 'Bekliyor')
+);
+
+foreach ($upcomingTasks as $task) {
+    $statusClass = $task['status'] === 'Bekliyor' ? 'warning' : 'info';
+    $typeClass = $task['type'] === 'Giriş' ? 'success' : 'danger';
+
+    echo '<tr>';
+    echo '<td><span class="badge badge-' . $typeClass . '">' . $task['type'] . '</span></td>';
+    echo '<td>' . $task['product'] . '</td>';
+    echo '<td>' . $task['quantity'] . '</td>';
+    echo '<td>' . $task['date'] . '</td>';
+    echo '<td><span class="badge badge-' . $statusClass . '">' . $task['status'] . '</span></td>';
+    echo '</tr>';
+}
+
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
+echo '</div>';
+echo '</div>';
+
+// AOS için Javascript başlatma ve Moodle sayfa sonu
+echo '<script>
+   
+    AOS.init();
+</script>';
+
 echo $OUTPUT->footer();
+?>
