@@ -17,7 +17,7 @@ $PAGE->set_heading('Stoklar');
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->css('/blocks/depo_yonetimi/stok_list.css');
 
-// Yetki kontrolü
+// Yetki kontrolüüü
 $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
 $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
