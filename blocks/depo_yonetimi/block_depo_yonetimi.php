@@ -288,6 +288,17 @@ class="btn btn-info">
                         </div>
                     </div>
                 </div>
+                
+                
+                <style>
+                    .stok-hareket-btn:hover {
+                        background-color: #fd7e14 !important;
+                        border-color: #fd7e14 !important;
+                    }
+                    .stok-hareket-btn:hover .stok-hareket-icon {
+                        color: white !important;
+                    }
+                </style>
     
                 <script>
                 
