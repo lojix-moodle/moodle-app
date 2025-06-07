@@ -3,44 +3,31 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once(__DIR__ . '/../../../config.php'); // Fixed DIR to _DIR_
-require_once(__DIR__ . '/../lib.php'); // Fixed DIR to _DIR_
+require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../lib.php');
 require_login();
 global $DB, $PAGE, $OUTPUT;
 
-
+// Sayfanın temel yapılandırması
 $depoid = required_param('depoid', PARAM_INT);
 $PAGE->set_url(new moodle_url('/blocks/depo_yonetimi/actions/urun_ekle.php', ['depoid' => $depoid]));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Ürün Ekle');
 $PAGE->set_heading('Ürün Ekle');
 
-// Depo bilgisini al
-
+// Depo ve kategori bilgilerini al
 $depo = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid]);
 $kategoriler = $DB->get_records('block_depo_yonetimi_kategoriler');
 
+// Form gönderildiğinde işlem yap
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
-    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT); // Bu satırı ekleyin
-
+    $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
-    $varyasyonlar = $_POST['varyasyon'];
-
-    $yeni_urun = new stdClass();
-    $yeni_urun->depoid = $depoid;
-    $yeni_urun->name = $name;
-    $yeni_urun->kategoriid = $kategoriid;
-    $yeni_urun->colors = json_encode($colors);
-    $yeni_urun->sizes = json_encode($sizes);
-    $yeni_urun->varyasyonlar = json_encode($varyasyonlar);
-    $yeni_urun->min_stok_seviyesi = $min_stok_seviyesi; // Bu satırı ekleyin
-
-
-
+    $varyasyonlar = isset($_POST['varyasyon']) ? $_POST['varyasyon'] : [];
 
     // Toplam adet hesaplama
     $toplam_adet = 0;
@@ -52,12 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
-
-//    $colors = optional_param_array('colors', false, PARAM_CLEAN);
-//    $sizes = optional_param_array('sizes', false, PARAM_CLEAN);
-//    $varyasyonlar = optional_param_array('varyasyon', false, PARAM_CLEAN);
-
+    // Ana ürün objesi oluşturma
     $ana_urun = new stdClass();
     $ana_urun->depoid = $depoid;
     $ana_urun->name = $name;
@@ -66,30 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
-    // urun_ekle.php dosyasında, POST işleme bölümünde:
-// Bu satırlar zaten var mı kontrol edin, yoksa ekleyin
+    $ana_urun->min_stok_seviyesi = $min_stok_seviyesi;
+
+    // Raf ve bölüm bilgileri
     $raf = optional_param('raf', '', PARAM_TEXT);
     $bolum = optional_param('bolum', '', PARAM_TEXT);
 
-// Debug için
-    error_log("Form gönderilen değerler - Raf: " . $raf . ", Bölüm: " . $bolum);
-
-// Ana ürüne raf ve bölüm bilgilerini ekle
-    // İlgili kayıt işleminden önce hata ayıklama kodları ekleyin
+    // Ana ürüne raf ve bölüm bilgilerini ekle
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
 
-// Depo ID'nin doğru geldiğinden emin olun
-    error_log("Depo ID: " . $depoid);
-
-// Kategori ID'sini kontrol edin
-    error_log("Kategori ID: " . $ana_urun->kategoriid);
-
     try {
-        // Depo kaydının var olup olmadığını kontrol edin
+        // Depo kaydının var olup olmadığını kontrol et
         $depo_kontrol = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
 
-        // Kategori kaydının var olup olmadığını kontrol edin
+        // Kategori kaydının var olup olmadığını kontrol et
         $kategori_kontrol = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $ana_urun->kategoriid], '*', MUST_EXIST);
 
         // Ana ürünü ekle ve ID'sini al
@@ -98,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Başarılı mesajı göster
         \core\notification::success('Ürün başarıyla eklendi.');
 
+        // Anasayfaya yönlendir
         redirect(new moodle_url('/my', ['depo' => $depoid]));
     } catch (dml_missing_record_exception $e) {
         // Kayıt bulunamadığında
@@ -108,16 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Genel hata: " . $e->getMessage());
         \core\notification::error('Bir hata oluştu: ' . $e->getMessage());
     }
-
-
-    // Ana ürünü ekle ve ID'sini al
-    $ana_urun_id = $DB->insert_record('block_depo_yonetimi_urunler', $ana_urun);
-    // Başarılı mesajı göster
-    \core\notification::success('Ürün başarıyla eklendi.');
-
-    redirect(new moodle_url('/my', ['depo' => $depoid]));
-
-
 }
 
 // Renk ve boyutlar için etiketleri elde etme yardımcı fonksiyonu
@@ -133,7 +97,13 @@ function get_string_from_value($value, $type) {
             'turuncu' => 'Turuncu',
             'mor' => 'Mor',
             'pembe' => 'Pembe',
-            'gri' => 'Gri'
+            'gri' => 'Gri',
+            'bej' => 'Bej',
+            'lacivert' => 'Lacivert',
+            'kahverengi' => 'Kahverengi',
+            'haki' => 'Haki',
+            'vizon' => 'Vizon',
+            'bordo' => 'Bordo'
         ];
         return isset($colors[$value]) ? $colors[$value] : $value;
     } else if ($type == 'size') {
@@ -150,7 +120,6 @@ function get_string_from_value($value, $type) {
     }
     return $value;
 }
-
 
 echo $OUTPUT->header();
 ?>
@@ -484,6 +453,7 @@ echo $OUTPUT->header();
                                 </select>
                             </div>
                         </div>
+
                         <!-- Minimum Stok Seviyesi -->
                         <div class="mb-4">
                             <label for="min_stok_seviyesi" class="form-label">
@@ -496,19 +466,6 @@ echo $OUTPUT->header();
                             </div>
                             <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
                             <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
-                        </div>
-
-                        <!-- Barkod -->
-
-                        <div class="mb-4">
-                            <label for="barkod" class="form-label">Barkod</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="barkod" name="barkod" value="<?php echo $urun->barkod ?? ''; ?>">
-                                <button type="button" class="btn btn-outline-primary" id="barkodOlustur">
-                                    <i class="fas fa-barcode me-2"></i>Barkod Oluştur
-                                </button>
-                            </div>
-                            <small class="text-muted">Otomatik barkod oluşturmak için butona tıklayın veya manuel giriş yapın.</small>
                         </div>
 
                         <!-- Renkler ve Boyutlar (Yan Yana) -->
@@ -537,7 +494,6 @@ echo $OUTPUT->header();
                                         <option value="kirmizi">Kırmızı</option>
                                         <option value="yesil">Yeşil</option>
                                         <option value="bordo">Bordo</option>
-
                                     </select>
                                 </div>
                                 <div class="form-text small">
@@ -603,17 +559,6 @@ echo $OUTPUT->header();
                             </div>
                         </div>
 
-                        <!-- Sağ Sütun - Varyasyonlar -->
-                        <div class="mb-3">
-                            <label for="varyasyon_barkod_${index}" class="form-label">Varyasyon Barkodu</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control varyasyon-barkod" id="varyasyon_barkod_${index}" name="varyasyonlar[${index}][barkod]" value="">
-                                <button type="button" class="btn btn-outline-secondary varyasyon-barkod-olustur" data-index="${index}">
-                                    <i class="fas fa-barcode me-1"></i>Barkod
-                                </button>
-                            </div>
-                        </div>
-
                         <div class="card shadow-sm mb-4">
                             <div class="card-body">
                                 <div class="d-grid mb-3">
@@ -650,16 +595,6 @@ echo $OUTPUT->header();
 
                             <!-- Sayfalama Bilgisi -->
                             <div id="pageInfo" class="text-center text-muted mt-2"></div>
-
-                            <!-- Sayfalama Kontrolleri -->
-<!--                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">-->
-<!--                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">-->
-<!--                                    <i class="fas fa-chevron-left me-1"></i> Önceki-->
-<!--                                </button>-->
-<!--                                <button id="nextPage" class="btn btn-sm btn-outline-primary">-->
-<!--                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>-->
-<!--                                </button>-->
-<!--                            </div>-->
                         </div>
                     </div>
                 </div>
@@ -678,7 +613,6 @@ echo $OUTPUT->header();
         </div>
     </div>
 </div>
-
 
 <script>
     (function () {
@@ -701,30 +635,13 @@ echo $OUTPUT->header();
 
         // Varyasyon oluşturma
         varyasyonOlusturBtn.addEventListener('click', function() {
-            // Seçilen renkler ve boyutları al
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.text
-                };
-            });
+            // Seçili renk ve boyutları al
+            const selectedColors = Array.from(colorSelect.selectedOptions).map(option => option.value);
+            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(option => option.value);
 
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.text
-                };
-            });
-
-            // Hiçbir seçim yapılmadıysa uyarı ver
+            // Hiç renk veya boyut seçilmemişse uyarı ver
             if (selectedColors.length === 0 || selectedSizes.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Eksik Seçim',
-                    text: 'Lütfen en az bir renk ve bir boyut seçin.',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#3e64ff'
-                });
+                alert('En az bir renk ve bir boyut seçmelisiniz!');
                 return;
             }
 
@@ -737,7 +654,8 @@ echo $OUTPUT->header();
                 selectedSizes.forEach(size => {
                     allVariants.push({
                         color: color,
-                        size: size
+                        size: size,
+                        stock: 0
                     });
                 });
             });
@@ -755,34 +673,41 @@ echo $OUTPUT->header();
             allVariants.forEach(variant => {
                 const row = document.createElement('tr');
 
-                // Renk + Boyut hücresi
-                const variantCell = document.createElement('td');
-                variantCell.className = 'd-flex align-items-center';
-
-                // Renk göstergesi
+                // Renk hücresi
+                const colorCell = document.createElement('td');
                 const colorBadge = document.createElement('span');
-                colorBadge.className = 'badge me-2';
-                colorBadge.style.backgroundColor = getColorHex(variant.color.value);
-                colorBadge.style.color = getContrastColor(variant.color.value);
-                colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
+                colorBadge.className = 'color-badge me-2';
+                colorBadge.style.backgroundColor = getColorHex(variant.color);
+                colorBadge.style.color = getContrastColor(variant.color);
+                colorBadge.innerText = variant.color.charAt(0).toUpperCase();
 
-                variantCell.appendChild(colorBadge);
-                variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
+                const colorName = document.createElement('span');
+                colorName.innerText = variant.color.charAt(0).toUpperCase() + variant.color.slice(1);
 
-                // Stok miktarı hücresi
+                colorCell.appendChild(colorBadge);
+                colorCell.appendChild(colorName);
+                row.appendChild(colorCell);
+
+                // Boyut hücresi
+                const sizeCell = document.createElement('td');
+                sizeCell.innerText = variant.size;
+                row.appendChild(sizeCell);
+
+                // Stok hücresi
                 const stockCell = document.createElement('td');
                 const stockInput = document.createElement('input');
                 stockInput.type = 'number';
-                stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
-                stockInput.className = 'form-control form-control-sm';
-                stockInput.min = 0;
-                stockInput.value = 0;
-                stockInput.required = true;
+                stockInput.className = 'form-control form-control-sm stock-input';
+                stockInput.min = '0';
+                stockInput.value = variant.stock;
+                stockInput.name = `variant_stock[${variant.color}][${variant.size}]`;
+                stockInput.addEventListener('change', function() {
+                    variant.stock = parseInt(this.value) || 0;
+                });
 
                 stockCell.appendChild(stockInput);
-
-                row.appendChild(variantCell);
                 row.appendChild(stockCell);
+
                 varyasyonTablo.appendChild(row);
             });
         }
@@ -790,22 +715,22 @@ echo $OUTPUT->header();
         // Renk kodlarını al
         function getColorHex(colorName) {
             const colorMap = {
+                'siyah': '#000000',
+                'beyaz': '#ffffff',
                 'kirmizi': '#dc3545',
                 'mavi': '#0d6efd',
-                'siyah': '#212529',
-                'beyaz': '#f8f9fa',
                 'yesil': '#198754',
                 'sari': '#ffc107',
                 'turuncu': '#fd7e14',
                 'mor': '#6f42c1',
                 'pembe': '#d63384',
                 'gri': '#6c757d',
-                'bej': '#E4DAD2',
-                'lacivert': '#11098A',
                 'kahverengi': '#8B4513',
-                'haki': '#8A9A5B',
-                'vizon': '#A89F91',
-                'bordo': '#800000'
+                'lacivert': '#000080',
+                'acik-mavi': '#0dcaf0',
+                'acik-yesil': '#20c997',
+                'acik-pembe': '#f8d7da',
+                'acik-gri': '#ced4da'
             };
 
             return colorMap[colorName] || '#6c757d';
@@ -828,13 +753,19 @@ echo $OUTPUT->header();
             const inputs = form.querySelectorAll('input, select');
             Array.prototype.slice.call(inputs).forEach(function(input) {
                 input.addEventListener('change', function() {
-                    // Geçerlilik kontrolü
-                    if (input.checkValidity()) {
-                        input.classList.remove('is-invalid');
-                        input.classList.add('is-valid');
+                    if (!this.validity.valid) {
+                        this.classList.add('is-invalid');
+                        const feedback = this.nextElementSibling;
+                        if (feedback && feedback.classList.contains('invalid-feedback')) {
+                            feedback.style.display = 'block';
+                        }
                     } else {
-                        input.classList.remove('is-valid');
-                        input.classList.add('is-invalid');
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        const feedback = this.nextElementSibling;
+                        if (feedback && feedback.classList.contains('invalid-feedback')) {
+                            feedback.style.display = 'none';
+                        }
                     }
                 });
             });
@@ -845,76 +776,15 @@ echo $OUTPUT->header();
                     event.preventDefault();
                     event.stopPropagation();
 
-                    // Geçersiz alanları işaretle
-                    Array.prototype.slice.call(inputs).forEach(function(input) {
-                        if (!input.checkValidity()) {
-                            input.classList.add('is-invalid');
-                        }
-                    });
-
-                    // Hata mesajı göster
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Form Hatası',
-                        text: 'Lütfen zorunlu alanları doldurun!',
-                        confirmButtonText: 'Tamam',
-                        confirmButtonColor: '#3e64ff'
-                    });
-                } else {
-                    // Varyasyonlar var mı kontrol et
-                    const hasVariations = !varyasyonBolumu.classList.contains('d-none') &&
-                        varyasyonTablo.querySelectorAll('tr').length > 0;
-
-                    if (hasVariations) {
-                        // Varyasyon girişlerini kontrol et
-                        const varyasyonInputs = varyasyonTablo.querySelectorAll('input[type="number"]');
-                        let varyasyonToplam = 0;
-                        let validVariants = 0;
-
-                        varyasyonInputs.forEach(function(input) {
-                            const value = parseInt(input.value);
-                            if (!isNaN(value) && value > 0) {
-                                varyasyonToplam += value;
-                                validVariants++;
-                            }
-                        });
-
-                        if (validVariants === 0) {
-                            event.preventDefault();
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Varyasyon Hatası',
-                                text: 'En az bir varyasyon için stok miktarı girmelisiniz!',
-                                confirmButtonText: 'Tamam',
-                                confirmButtonColor: '#3e64ff'
-                            });
-                            return;
-                        }
-
-                        // Onay mesajı göster
-                        event.preventDefault();
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Onay',
-                            html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok güncellemek üzeresiniz.</p>` +
-                                `<p>Devam etmek istiyor musunuz?</p>`,
-                            showCancelButton: true,
-                            confirmButtonText: 'Evet, Güncelle',
-                            cancelButtonText: 'İptal',
-                            confirmButtonColor: '#3e64ff',
-                            cancelButtonColor: '#6c757d'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                loadingOverlay.style.display = 'flex';
-                                submitBtn.disabled = true;
-                                form.submit();
-                            }
-                        });
-                    } else {
-                        // Varyasyon yok, normal form gönderimi
-                        loadingOverlay.style.display = 'flex';
-                        submitBtn.disabled = true;
+                    // Tüm geçersiz alanlara odaklan
+                    const invalidInputs = form.querySelectorAll(':invalid');
+                    if (invalidInputs.length > 0) {
+                        invalidInputs[0].focus();
                     }
+                } else {
+                    // Form geçerli, yükleme ekranını göster
+                    loadingOverlay.style.display = 'flex';
+                    submitBtn.disabled = true;
                 }
 
                 form.classList.add('was-validated');
@@ -929,43 +799,20 @@ echo $OUTPUT->header();
         const rafSelect = document.getElementById("raf");
 
         if (bolumSelect && rafSelect) {
-            // Bölüm seçildiğinde rafları güncelleme
+            // Bölüm değiştiğinde rafları güncelle
             bolumSelect.addEventListener("change", updateRaflar);
 
-            // Sayfa yüklendiğinde mevcut bölüm seçimine göre rafları ayarla
-            if (bolumSelect.value) {
-                updateRaflar.call(bolumSelect);
-            }
-
-            // Form gönderimini kontrol et
-            const form = document.getElementById("urunForm");
-            if (form) {
-                form.addEventListener("submit", function(event) {
-                    const bolumValue = bolumSelect.value;
-                    const rafValue = rafSelect.value;
-
-                    // Bölüm seçilmiş ama raf seçilmemişse
-                    if (bolumValue && !rafValue) {
-                        event.preventDefault();
-                        alert("Lütfen raf seçimi yapınız.");
-                        return false;
-                    }
-
-                    // Debug için konsola yazdır
-                    console.log("Form gönderiliyor - Bölüm:", bolumValue, "Raf:", rafValue);
-                });
-            }
+            // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
+            updateRaflar();
         }
 
         // Rafları güncelleme fonksiyonu
         function updateRaflar() {
-            const bolum = this.value;
-            const rafSelect = document.getElementById("raf");
+            // Seçilen bölümü al
+            const bolum = bolumSelect.value;
 
             // Raf seçimini temizle
             rafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
-
-            console.log("Seçilen bölüm:", bolum);
 
             // Bölüme göre rafları ayarla
             if (bolum === "Tişört" || bolum === "Gömlek") {
@@ -990,9 +837,6 @@ echo $OUTPUT->header();
                 addRafOption(rafSelect, "E2 Rafı");
                 addRafOption(rafSelect, "E3 Rafı");
             }
-
-            // Seçenek sayısını kontrol et
-            console.log("Raf seçenekleri güncellendi:", rafSelect.options.length);
         }
 
         // Raf seçeneği ekleme yardımcı fonksiyonu
@@ -1004,124 +848,143 @@ echo $OUTPUT->header();
         }
     });
 
+    // Form doğrulama
+    (function () {
+        'use strict';
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const barkodBtn = document.getElementById('barkodOlustur');
-        const barkodInput = document.getElementById('barkod');
+        // Form doğrulama
+        const forms = document.querySelectorAll('.needs-validation');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const submitBtn = document.getElementById('submitBtn');
 
-        if (barkodBtn && barkodInput) {
-            barkodBtn.addEventListener('click', function() {
-                // Benzersiz barkod oluştur
-                const barkod = generateUniqueBarkod();
-                barkodInput.value = barkod;
+        // Renk ve boyut seçimleri
+        const colorSelect = document.getElementById('colors');
+        const sizeSelect = document.getElementById('sizes');
+        const varyasyonOlusturBtn = document.getElementById('varyasyonOlustur');
+        const varyasyonBolumu = document.getElementById('varyasyonBolumu');
+        const varyasyonTablo = document.getElementById('varyasyonTablo');
 
-                // Görsel feedback
-                barkodBtn.classList.add('btn-success');
-                barkodBtn.innerHTML = '<i class="fas fa-check me-2"></i>Oluşturuldu';
+        // Tüm varyasyonları tutacak dizi
+        let allVariants = [];
 
-                setTimeout(() => {
-                    barkodBtn.classList.remove('btn-success');
-                    barkodBtn.innerHTML = '<i class="fas fa-barcode me-2"></i>Barkod Oluştur';
-                }, 1500);
+        // Varyasyon oluşturma
+        varyasyonOlusturBtn.addEventListener('click', function() {
+            // Seçilen renkler ve boyutları al
+            const selectedColors = Array.from(colorSelect.selectedOptions).map(option => option.value);
+            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(option => option.value);
+
+            // Her ikisinden de seçim yapıldı mı kontrol et
+            if (selectedColors.length === 0 || selectedSizes.length === 0) {
+                alert('Lütfen en az bir renk ve bir boyut seçin!');
+                return;
+            }
+
+            // Varyasyonları oluştur
+            allVariants = [];
+            for (let color of selectedColors) {
+                for (let size of selectedSizes) {
+                    allVariants.push({
+                        color: color,
+                        size: size
+                    });
+                }
+            }
+
+            // Varyasyon bölümünü göster ve tabloyu oluştur
+            varyasyonBolumu.classList.remove('d-none');
+            displayVariantsByPage();
+        });
+
+        // Tüm varyasyonları göster (sayfalama olmadan)
+        function displayVariantsByPage() {
+            varyasyonTablo.innerHTML = '';
+
+            if (allVariants.length === 0) {
+                varyasyonTablo.innerHTML = '<tr><td colspan="4" class="text-center">Varyasyon oluşturmak için renk ve boyut seçin</td></tr>';
+                return;
+            }
+
+            // Varyasyonları tabloya ekle
+            allVariants.forEach((variant, index) => {
+                const colorHex = getColorHex(variant.color);
+                const contrastColor = getContrastColor(variant.color);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <span class="color-badge" style="background-color: ${colorHex}; color: ${contrastColor}">
+                            ${variant.color}
+                        </span>
+                    </td>
+                    <td>${variant.size}</td>
+                    <td>
+                        <input type="number" name="variant_quantity[${index}]" class="form-control form-control-sm" value="1" min="0">
+                        <input type="hidden" name="variant_color[${index}]" value="${variant.color}">
+                        <input type="hidden" name="variant_size[${index}]" value="${variant.size}">
+                    </td>
+                `;
+                varyasyonTablo.appendChild(row);
             });
         }
 
-        // Benzersiz barkod oluşturma fonksiyonu
-        function generateUniqueBarkod() {
-            // Depo ID'sini al (eğer URL'de varsa)
-            const urlParams = new URLSearchParams(window.location.search);
-            const depoId = urlParams.get('depoid') || '0';
+        // Renk kodlarını al
+        function getColorHex(colorName) {
+            const colorMap = {
+                'Kırmızı': '#ff0000',
+                'Mavi': '#0000ff',
+                'Yeşil': '#00ff00',
+                'Sarı': '#ffff00',
+                'Siyah': '#000000',
+                'Beyaz': '#ffffff',
+                'Turuncu': '#ffa500',
+                'Mor': '#800080',
+                'Pembe': '#ffc0cb',
+                'Gri': '#808080',
+                'Lacivert': '#000080',
+                'Bej': '#f5f5dc',
+                'Kahverengi': '#a52a2a',
+                'Bordo': '#800000',
+                'Turkuaz': '#40e0d0'
+            };
 
-            // Tarih damgası ve rastgele sayı ile benzersiz bir kod oluşturma
-            const timestamp = new Date().getTime().toString().slice(-6);
-            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-
-            // Depo ID + Tarih damgası + Rastgele sayı
-            return `DEP${depoId}-${timestamp}${random}`;
+            return colorMap[colorName] || '#cccccc';
         }
 
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('varyasyon-barkod-olustur') ||
-                e.target.closest('.varyasyon-barkod-olustur')) {
+        // Kontrast rengi hesapla
+        function getContrastColor(colorName) {
+            const darkColors = ['Siyah', 'Lacivert', 'Bordo', 'Kahverengi', 'Mavi', 'Mor'];
+            return darkColors.includes(colorName) ? '#ffffff' : '#000000';
+        }
 
-                const btn = e.target.classList.contains('varyasyon-barkod-olustur') ?
-                    e.target : e.target.closest('.varyasyon-barkod-olustur');
-
-                const index = btn.dataset.index;
-                const input = document.getElementById(`varyasyon_barkod_${index}`);
-
-                if (input) {
-                    // Ana barkodu al
-                    const anaBarkod = document.getElementById('barkod').value || generateUniqueBarkod();
-
-                    // Varyasyon için benzersiz barkod oluştur (ana barkod + varyasyon numarası)
-                    const varyasyonBarkod = `${anaBarkod}-V${index}`;
-
-                    input.value = varyasyonBarkod;
-
-                    // Görsel feedback
-                    btn.classList.add('btn-success');
-                    btn.innerHTML = '<i class="fas fa-check me-1"></i>OK';
-
-                    setTimeout(() => {
-                        btn.classList.remove('btn-success');
-                        btn.innerHTML = '<i class="fas fa-barcode me-1"></i>Barkod';
-                    }, 1500);
-                }
+        // Sayfa yüklendiğinde loading overlay'i gizle
+        window.addEventListener('load', function() {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
             }
         });
 
-        // Barkod görselleştirme
-        function renderBarcode(value) {
-            // Eğer barkod canvas yoksa oluştur
-            let barcodeContainer = document.getElementById('barcodeContainer');
-            if (!barcodeContainer) {
-                barcodeContainer = document.createElement('div');
-                barcodeContainer.id = 'barcodeContainer';
-                barcodeContainer.classList.add('text-center', 'mt-3', 'mb-4', 'p-3', 'border', 'rounded', 'bg-light');
-
-                const canvas = document.createElement('canvas');
-                canvas.id = 'barcodeCanvas';
-                barcodeContainer.appendChild(canvas);
-
-                // Barkod alanının altına ekle
-                const barkodDiv = document.getElementById('barkod').closest('.mb-4');
-                barkodDiv.appendChild(barcodeContainer);
-            }
-
-            try {
-                JsBarcode("#barcodeCanvas", value, {
-                    format: "CODE128",
-                    displayValue: true,
-                    fontSize: 16,
-                    margin: 10
-                });
-                barcodeContainer.style.display = 'block';
-            } catch(e) {
-                barcodeContainer.style.display = 'none';
-            }
-        }
-
-        // Barkod oluşturulduğunda veya değiştiğinde görselleştir
-        if (barkodInput) {
-            barkodBtn.addEventListener('click', function() {
-                renderBarcode(barkodInput.value);
-            });
-
-            barkodInput.addEventListener('input', function() {
-                if (this.value.length > 3) {
-                    renderBarcode(this.value);
+        // Form doğrulama
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    // Form geçerli, loading göster
+                    if (loadingOverlay && submitBtn) {
+                        loadingOverlay.style.display = 'flex';
+                        submitBtn.disabled = true;
+                    }
                 }
-            });
-        }
-    });
-    </script>
 
-<!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
 
 <?php
+// Sayfanın alt kısmı
 echo $OUTPUT->footer();
 ?>
