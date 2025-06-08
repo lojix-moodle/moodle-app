@@ -282,17 +282,7 @@ echo $OUTPUT->header();
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Son 30 Günlük Stok Hareketleri</span>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                Filtre
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Son 7 Gün</a></li>
-                                <li><a class="dropdown-item" href="#">Son 30 Gün</a></li>
-                                <li><a class="dropdown-item" href="#">Son 90 Gün</a></li>
-                            </ul>
-                        </div>
-                    </div>
+
                     <div class="card-body">
                         <div class="chart-container">
                             <canvas id="stockChart"></canvas>
@@ -304,7 +294,6 @@ echo $OUTPUT->header();
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Ürün Kategorileri Dağılımı</span>
-                        <button class="btn btn-sm btn-outline-secondary">Detay</button>
                     </div>
                     <div class="card-body">
                         <div class="chart-container" style="height: 250px;">
@@ -372,10 +361,7 @@ echo $OUTPUT->header();
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
-                        <div>
-                            <span class="badge bg-danger me-2">5 Kritik</span>
-                            <button class="btn btn-sm btn-outline-primary">Tümünü Gör</button>
-                        </div>
+
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-hover mb-0">
@@ -456,10 +442,7 @@ echo $OUTPUT->header();
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
-                    <div>
-                        <span class="badge bg-primary me-2">3 Geciken</span>
-                        <button class="btn btn-sm btn-outline-primary">Tüm Siparişler</button>
-                    </div>
+
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0">
@@ -499,10 +482,6 @@ echo $OUTPUT->header();
                         </tbody>
                     </table>
                 </div>
-                <div class="card-footer bg-light text-end">
-                    <button class="btn btn-sm btn-outline-secondary">Yeni Sipariş Oluştur</button>
-                </div>
-            </div>
 
             <!-- Yeni Kart: Ürün Hareket Analizi -->
             <div class="card">
