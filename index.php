@@ -125,154 +125,283 @@ echo $OUTPUT->header();
 ?>
 
 <style>
+    /* ======= TEMEL DEĞIŞKENLER VE STIL TEMELLERI ======= */
     :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #3498db;
-        --accent-color: #e74c3c;
-        --light-color: #ecf0f1;
-        --dark-color: #34495e;
-        --success-color: #27ae60;
-        --warning-color: #f39c12;
-        --danger-color: #c0392b;
+        --primary: #3498db;
+        --primary-dark: #2980b9;
+        --secondary: #2c3e50;
+        --success: #2ecc71;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --info: #3498db;
+        --light: #ecf0f1;
+        --dark: #34495e;
+        --gray: #95a5a6;
+        --gray-light: #f5f7fa;
+
+        --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+        --border-radius: 10px;
+        --border-radius-sm: 6px;
+        --border-radius-lg: 16px;
+
+        --transition: all 0.25s ease;
     }
 
     body {
-        background-color: #f5f7fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--gray-light);
+        color: var(--secondary);
+        line-height: 1.6;
     }
 
+    /* ======= BAŞLIK VE HEADER STILLER ======= */
     .header-container {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
         color: white;
-        padding: 2rem 0;
-        border-radius: 0 0 20px 20px;
+        padding: 2.5rem 0;
+        border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
         margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-lg);
     }
 
+    .header-container h1 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .header-container .lead {
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    .header-container .btn-light {
+        font-weight: 600;
+    }
+
+    /* ======= KART VE CONTAINER STILLER ======= */
     .card {
-        border-radius: 10px;
         border: none;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        overflow: hidden;
         margin-bottom: 1.5rem;
     }
 
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
     }
 
     .card-header {
         background-color: white;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        font-weight: bold;
-        border-radius: 10px 10px 0 0 !important;
-        padding: 1rem 1.25rem;
+        font-weight: 600;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
     }
 
+    .card-header i {
+        margin-right: 0.5rem;
+        opacity: 0.8;
+    }
+
+    .card-footer {
+        background-color: var(--gray-light);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 1.5rem;
+    }
+
+    /* ======= İSTATISTIK KARTLARI ======= */
     .status-card {
         text-align: center;
-        padding: 1.5rem;
+        padding: 1.75rem 1rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     .status-card i {
         font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--secondary-color);
+        color: var(--primary);
+        margin-bottom: 1.25rem;
+        opacity: 0.85;
     }
 
     .status-card h2 {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 2rem;
     }
 
+    .status-card p {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    /* ======= HIZLI İŞLEMLER ======= */
     .quick-action {
-        padding: 1.2rem;
+        height: 100%;
+        padding: 1.5rem;
         text-align: center;
-        transition: all 0.3s ease;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        background-color: white;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: var(--transition);
+        border-radius: var(--border-radius);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     .quick-action:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+        cursor: pointer;
     }
 
     .quick-action i {
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        font-size: 2.25rem;
+        margin-bottom: 1.25rem;
+        transition: var(--transition);
     }
 
-    .action-1 { color: var(--secondary-color); }
-    .action-2 { color: var(--success-color); }
-    .action-3 { color: var(--warning-color); }
-    .action-4 { color: var(--accent-color); }
+    .quick-action h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
 
+    .quick-action p {
+        font-size: 0.85rem;
+        margin-bottom: 0;
+    }
+
+    .action-1 { color: var(--primary); }
+    .action-2 { color: var(--success); }
+    .action-3 { color: var(--warning); }
+    .action-4 { color: var(--danger); }
+
+    .quick-action:hover .action-1 { color: var(--primary-dark); }
+
+    /* ======= BARKOD TARAYICI ======= */
     .barcode-scanner {
         background-color: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        text-align: center;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
     }
 
+    .barcode-scanner i {
+        color: var(--secondary);
+        opacity: 0.8;
+    }
+
+    .barcode-scanner h5 {
+        font-weight: 600;
+    }
+
+    #barcode-result {
+        background-color: var(--gray-light);
+        padding: 1rem;
+        border-radius: var(--border-radius-sm);
+    }
+
+    /* ======= STOK GÖSTERGELERI ======= */
     .stock-indicator {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        margin-right: 5px;
     }
 
-    .stock-low { background-color: var(--danger-color); }
-    .stock-medium { background-color: var(--warning-color); }
-    .stock-high { background-color: var(--success-color); }
+    .stock-low { background-color: var(--danger); }
+    .stock-medium { background-color: var(--warning); }
+    .stock-high { background-color: var(--success); }
 
-    .critical-alert {
-        background-color: #fef2f2;
-        border-left: 4px solid var(--danger-color);
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        border-radius: 5px;
-    }
-    .quick-action.btn {
-        display: block;
-        border: none;
-        background-color: white;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        padding: 1.2rem;
-        text-align: center;
-        border-radius: 10px;
-        margin-bottom: 1rem;
+    /* ======= TABLOLAR VE LISTELER ======= */
+    .table {
+        margin-bottom: 0;
     }
 
-    .quick-action.btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    .table > :not(caption) > * > * {
+        padding: 1rem 1.5rem;
     }
 
-    .quick-action.btn:focus {
-        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    .table-light {
+        background-color: var(--gray-light);
     }
 
-    @media (max-width: 768px) {
-        .status-card {
-            margin-bottom: 1rem;
-        }
-
-        .quick-actions-container .col-md-3 {
-            width: 50%;
-        }
+    .progress {
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 1rem;
     }
 
+    /* ======= GRAFIKLER ======= */
     .chart-container {
         position: relative;
         height: 300px;
         width: 100%;
+    }
+
+    /* ======= RESPONSIVE AYARLAR ======= */
+    @media (max-width: 992px) {
+        .header-container {
+            padding: 2rem 0;
+        }
+
+        .status-card {
+            margin-bottom: 1rem;
+        }
+
+        .header-container .text-end {
+            text-align: left !important;
+            margin-top: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .quick-actions-container .col-md-3 {
+            width: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .barcode-scanner {
+            padding: 1.5rem;
+        }
+
+        .barcode-scanner .col-md-2 {
+            margin-bottom: 1rem;
+            text-align: left !important;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-header div {
+            margin-top: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .quick-actions-container .col-md-3 {
+            width: 100%;
+        }
+
+        .status-card i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .header-container h1 {
+            font-size: 1.75rem;
+        }
     }
 </style>
 
