@@ -452,65 +452,108 @@ echo $OUTPUT->header();
                 </div>
             </div>
 
-                <!-- Son İşlemler -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Son İşlemler</span>
-                        <a href="transactions.php" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <span class="badge bg-success">Giriş</span>
-                                            Beyaz Tişört
-                                        </h6>
-                                        <small class="text-muted">20 adet | Depo A - C1 Rafı</small>
-                                    </div>
-                                    <span class="text-secondary">1 saat önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <span class="badge bg-danger">Çıkış</span>
-                                            Deri Ayakkabı
-                                        </h6>
-                                        <small class="text-muted">3 adet | Depo B - A2 Rafı</small>
-                                    </div>
-                                    <span class="text-secondary">3 saat önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <span class="badge bg-success">Giriş</span>
-                                            Kış Montu
-                                        </h6>
-                                        <small class="text-muted">15 adet | Depo A - B3 Rafı</small>
-                                    </div>
-                                    <span class="text-secondary">5 saat önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <span class="badge bg-danger">Çıkış</span>
-                                            Spor Çanta
-                                        </h6>
-                                        <small class="text-muted">2 adet | Depo C - D1 Rafı</small>
-                                    </div>
-                                    <span class="text-secondary">8 saat önce</span>
-                                </div>
-                            </li>
-                        </ul>
+            <!-- İlk Kart: Yaklaşan Siparişler -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
+                    <div>
+                        <span class="badge bg-primary me-2">3 Geciken</span>
+                        <button class="btn btn-sm btn-outline-primary">Tüm Siparişler</button>
                     </div>
                 </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Sipariş Kodu</th>
+                            <th>Tedarikçi</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><strong>SP-32145</strong></td>
+                            <td>ABC Tekstil Ltd.</td>
+                            <td>20.07.2023</td>
+                            <td><span class="badge bg-primary">Yolda</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32157</strong></td>
+                            <td>Mega Ayakkabı A.Ş.</td>
+                            <td>18.07.2023</td>
+                            <td><span class="badge bg-warning">Gecikiyor</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32162</strong></td>
+                            <td>Trend Aksesuar</td>
+                            <td>22.07.2023</td>
+                            <td><span class="badge bg-success">Hazırlanıyor</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32169</strong></td>
+                            <td>Star Konfeksiyon</td>
+                            <td>15.07.2023</td>
+                            <td><span class="badge bg-danger">Beklemede</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light text-end">
+                    <button class="btn btn-sm btn-outline-secondary">Yeni Sipariş Oluştur</button>
+                </div>
+            </div>
+
+            <!-- İkinci Kart: Lokasyon Haritası -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-map-marked-alt me-2"></i>Depo Lokasyon Haritası</span>
+                    <button class="btn btn-sm btn-outline-primary">Tam Görünüm</button>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row text-center mb-3">
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded" style="background-color: rgba(231, 76, 60, 0.1);">
+                                <h6>A Bölgesi</h6>
+                                <div class="mb-2 fs-4">92%</div>
+                                <small class="text-danger">Dolu</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded" style="background-color: rgba(243, 156, 18, 0.1);">
+                                <h6>B Bölgesi</h6>
+                                <div class="mb-2 fs-4">78%</div>
+                                <small class="text-warning">Yoğun</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded" style="background-color: rgba(46, 204, 113, 0.1);">
+                                <h6>C Bölgesi</h6>
+                                <div class="mb-2 fs-4">45%</div>
+                                <small class="text-success">Normal</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded" style="background-color: rgba(52, 152, 219, 0.1);">
+                                <h6>D Bölgesi</h6>
+                                <div class="mb-2 fs-4">23%</div>
+                                <small class="text-primary">Müsait</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-route me-1"></i>En Kısa Rota
+                        </button>
+                        <button class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-edit me-1"></i>Yerleşim Düzenle
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">Yerleşim planı son güncelleme: 16.07.2023</small>
+                </div>
+            </div>
             </div>
         </div>
     </div>
