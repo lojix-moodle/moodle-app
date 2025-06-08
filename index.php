@@ -976,6 +976,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 counter.innerText = value;
             }
         }
+        
         animate();
     });
 });
