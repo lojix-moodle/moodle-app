@@ -314,55 +314,143 @@ echo $OUTPUT->header();
                 </div>
             </div>
 
-            <!-- Sağ Taraf - Listeler -->
+            <!-- Sağ Taraf - Analiz Kartları -->
             <div class="col-md-5">
-                <!-- Son Eklenen Ürünler -->
+                <!-- Depo Kullanım İstatistiği -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Son Eklenen Ürünler</span>
-                        <a href="products.php" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+                        <span><i class="fas fa-warehouse me-2"></i>Depo Kullanım İstatistiği</span>
+                        <div>
+                            <span class="badge bg-danger me-2">2 Kritik</span>
+                            <button class="btn btn-sm btn-outline-primary">Depo Detayı</button>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Beyaz Gömlek L Beden</h6>
-                                        <small class="text-muted">Gömlek | 10 Adet</small>
-                                    </div>
-                                    <span class="text-secondary">2 saat önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Siyah Pantolon 32 Beden</h6>
-                                        <small class="text-muted">Pantolon | 15 Adet</small>
-                                    </div>
-                                    <span class="text-secondary">4 saat önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Spor Ayakkabı 42 Numara</h6>
-                                        <small class="text-muted">Ayakkabı | 8 Adet</small>
-                                    </div>
-                                    <span class="text-secondary">1 gün önce</span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Deri Çanta</h6>
-                                        <small class="text-muted">Çanta | 5 Adet</small>
-                                    </div>
-                                    <span class="text-secondary">1 gün önce</span>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>A Deposu (Tekstil)</span>
+                                <span class="fw-bold">85%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>B Deposu (Elektronik)</span>
+                                <span class="fw-bold">62%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>C Deposu (Gıda)</span>
+                                <span class="fw-bold">41%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>D Deposu (Mobilya)</span>
+                                <span class="fw-bold">78%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button class="btn btn-sm btn-outline-secondary">Kapasite Planlaması</button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Kritik Stok Bildirimleri -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
+                        <div>
+                            <span class="badge bg-danger me-2">5 Kritik</span>
+                            <button class="btn btn-sm btn-outline-primary">Tümünü Gör</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Ürün</th>
+                                <th>Durum</th>
+                                <th>Stok</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-indicator stock-low me-2"></div>
+                                        <span>Beyaz Gömlek L Beden</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-danger">Kritik</span></td>
+                                <td><strong>2</strong> / 10</td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-indicator stock-low me-2"></div>
+                                        <span>Spor Ayakkabı 42 No</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-danger">Kritik</span></td>
+                                <td><strong>3</strong> / 12</td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-indicator stock-medium me-2"></div>
+                                        <span>Deri Cüzdan Kahve</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-warning">Uyarı</span></td>
+                                <td><strong>5</strong> / 8</td>
+                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-indicator stock-low me-2"></div>
+                                        <span>Yazlık Elbise M Beden</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-danger">Kritik</span></td>
+                                <td><strong>1</strong> / 8</td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-indicator stock-medium me-2"></div>
+                                        <span>Kış Montu XL Beden</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-warning">Uyarı</span></td>
+                                <td><strong>4</strong> / 6</td>
+                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer text-center bg-light">
+                        <small class="text-muted">Son güncelleme: 17.07.2023 - 15:30</small>
+                    </div>
+                </div>
+            </div>
 
                 <!-- Son İşlemler -->
                 <div class="card">
