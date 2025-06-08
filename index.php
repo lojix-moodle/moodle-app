@@ -489,7 +489,6 @@ echo $OUTPUT->header();
                     <span><i class="fas fa-exchange-alt me-2"></i>Ürün Hareket Analizi</span>
                     <div>
                         <span class="badge bg-danger me-2">4 Durağan</span>
-                        <button class="btn btn-sm btn-outline-primary">Detaylı Analiz</button>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -563,14 +562,7 @@ echo $OUTPUT->header();
                 </div>
                 <div class="card-footer bg-light d-flex justify-content-between align-items-center">
                     <small class="text-muted">Son analiz: 17.07.2023</small>
-                    <div>
-                        <button class="btn btn-sm btn-outline-danger me-2">
-                            <i class="fas fa-tag me-1"></i>İndirim Öner
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-chart-line me-1"></i>Trend Analizi
-                        </button>
-                    </div>
+
                 </div>
             </div>
             </div>
