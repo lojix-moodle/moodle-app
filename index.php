@@ -504,54 +504,94 @@ echo $OUTPUT->header();
                 </div>
             </div>
 
-            <!-- İkinci Kart: Lokasyon Haritası -->
+            <!-- Yeni Kart: Ürün Hareket Analizi -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-map-marked-alt me-2"></i>Depo Lokasyon Haritası</span>
-                    <button class="btn btn-sm btn-outline-primary">Tam Görünüm</button>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row text-center mb-3">
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="p-3 border rounded" style="background-color: rgba(231, 76, 60, 0.1);">
-                                <h6>A Bölgesi</h6>
-                                <div class="mb-2 fs-4">92%</div>
-                                <small class="text-danger">Dolu</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="p-3 border rounded" style="background-color: rgba(243, 156, 18, 0.1);">
-                                <h6>B Bölgesi</h6>
-                                <div class="mb-2 fs-4">78%</div>
-                                <small class="text-warning">Yoğun</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="p-3 border rounded" style="background-color: rgba(46, 204, 113, 0.1);">
-                                <h6>C Bölgesi</h6>
-                                <div class="mb-2 fs-4">45%</div>
-                                <small class="text-success">Normal</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="p-3 border rounded" style="background-color: rgba(52, 152, 219, 0.1);">
-                                <h6>D Bölgesi</h6>
-                                <div class="mb-2 fs-4">23%</div>
-                                <small class="text-primary">Müsait</small>
-                            </div>
-                        </div>
+                    <span><i class="fas fa-exchange-alt me-2"></i>Ürün Hareket Analizi</span>
+                    <div>
+                        <span class="badge bg-danger me-2">4 Durağan</span>
+                        <button class="btn btn-sm btn-outline-primary">Detaylı Analiz</button>
                     </div>
-                    <div class="d-flex justify-content-between">
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Kategori</th>
+                            <th>Stokta Kalma</th>
+                            <th>Hareket</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Spor Ayakkabı (42 No)</td>
+                            <td>Ayakkabı</td>
+                            <td><small>3 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
+                                </div>
+                                <small class="text-success">Çok Hızlı</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Kapüşonlu Sweatshirt</td>
+                            <td>Üst Giyim</td>
+                            <td><small>7 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
+                                </div>
+                                <small class="text-primary">Hızlı</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Deri Cüzdan (Kahve)</td>
+                            <td>Aksesuar</td>
+                            <td><small>14 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                                </div>
+                                <small class="text-warning">Orta</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Kış Montu (XL)</td>
+                            <td>Dış Giyim</td>
+                            <td><small>38 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"></div>
+                                </div>
+                                <small class="text-danger">Yavaş</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Klasik Takım Elbise</td>
+                            <td>Resmi Giyim</td>
+                            <td><small>52 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 10%"></div>
+                                </div>
+                                <small class="text-danger">Durağan</small>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Son analiz: 17.07.2023</small>
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger me-2">
+                            <i class="fas fa-tag me-1"></i>İndirim Öner
+                        </button>
                         <button class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-route me-1"></i>En Kısa Rota
-                        </button>
-                        <button class="btn btn-sm btn-outline-success">
-                            <i class="fas fa-edit me-1"></i>Yerleşim Düzenle
+                            <i class="fas fa-chart-line me-1"></i>Trend Analizi
                         </button>
                     </div>
-                </div>
-                <div class="card-footer bg-light text-center">
-                    <small class="text-muted">Yerleşim planı son güncelleme: 16.07.2023</small>
                 </div>
             </div>
             </div>
