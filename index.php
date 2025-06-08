@@ -130,6 +130,27 @@ echo $OUTPUT->header();
             margin-bottom: 1.5rem;
             border-radius: 5px;
         }
+        .quick-action.btn {
+            display: block;
+            border: none;
+            background-color: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            padding: 1.2rem;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .quick-action.btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action.btn:focus {
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+
 
         @media (max-width: 768px) {
             .status-card {
@@ -187,21 +208,7 @@ echo $OUTPUT->header();
             </div>
         </div>
 
-        <!-- Kritik Stok Uyarısı -->
-        <div class="critical-alert">
-            <div class="row align-items-center">
-                <div class="col-md-1 text-center">
-                    <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
-                </div>
-                <div class="col-md-9">
-                    <h5 class="text-danger mb-1">Kritik Stok Uyarısı</h5>
-                    <p class="mb-0">7 ürün kritik stok seviyesinin altında. Stok güncellemeniz gerekiyor.</p>
-                </div>
-                <div class="col-md-2 text-end">
-                    <button class="btn btn-danger btn-sm">Görüntüle</button>
-                </div>
-            </div>
-        </div>
+
 
         <!-- İstatistik Kartları -->
         <div class="row mb-4">
@@ -239,43 +246,34 @@ echo $OUTPUT->header();
         <h4 class="mb-3">Hızlı İşlemler</h4>
         <div class="row quick-actions-container mb-4">
             <div class="col-md-3 col-6">
-                <a href="actions/urun_ekle.php" class="text-decoration-none">
-                    <div class="quick-action">
-                        <i class="fas fa-plus-circle action-1"></i>
-                        <h5>Yeni Ürün</h5>
-                        <p class="text-muted small mb-0">Envantere ürün ekle</p>
-                    </div>
-                </a>
+                <button type="button" class="btn quick-action w-100" onclick="window.location.href='actions/urun_ekle.php'">
+                    <i class="fas fa-plus-circle action-1"></i>
+                    <h5>Yeni Ürün</h5>
+                    <p class="text-muted small mb-0">Envantere ürün ekle</p>
+                </button>
             </div>
             <div class="col-md-3 col-6">
-                <a href="actions/stok_giris.php" class="text-decoration-none">
-                    <div class="quick-action">
-                        <i class="fas fa-arrow-down action-2"></i>
-                        <h5>Stok Girişi</h5>
-                        <p class="text-muted small mb-0">Mevcut ürün girişi</p>
-                    </div>
-                </a>
+                <button type="button" class="btn quick-action w-100" onclick="window.location.href='actions/stok_giris.php'">
+                    <i class="fas fa-arrow-down action-2"></i>
+                    <h5>Stok Girişi</h5>
+                    <p class="text-muted small mb-0">Mevcut ürün girişi</p>
+                </button>
             </div>
             <div class="col-md-3 col-6">
-                <a href="actions/stok_cikis.php" class="text-decoration-none">
-                    <div class="quick-action">
-                        <i class="fas fa-arrow-up action-3"></i>
-                        <h5>Stok Çıkışı</h5>
-                        <p class="text-muted small mb-0">Ürün çıkışı kaydet</p>
-                    </div>
-                </a>
+                <button type="button" class="btn quick-action w-100" onclick="window.location.href='actions/stok_cikis.php'">
+                    <i class="fas fa-arrow-up action-3"></i>
+                    <h5>Stok Çıkışı</h5>
+                    <p class="text-muted small mb-0">Ürün çıkışı kaydet</p>
+                </button>
             </div>
             <div class="col-md-3 col-6">
-                <a href="reports.php" class="text-decoration-none">
-                    <div class="quick-action">
-                        <i class="fas fa-chart-bar action-4"></i>
-                        <h5>Raporlar</h5>
-                        <p class="text-muted small mb-0">Detaylı analiz</p>
-                    </div>
-                </a>
+                <button type="button" class="btn quick-action w-100" onclick="window.location.href='reports.php'">
+                    <i class="fas fa-chart-bar action-4"></i>
+                    <h5>Raporlar</h5>
+                    <p class="text-muted small mb-0">Detaylı analiz</p>
+                </button>
             </div>
         </div>
-
         <!-- Grafik ve Listeler -->
         <div class="row">
             <!-- Sol Taraf - Grafikler -->
