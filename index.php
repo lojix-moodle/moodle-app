@@ -246,28 +246,28 @@ echo $OUTPUT->header();
         <h4 class="mb-3">Hızlı İşlemler</h4>
         <div class="row quick-actions-container mb-4">
             <div class="col-md-3 col-6">
-                <div class="card status-card quick-action" onclick="window.location.href='actions/urun_ekle.php'">
+                <div class="card status-card quick-action">
                     <i class="fas fa-plus-circle action-1"></i>
                     <h5>Yeni Ürün</h5>
                     <p class="text-muted small mb-0">Envantere ürün ekle</p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
-                <div class="card status-card quick-action" onclick="window.location.href='actions/stok_giris.php'">
+                <div class="card status-card quick-action">
                     <i class="fas fa-arrow-down action-2"></i>
                     <h5>Stok Girişi</h5>
                     <p class="text-muted small mb-0">Mevcut ürün girişi</p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
-                <div class="card status-card quick-action" onclick="window.location.href='actions/stok_cikis.php'">
+                <div class="card status-card quick-action">
                     <i class="fas fa-arrow-up action-3"></i>
                     <h5>Stok Çıkışı</h5>
                     <p class="text-muted small mb-0">Ürün çıkışı kaydet</p>
                 </div>
             </div>
             <div class="col-md-3 col-6">
-                <div class="card status-card quick-action" onclick="window.location.href='reports.php'">
+                <div class="card status-card quick-action">
                     <i class="fas fa-chart-bar action-4"></i>
                     <h5>Raporlar</h5>
                     <p class="text-muted small mb-0">Detaylı analiz</p>
