@@ -331,11 +331,11 @@ echo '<style>
     }
 
     .site-hero h1 {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
     }
 
     .site-hero p {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
 
     .section-title {
@@ -343,11 +343,11 @@ echo '<style>
     }
 
     .counter-container h2 {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
     }
 
     .chart-container {
-        height: 280px;
+        height: 250px;
     }
 }
 </style>';
@@ -360,7 +360,8 @@ document.addEventListener("DOMContentLoaded", function() {
         AOS.init({
             duration: 800,
             easing: "ease-in-out",
-            once: true
+            once: true,
+            mirror: false
         });
     }
 
@@ -369,86 +370,90 @@ document.addEventListener("DOMContentLoaded", function() {
     counters.forEach(counter => {
         const target = parseInt(counter.getAttribute("data-count"));
         const duration = 2000;
-        const step = Math.ceil(target / (duration / 16));
-        let current = 0;
-
-        const updateCounter = () => {
-            current += step;
-            if (current < target) {
-                counter.innerText = current;
-                setTimeout(updateCounter, 16);
+        const startTime = Date.now();
+        const step = () => {
+            const currentTime = Date.now();
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            counter.textContent = Math.floor(progress * target);
+            if (progress < 1) {
+                requestAnimationFrame(step);
             } else {
-                counter.innerText = target;
+                counter.textContent = target;
             }
         };
-
-        const observer = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                updateCounter();
-                observer.unobserve(counter);
-            }
-        });
-
-        observer.observe(counter);
+        requestAnimationFrame(step);
     });
 
     // Stok hareketleri grafiği
     if (typeof Chart !== "undefined") {
-        const ctxOverview = document.getElementById("stockOverviewChart");
-        if (ctxOverview) {
-            new Chart(ctxOverview, {
+        const stockCtx = document.getElementById("stockOverviewChart");
+        if (stockCtx) {
+            new Chart(stockCtx, {
                 type: "doughnut",
                 data: {
-                    labels: ["Giyim", "Ayakkabı", "Aksesuar", "Çanta", "Elektronik"],
-                    datasets: [
-                        {
-                            data: [45, 25, 15, 10, 5],
-                            backgroundColor: [
-                                "#4caf50",
-                                "#2196f3",
-                                "#ff9800",
-                                "#9c27b0",
-                                "#607d8b"
-                            ]
-                        }
-                    ]
+                    labels: ["Elektronik", "Mobilya", "Gıda", "Giyim", "Diğer"],
+                    datasets: [{
+                        data: [35, 20, 15, 20, 10],
+                        backgroundColor: ["#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ddd"],
+                        borderWidth: 0
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: "right"
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            padding: 20,
+                            fontColor: "#333"
                         }
+                    },
+                    cutoutPercentage: 70,
+                    animation: {
+                        animateScale: true
                     }
                 }
             });
         }
-
-        const ctxEfficiency = document.getElementById("efficiencyChart");
-        if (ctxEfficiency) {
-            new Chart(ctxEfficiency, {
+        
+        const efficiencyCtx = document.getElementById("efficiencyChart");
+        if (efficiencyCtx) {
+            new Chart(efficiencyCtx, {
                 type: "line",
                 data: {
                     labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
-                    datasets: [
-                        {
-                            label: "Verimlilik Artışı (%)",
-                            data: [10, 25, 32, 40, 48, 60],
-                            borderColor: "#4caf50",
-                            backgroundColor: "rgba(76, 175, 80, 0.1)",
-                            tension: 0.3,
-                            fill: true
-                        }
-                    ]
+                    datasets: [{
+                        label: "Verimlilik Artışı (%)",
+                        data: [5, 15, 20, 30, 40, 45],
+                        borderColor: "#2e7d32",
+                        backgroundColor: "rgba(46,125,50,0.1)",
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: "#2e7d32",
+                        fill: true
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function(value) {
+                                    return value + "%";
+                                }
+                            },
+                            gridLines: {
+                                color: "rgba(0,0,0,0.05)",
+                                zeroLineColor: "rgba(0,0,0,0.1)"
+                            }
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                display: false
+                            }
+                        }]
                     }
                 }
             });
@@ -856,9 +861,125 @@ echo '</div>';
 echo '</div>';
 echo '</div>';
 
-// Bootstrap JS ve gerekli scriptler
+// AOS ve diğer JavaScript kütüphaneleri
 echo '<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>';
 echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>';
+echo '<script>
+// AOS başlat
+document.addEventListener("DOMContentLoaded", function() {
+    AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true
+    });
+    
+    // Grafikleri oluştur
+    if (typeof Chart !== "undefined") {
+        // Stok Dağılımı Grafiği
+        var stockCtx = document.getElementById("stockOverviewChart");
+        if (stockCtx) {
+            var stockChart = new Chart(stockCtx, {
+                type: "pie",
+                data: {
+                    labels: ["Giyim", "Elektronik", "Gıda", "Mobilya", "Kozmetik"],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ["#4CAF50", "#8BC34A", "#FFC107", "#FF9800", "#F44336"],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        position: "right",
+                        labels: {
+                            fontSize: 14,
+                            padding: 20
+                        }
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                var total = dataset.data.reduce(function(previousValue, currentValue) {
+                                    return previousValue + currentValue;
+                                });
+                                var currentValue = dataset.data[tooltipItem.index];
+                                var percentage = Math.floor(((currentValue/total) * 100)+0.5);
+                                return data.labels[tooltipItem.index] + ": " + percentage + "%";
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Verimlilik Artışı Grafiği
+        var efficiencyCtx = document.getElementById("efficiencyChart");
+        if (efficiencyCtx) {
+            var efficiencyChart = new Chart(efficiencyCtx, {
+                type: "line",
+                data: {
+                    labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
+                    datasets: [{
+                        label: "Verimlilik Artışı (%)",
+                        data: [10, 15, 25, 35, 40, 45],
+                        backgroundColor: "rgba(76, 175, 80, 0.1)",
+                        borderColor: "#4CAF50",
+                        borderWidth: 3,
+                        pointBackgroundColor: "#4CAF50",
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function(value) {return value + "%"}
+                            },
+                            gridLines: {
+                                drawBorder: false
+                            }
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                display: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        }
+    }
+    
+    // Sayaç animasyonları
+    const counters = document.querySelectorAll(".counter");
+    const speed = 200;
+    
+    counters.forEach(counter => {
+        const animate = () => {
+            const value = +counter.getAttribute("data-count");
+            const data = +counter.innerText;
+            
+            const time = value / speed;
+            
+            if (data < value) {
+                counter.innerText = Math.ceil(data + time);
+                setTimeout(animate, 1);
+            } else {
+                counter.innerText = value;
+            }
+        }
+        animate();
+    });
+});
+</script>';
 
 echo $OUTPUT->footer();
 ?>
