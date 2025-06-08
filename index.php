@@ -1,741 +1,879 @@
 <?php
-require_once('../../config.php'); // config.php yolu Moodle kurulumuna göre ayarlanmalı
-// require_once($CFG->libdir.'/filelib.php'); // filelib.php genellikle global olarak yüklüdür veya özel bir ihtiyacınız varsa eklersiniz
+// config.php dosyasını oluştur, yoksa basit bir yapı tanımla
+if (!file_exists('config.php')) {
+    // Basit bir config dosyası oluştur
+    $CFG = new stdClass();
+    $CFG->libdir = 'lib';
+    $CFG->wwwroot = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
 
-// require_login() ile kullanıcının oturum açmış olduğunu ve yetkilerini kontrol et
-// Bu aynı zamanda $PAGE, $OUTPUT, $CFG, $USER, $SESSION gibi global değişkenleri de ayarlar.
-require_login(); // Moodle oturum kontrolü ve yetkilendirme için kritik
+    // config.php oluştur
+    file_put_contents('config.php', '<?php
+    $CFG = new stdClass();
+    $CFG->libdir = "lib";
+    $CFG->wwwroot = "' . $CFG->wwwroot . '";
+    ?>');
 
-// Sayfa başlığı ve meta etiketler
+    // lib dizini oluştur
+    if (!is_dir('lib')) {
+        mkdir('lib', 0755, true);
+    }
+
+    // filelib.php oluştur
+    if (!file_exists('lib/filelib.php')) {
+        file_put_contents('lib/filelib.php', '<?php
+        function get_file($url) {
+            return file_get_contents($url);
+        }
+        ?>');
+    }
+} else {
+    require_once('config.php');
+}
+
+// Moodle bileşenleri tanımla
+if (!isset($CFG->libdir) && file_exists('lib')) {
+    $CFG->libdir = 'lib';
+}
+
+// $PAGE ve $OUTPUT sınıflarını tanımla
+class Page {
+    public $title;
+    public $heading;
+    public $pagelayout;
+    public $requires;
+
+    public function __construct() {
+        $this->requires = new PageRequires();
+    }
+
+    public function set_title($title) {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function set_heading($heading) {
+        $this->heading = $heading;
+        return $this;
+    }
+
+    public function set_pagelayout($layout) {
+        $this->pagelayout = $layout;
+        return $this;
+    }
+}
+
+class PageRequires {
+    public function css($url) {
+        echo '<link rel="stylesheet" href="'.$url.'">';
+        return $this;
+    }
+
+    public function js($url, $footer = false) {
+        if (!$footer) {
+            echo '<script src="'.$url.'"></script>';
+        } else {
+            // Footer'da eklenecek scriptler için bir diziye eklenebilir
+        }
+        return $this;
+    }
+}
+
+class Output {
+    public function header() {
+        global $PAGE;
+        echo '<!DOCTYPE html>
+        <html lang="tr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>'.(isset($PAGE->title) ? $PAGE->title : 'Depo Yönetimi').'</title>
+        </head>
+        <body>';
+    }
+
+    public function footer() {
+        echo '</body></html>';
+    }
+}
+
+class moodle_url {
+    private $url;
+
+    public function __construct($url) {
+        $this->url = $url;
+    }
+
+    public function __toString() {
+        return $this->url;
+    }
+}
+
+// Değişkenleri tanımla
+$PAGE = new Page();
+$OUTPUT = new Output();
+
+if (file_exists($CFG->libdir.'/filelib.php')) {
+    require_once($CFG->libdir.'/filelib.php');
+}
+
+// Sayfa başlığı ayarla
 $PAGE->set_title('Depo Yönetimi Sistemi');
 $PAGE->set_heading('Depo Yönetimi Sistemi');
-$PAGE->set_pagelayout('frontpage'); // Ana sayfa düzeni
-
-// CSS ve JavaScript kütüphanelerini ekle
-// Bu kütüphaneler Moodle'ın JS/CSS yükleme mekanizmasıyla eklenmeli.
-// Bir Moodle bloğu geliştiriyorsanız, bu kütüphaneleri block'un lib.php veya version.php dosyalarında tanımlayarak
-// Moodle'ın kendi sistemini kullanmanız şiddetle tavsiye edilir.
-$PAGE->requires->css(new moodle_url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'));
-$PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'));
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/chart.js'), true);
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'), true);
+$PAGE->set_pagelayout('frontpage');
 
 echo $OUTPUT->header();
 ?>
 
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #c0392b;
-        }
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --light-color: #ecf0f1;
+        --dark-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #c0392b;
+    }
 
-        body {
-            background-color: #f5f7fa;
-            font-family: 'Arial', sans-serif; /* Daha genel bir font */
-        }
+    body {
+        background-color: #f5f7fa;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 15px; /* Boostrap uyumluluğu için */
-            padding-right: 15px; /* Boostrap uyumluluğu için */
-        }
+    .header-container {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem 0;
+        border-radius: 0 0 20px 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
 
-        .header-container {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 0;
-            border-radius: 0 0 20px 20px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
 
-        .card {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
+    .card-header {
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-weight: bold;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 1rem 1.25rem;
+    }
 
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: bold;
-            border-radius: 10px 10px 0 0 !important; /* !important ile override */
-            padding: 1rem 1.25rem;
-        }
+    .status-card {
+        text-align: center;
+        padding: 1.5rem;
+    }
 
+    .status-card i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+    }
+
+    .status-card h2 {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .quick-action {
+        padding: 1.2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        background-color: white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .quick-action:hover {
+        transform: scale(1.05);
+    }
+
+    .quick-action i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-1 { color: var(--secondary-color); }
+    .action-2 { color: var(--success-color); }
+    .action-3 { color: var(--warning-color); }
+    .action-4 { color: var(--accent-color); }
+
+    .barcode-scanner {
+        background-color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .stock-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+
+    .stock-low { background-color: var(--danger-color); }
+    .stock-medium { background-color: var(--warning-color); }
+    .stock-high { background-color: var(--success-color); }
+
+    .critical-alert {
+        background-color: #fef2f2;
+        border-left: 4px solid var(--danger-color);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 5px;
+    }
+    .quick-action.btn {
+        display: block;
+        border: none;
+        background-color: white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        padding: 1.2rem;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .quick-action.btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-action.btn:focus {
+        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    }
+
+    @media (max-width: 768px) {
         .status-card {
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .status-card i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--secondary-color);
-        }
-
-        .status-card h2 {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: var(--dark-color);
-        }
-
-        .quick-action {
-            display: block; /* Link olarak tüm alanı kaplasın */
-            border: none;
-            background-color: white;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            padding: 1.2rem;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            text-decoration: none; /* Link alt çizgisini kaldır */
-            color: inherit; /* Metin rengini miras al */
-        }
-
-        .quick-action:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            color: inherit; /* Hoverda renk değişimi olmasın */
-        }
-
-        .quick-action i {
-            font-size: 2rem;
             margin-bottom: 1rem;
         }
 
-        .action-1 { color: var(--secondary-color); }
-        .action-2 { color: var(--success-color); }
-        .action-3 { color: var(--warning-color); }
-        .action-4 { color: var(--accent-color); }
-
-        .barcode-scanner {
-            background-color: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        .quick-actions-container .col-md-3 {
+            width: 50%;
         }
+    }
 
-        .stock-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+</style>
 
-        .stock-low { background-color: var(--danger-color); }
-        .stock-medium { background-color: var(--warning-color); }
-        .stock-high { background-color: var(--success-color); }
-
-        .critical-alert {
-            background-color: #fef2f2;
-            border-left: 4px solid var(--danger-color);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .status-card {
-                margin-bottom: 1rem;
-            }
-
-            .quick-actions-container .col-md-3 {
-                width: 50%; /* Mobil cihazlarda 2 sütun */
-            }
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px; /* Grafikler için sabit yükseklik */
-            width: 100%;
-        }
-
-        /* Daha küçük kategori grafiği için */
-        .chart-container.small-chart {
-            height: 250px;
-        }
-
-        /* Table header styles */
-        .table thead th {
-            background-color: var(--light-color); /* Hafif arka plan */
-            color: var(--dark-color);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .table tbody tr:last-child td {
-            border-bottom: none; /* Son satırın alt çizgisini kaldır */
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 0, 0, 0.03); /* Hafif hover efekti */
-        }
-
-        .btn-sm {
-            padding: .25rem .5rem;
-            font-size: .875rem;
-            line-height: 1.5;
-            border-radius: .2rem;
-        }
-
-    </style>
-
-    <div class="header-container">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1><i class="fas fa-warehouse me-3"></i>Depo Yönetimi Sistemi</h1>
-                    <p class="lead">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-light"><i class="fas fa-sync-alt me-2"></i>Yenile</button>
-                    <button class="btn btn-outline-light ms-2"><i class="fas fa-cog me-2"></i>Ayarlar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<!-- Ana Başlık Bölümü -->
+<div class="header-container">
     <div class="container">
-        <div class="barcode-scanner">
-            <div class="row align-items-center">
-                <div class="col-md-2 text-center mb-3 mb-md-0">
-                    <i class="fas fa-barcode fa-3x text-secondary"></i>
-                </div>
-                <div class="col-md-8 mb-3 mb-md-0">
-                    <h5 class="mb-3">Hızlı Ürün Arama</h5>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="barcodeInput" placeholder="Barkod numarasını girin veya taratın">
-                        <button class="btn btn-primary" id="searchBtn" type="button"><i class="fas fa-search"></i></button>
-                    </div>
-                </div>
-                <div class="col-md-2 text-center">
-                    <button class="btn btn-outline-secondary" id="generateBarcodeBtn" type="button"><i class="fas fa-tag me-2"></i>Barkod Oluştur</button>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-warehouse me-3"></i>Depo Yönetimi Sistemi</h1>
+                <p class="lead">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light"><i class="fas fa-refresh me-2"></i>Yenile</button>
+                <button class="btn btn-outline-light ms-2"><i class="fas fa-cog me-2"></i>Ayarlar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Barkod Tarayıcı -->
+    <div class="barcode-scanner">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                <i class="fas fa-barcode fa-3x text-secondary"></i>
+            </div>
+            <div class="col-md-8">
+                <h5 class="mb-3">Hızlı Ürün Arama</h5>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="barcodeInput" placeholder="Barkod numarasını girin veya taratın">
+                    <button class="btn btn-primary" id="searchBtn" type="button"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-            <div id="barcode-result" class="mt-3 text-center" style="display: none;">
-                <svg id="barcodeSvg"></svg>
+            <div class="col-md-2 text-center">
+                <button class="btn btn-outline-secondary" id="generateBarcode"><i class="fas fa-tag me-2"></i>Barkod Oluştur</button>
+            </div>
+        </div>
+        <div id="barcode-result" class="mt-3 text-center" style="display: none;">
+            <svg id="barcodeSvg"></svg>
+        </div>
+    </div>
+
+    <!-- İstatistik Kartları -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card status-card">
+                <i class="fas fa-boxes"></i>
+                <h2 id="totalProducts">1,425</h2>
+                <p class="text-muted">Toplam Ürün</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card">
+                <i class="fas fa-exchange-alt"></i>
+                <h2 id="monthlyTransactions">368</h2>
+                <p class="text-muted">Aylık İşlem</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card">
+                <i class="fas fa-box-open"></i>
+                <h2 id="lowStock">7</h2>
+                <p class="text-muted">Kritik Stok</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card">
+                <i class="fas fa-truck"></i>
+                <h2 id="pendingOrders">12</h2>
+                <p class="text-muted">Bekleyen Sipariş</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hızlı İşlemler -->
+    <h4 class="mb-3">Hızlı İşlemler</h4>
+    <div class="row quick-actions-container mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card status-card quick-action">
+                <i class="fas fa-plus-circle action-1"></i>
+                <h5>Yeni Ürün</h5>
+                <p class="text-muted small mb-0">Envantere ürün ekle</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card status-card quick-action">
+                <i class="fas fa-arrow-down action-2"></i>
+                <h5>Stok Girişi</h5>
+                <p class="text-muted small mb-0">Mevcut ürün girişi</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card status-card quick-action">
+                <i class="fas fa-arrow-up action-3"></i>
+                <h5>Stok Çıkışı</h5>
+                <p class="text-muted small mb-0">Ürün çıkışı kaydet</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card status-card quick-action">
+                <i class="fas fa-chart-bar action-4"></i>
+                <h5>Raporlar</h5>
+                <p class="text-muted small mb-0">Detaylı analiz</p>
+            </div>
+        </div>
+    </div>
+    <!-- Grafik ve Listeler -->
+    <div class="row">
+        <!-- Sol Taraf - Grafikler -->
+        <div class="col-md-7">
+            <!-- Stok Hareketleri Grafiği -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Son 30 Günlük Stok Hareketleri</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kategori Dağılımı -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Ürün Kategorileri Dağılımı</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-md-3 col-sm-6">
-                <div class="card status-card">
-                    <i class="fas fa-boxes"></i>
-                    <h2 id="totalProducts">0</h2> <p class="text-muted">Toplam Ürün</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card status-card">
-                    <i class="fas fa-exchange-alt"></i>
-                    <h2 id="monthlyTransactions">0</h2> <p class="text-muted">Aylık İşlem</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card status-card">
-                    <i class="fas fa-box-open"></i>
-                    <h2 id="lowStock">0</h2> <p class="text-muted">Kritik Stok</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card status-card">
-                    <i class="fas fa-truck"></i>
-                    <h2 id="pendingOrders">0</h2> <p class="text-muted">Bekleyen Sipariş</p>
-                </div>
-            </div>
-        </div>
-
-        <h4 class="mb-3">Hızlı İşlemler</h4>
-        <div class="row quick-actions-container mb-4">
-            <div class="col-md-3 col-6">
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/yeni_urun.php'); ?>" class="quick-action">
-                    <i class="fas fa-plus-circle action-1"></i>
-                    <h5>Yeni Ürün</h5>
-                    <p class="text-muted small mb-0">Envantere ürün ekle</p>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_girisi.php'); ?>" class="quick-action">
-                    <i class="fas fa-arrow-down action-2"></i>
-                    <h5>Stok Girişi</h5>
-                    <p class="text-muted small mb-0">Mevcut ürün girişi</p>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/stok_cikisi.php'); ?>" class="quick-action">
-                    <i class="fas fa-arrow-up action-3"></i>
-                    <h5>Stok Çıkışı</h5>
-                    <p class="text-muted small mb-0">Ürün çıkışı kaydet</p>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/reports.php'); ?>" class="quick-action">
-                    <i class="fas fa-chart-bar action-4"></i>
-                    <h5>Raporlar</h5>
-                    <p class="text-muted small mb-0">Detaylı analiz</p>
-                </a>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-7">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Son 30 Günlük Stok Hareketleri</span>
+        <!-- Sağ Taraf - Analiz Kartları -->
+        <div class="col-md-5">
+            <!-- Depo Kullanım İstatistiği -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-warehouse me-2"></i>Depo Kullanım İstatistiği</span>
+                    <div>
+                        <span class="badge bg-danger me-2">2 Kritik</span>
+                        <button class="btn btn-sm btn-outline-primary">Depo Detayı</button>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="stockChart"></canvas>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>A Deposu (Tekstil)</span>
+                            <span class="fw-bold">85%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card mb-4"> <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Ürün Kategorileri Dağılımı</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container small-chart"> <canvas id="categoryChart"></canvas>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>B Deposu (Elektronik)</span>
+                            <span class="fw-bold">62%</span>
                         </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>C Deposu (Gıda)</span>
+                            <span class="fw-bold">41%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>D Deposu (Mobilya)</span>
+                            <span class="fw-bold">78%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <button class="btn btn-sm btn-outline-secondary">Kapasite Planlaması</button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-5">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-warehouse me-2"></i>Depo Kullanım İstatistiği</span>
-                        <div>
-                            <span class="badge bg-danger me-2">2 Kritik</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>A Deposu (Tekstil)</span>
-                                <span class="fw-bold">85%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>B Deposu (Elektronik)</span>
-                                <span class="fw-bold">62%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>C Deposu (Gıda)</span>
-                                <span class="fw-bold">41%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>D Deposu (Mobilya)</span>
-                                <span class="fw-bold">78%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
+            <!-- Kritik Stok Bildirimleri -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
+                    <div>
+                        <span class="badge bg-danger me-2">5 Kritik</span>
+                        <button class="btn btn-sm btn-outline-primary">Tümünü Gör</button>
                     </div>
                 </div>
-
-                <div class="card mb-4"> <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Ürün</th>
-                                <th>Durum</th>
-                                <th>Stok</th>
-                                <th>İşlem</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="stock-indicator stock-low me-2"></div>
-                                        <span><?php echo s('Beyaz Gömlek L Beden'); ?></span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-danger">Kritik</span></td>
-                                <td><strong><?php echo s('2'); ?></strong> / <?php echo s('10'); ?></td>
-                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="stock-indicator stock-low me-2"></div>
-                                        <span><?php echo s('Spor Ayakkabı 42 No'); ?></span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-danger">Kritik</span></td>
-                                <td><strong><?php echo s('3'); ?></strong> / <?php echo s('12'); ?></td>
-                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="stock-indicator stock-medium me-2"></div>
-                                        <span><?php echo s('Deri Cüzdan Kahve'); ?></span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-warning">Uyarı</span></td>
-                                <td><strong><?php echo s('5'); ?></strong> / <?php echo s('8'); ?></td>
-                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="stock-indicator stock-low me-2"></div>
-                                        <span><?php echo s('Yazlık Elbise M Beden'); ?></span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-danger">Kritik</span></td>
-                                <td><strong><?php echo s('1'); ?></strong> / <?php echo s('8'); ?></td>
-                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="stock-indicator stock-medium me-2"></div>
-                                        <span><?php echo s('Kış Montu XL Beden'); ?></span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-warning">Uyarı</span></td>
-                                <td><strong><?php echo s('4'); ?></strong> / <?php echo s('6'); ?></td>
-                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer text-center bg-light">
-                        <small class="text-muted">Son güncelleme: <?php echo s(date('d.m.Y - H:i')); ?></small>
-                    </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Durum</th>
+                            <th>Stok</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stock-indicator stock-low me-2"></div>
+                                    <span>Beyaz Gömlek L Beden</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-danger">Kritik</span></td>
+                            <td><strong>2</strong> / 10</td>
+                            <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stock-indicator stock-low me-2"></div>
+                                    <span>Spor Ayakkabı 42 No</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-danger">Kritik</span></td>
+                            <td><strong>3</strong> / 12</td>
+                            <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stock-indicator stock-medium me-2"></div>
+                                    <span>Deri Cüzdan Kahve</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-warning">Uyarı</span></td>
+                            <td><strong>5</strong> / 8</td>
+                            <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stock-indicator stock-low me-2"></div>
+                                    <span>Yazlık Elbise M Beden</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-danger">Kritik</span></td>
+                            <td><strong>1</strong> / 8</td>
+                            <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stock-indicator stock-medium me-2"></div>
+                                    <span>Kış Montu XL Beden</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-warning">Uyarı</span></td>
+                            <td><strong>4</strong> / 6</td>
+                            <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Sipariş Kodu</th>
-                                <th>Tedarikçi</th>
-                                <th>Tarih</th>
-                                <th>Durum</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><strong><?php echo s('SP-32145'); ?></strong></td>
-                                <td><?php echo s('ABC Tekstil Ltd.'); ?></td>
-                                <td><?php echo s('20.07.2023'); ?></td>
-                                <td><span class="badge bg-primary">Yolda</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong><?php echo s('SP-32157'); ?></strong></td>
-                                <td><?php echo s('Mega Ayakkabı A.Ş.'); ?></td>
-                                <td><?php echo s('18.07.2023'); ?></td>
-                                <td><span class="badge bg-warning">Gecikiyor</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong><?php echo s('SP-32162'); ?></strong></td>
-                                <td><?php echo s('Trend Aksesuar'); ?></td>
-                                <td><?php echo s('22.07.2023'); ?></td>
-                                <td><span class="badge bg-success">Hazırlanıyor</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong><?php echo s('SP-32169'); ?></strong></td>
-                                <td><?php echo s('Star Konfeksiyon'); ?></td>
-                                <td><?php echo s('15.07.2023'); ?></td>
-                                <td><span class="badge bg-danger">Beklemede</span></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-exchange-alt me-2"></i>Ürün Hareket Analizi</span>
-                        <div>
-                            <span class="badge bg-danger me-2">4 Durağan</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Ürün</th>
-                                <th>Kategori</th>
-                                <th>Stokta Kalma</th>
-                                <th>Hareket</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><?php echo s('Spor Ayakkabı (42 No)'); ?></td>
-                                <td><?php echo s('Ayakkabı'); ?></td>
-                                <td><small><?php echo s('3 gün'); ?></small></td>
-                                <td>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
-                                    </div>
-                                    <small class="text-success">Çok Hızlı</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><?php echo s('Kapüşonlu Sweatshirt'); ?></td>
-                                <td><?php echo s('Üst Giyim'); ?></td>
-                                <td><small><?php echo s('7 gün'); ?></small></td>
-                                <td>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
-                                    </div>
-                                    <small class="text-primary">Hızlı</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><?php echo s('Deri Cüzdan (Kahve)'); ?></td>
-                                <td><?php echo s('Aksesuar'); ?></td>
-                                <td><small><?php echo s('14 gün'); ?></small></td>
-                                <td>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
-                                    </div>
-                                    <small class="text-warning">Orta</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><?php echo s('Kış Montu (XL)'); ?></td>
-                                <td><?php echo s('Dış Giyim'); ?></td>
-                                <td><small><?php echo s('38 gün'); ?></small></td>
-                                <td>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"></div>
-                                    </div>
-                                    <small class="text-danger">Yavaş</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><?php echo s('Klasik Takım Elbise'); ?></td>
-                                <td><?php echo s('Resmi Giyim'); ?></td>
-                                <td><small><?php echo s('52 gün'); ?></small></td>
-                                <td>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 10%"></div>
-                                    </div>
-                                    <small class="text-danger">Durağan</small>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
-                        <small class="text-muted">Son analiz: <?php echo s('17.07.2023'); ?></small>
-                    </div>
+                <div class="card-footer text-center bg-light">
+                    <small class="text-muted">Son güncelleme: 17.07.2023 - 15:30</small>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="row mt-4">
+        <!-- Yaklaşan Teslimatlar -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
+                    <div>
+                        <span class="badge bg-primary me-2">3 Geciken</span>
+                        <button class="btn btn-sm btn-outline-primary">Tüm Siparişler</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Sipariş Kodu</th>
+                            <th>Tedarikçi</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><strong>SP-32145</strong></td>
+                            <td>ABC Tekstil Ltd.</td>
+                            <td>20.07.2023</td>
+                            <td><span class="badge bg-primary">Yolda</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32157</strong></td>
+                            <td>Mega Ayakkabı A.Ş.</td>
+                            <td>18.07.2023</td>
+                            <td><span class="badge bg-warning">Gecikiyor</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32162</strong></td>
+                            <td>Trend Aksesuar</td>
+                            <td>22.07.2023</td>
+                            <td><span class="badge bg-success">Hazırlanıyor</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SP-32169</strong></td>
+                            <td>Star Konfeksiyon</td>
+                            <td>15.07.2023</td>
+                            <td><span class="badge bg-danger">Beklemede</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light text-end">
+                    <button class="btn btn-sm btn-outline-secondary">Yeni Sipariş Oluştur</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ürün Hareket Analizi -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-exchange-alt me-2"></i>Ürün Hareket Analizi</span>
+                    <div>
+                        <span class="badge bg-danger me-2">4 Durağan</span>
+                        <button class="btn btn-sm btn-outline-primary">Detaylı Analiz</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Kategori</th>
+                            <th>Stokta Kalma</th>
+                            <th>Hareket</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Spor Ayakkabı (42 No)</td>
+                            <td>Ayakkabı</td>
+                            <td><small>3 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
+                                </div>
+                                <small class="text-success">Çok Hızlı</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Kapüşonlu Sweatshirt</td>
+                            <td>Üst Giyim</td>
+                            <td><small>7 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
+                                </div>
+                                <small class="text-primary">Hızlı</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Deri Cüzdan (Kahve)</td>
+                            <td>Aksesuar</td>
+                            <td><small>14 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                                </div>
+                                <small class="text-warning">Orta</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Bu kod "Ürün Hareket Analizi" kartının devamıdır -->
+                            <td>Kış Montu (XL)</td>
+                            <td>Dış Giyim</td>
+                            <td><small>38 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"></div>
+                                </div>
+                                <small class="text-danger">Yavaş</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Klasik Takım Elbise</td>
+                            <td>Resmi Giyim</td>
+                            <td><small>52 gün</small></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 10%"></div>
+                                </div>
+                                <small class="text-danger">Durağan</small>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Son analiz: 17.07.2023</small>
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger me-2">
+                            <i class="fas fa-tag me-1"></i>İndirim Öner
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chart-line me-1"></i>Trend Analizi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafik ve Barkod işlevleri için JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stok Hareketleri Grafiği
+        const stockCtx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(stockCtx, {
+            type: 'line',
+            data: {
+                labels: ['1 Tem', '5 Tem', '10 Tem', '15 Tem', '20 Tem', '25 Tem', '30 Tem'],
+                datasets: [
+                    {
+                        label: 'Giriş',
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        data: [65, 59, 80, 81, 56, 55, 72],
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Çıkış',
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        data: [32, 48, 40, 79, 63, 35, 60],
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Kategori Dağılımı Grafiği
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryChart = new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Giyim', 'Ayakkabı', 'Aksesuar', 'Elektronik', 'Ev Eşyası'],
+                datasets: [{
+                    data: [35, 25, 15, 15, 10],
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#f39c12',
+                        '#9b59b6',
+                        '#e74c3c'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Barkod Oluşturma İşlevi
+        const barcodeInput = document.getElementById('barcodeInput');
+        const generateBarcode = document.getElementById('generateBarcode');
+        const barcodeResult = document.getElementById('barcode-result');
+
+        generateBarcode.addEventListener('click', function() {
+            const code = barcodeInput.value.trim() || '123456789012';
+
+            if (code) {
+                JsBarcode("#barcodeSvg", code, {
+                    format: "CODE128",
+                    lineColor: "#000000",
+                    width: 2,
+                    height: 50,
+                    displayValue: true
+                });
+                barcodeResult.style.display = 'block';
+            }
+        });
+    });
+</script>
+
+    <!-- Bootstrap ve diğer JavaScript kütüphanelerini dahil et -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <!-- İstatistik kartlarını güncelleyen JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Barkod işlemleri
-            const barcodeInput = document.getElementById('barcodeInput');
-            const searchBtn = document.getElementById('searchBtn');
-            const generateBarcodeBtn = document.getElementById('generateBarcodeBtn'); // ID güncellendi
-            const barcodeResult = document.getElementById('barcode-result');
-            const barcodeSvg = document.getElementById('barcodeSvg');
+            // İstatistik kartlarını rastgele güncelleme simülasyonu
+            function updateStatistics() {
+                // Rastgele değişim oranları
+                const productChange = Math.floor(Math.random() * 10) - 5; // -5 ile +5 arası değişim
+                const transactionChange = Math.floor(Math.random() * 8) - 3; // -3 ile +5 arası değişim
+                const lowStockChange = Math.floor(Math.random() * 3) - 1; // -1 ile +2 arası değişim
+                const ordersChange = Math.floor(Math.random() * 4) - 2; // -2 ile +2 arası değişim
 
-            // Moodle URL'lerini JavaScript'e aktarmanın güvenli yolu
-            // Bu şekilde, PHP'den gelen wwwroot değişkeni JavaScript içinde doğrudan kullanılabilir.
-            const moodleBaseUrl = '<?php echo new moodle_url('/blocks/depo_yonetimi'); ?>';
+                // Mevcut değerleri al ve güncelle
+                let products = parseInt(document.getElementById('totalProducts').innerText.replace(',', ''));
+                let transactions = parseInt(document.getElementById('monthlyTransactions').innerText);
+                let lowStock = parseInt(document.getElementById('lowStock').innerText);
+                let orders = parseInt(document.getElementById('pendingOrders').innerText);
 
-            // Barkod arama butonu
-            searchBtn.addEventListener('click', function() {
-                const code = barcodeInput.value.trim();
-                if (code) {
-                    window.location.href = moodleBaseUrl + '/actions/barkod_ara.php?code=' + encodeURIComponent(code);
-                }
-            });
+                // Değerleri değiştir
+                products += productChange;
+                transactions += transactionChange;
+                lowStock += lowStockChange;
+                orders += ordersChange;
 
-            // Enter tuşu ile arama
-            barcodeInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Form submit etmeyi engelle
-                    const code = barcodeInput.value.trim();
-                    if (code) {
-                        window.location.href = moodleBaseUrl + '/actions/barkod_ara.php?code=' + encodeURIComponent(code);
-                    }
-                }
-            });
+                // Değerleri güncelle
+                document.getElementById('totalProducts').innerText = products.toLocaleString();
+                document.getElementById('monthlyTransactions').innerText = transactions;
+                document.getElementById('lowStock').innerText = lowStock;
+                document.getElementById('pendingOrders').innerText = orders;
+            }
 
-            // Barkod oluşturma
-            generateBarcodeBtn.addEventListener('click', function() {
-                let code = barcodeInput.value.trim();
-                if (!code) {
-                    // Eğer giriş boşsa rastgele bir barkod oluştur
-                    for (let i = 0; i < 12; i++) {
-                        code += Math.floor(Math.random() * 10);
-                    }
-                    barcodeInput.value = code; // Oluşturulan barkodu inputa yaz
-                }
+            // Her 30 saniyede bir istatistikleri güncelle
+            setInterval(updateStatistics, 30000);
 
-                try {
-                    barcodeResult.style.display = 'block';
-                    JsBarcode(barcodeSvg, code, {
-                        format: "CODE128", // Yaygın barkod formatı
-                        lineColor: "#000",
-                        width: 2,
-                        height: 50,
-                        displayValue: true // Sayısal değeri göster
+            // Hızlı işlem butonlarına tıklama olayları ekle
+            document.querySelectorAll('.quick-action').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const actionText = this.querySelector('h5').innerText;
+
+                    // SweetAlert ile bildirim göster
+                    Swal.fire({
+                        title: actionText,
+                        text: `${actionText} işlemi başlatılıyor...`,
+                        icon: 'info',
+                        confirmButtonText: 'Tamam'
                     });
-                } catch (e) {
-                    alert("Geçersiz barkod değeri! Lütfen geçerli bir barkod girin.");
-                    console.error("Barkod oluşturulurken hata oluştu:", e);
-                }
+                });
             });
 
-            // Stok hareketleri grafiği
-            const stockCtx = document.getElementById('stockChart'); // Get the canvas element directly
-            if (stockCtx) { // Check if the element exists
-                new Chart(stockCtx.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: ['1 Haz', '5 Haz', '10 Haz', '15 Haz', '20 Haz', '25 Haz', '30 Haz'],
-                        datasets: [
-                            {
-                                label: 'Giriş',
-                                data: [65, 78, 52, 91, 43, 58, 85],
-                                borderColor: '#27ae60',
-                                backgroundColor: 'rgba(39, 174, 96, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.4,
-                                fill: true
-                            },
-                            {
-                                label: 'Çıkış',
-                                data: [28, 48, 40, 19, 36, 27, 50],
-                                borderColor: '#e74c3c',
-                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.4,
-                                fill: true
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            }
-                        }
-                    }
-                });
-            }
+            // Arama butonuna işlevsellik ekle
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                const searchValue = document.getElementById('barcodeInput').value.trim();
 
-
-            // Kategori dağılımı grafiği
-            const categoryCtx = document.getElementById('categoryChart'); // Get the canvas element directly
-            if (categoryCtx) { // Check if the element exists
-                new Chart(categoryCtx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Tişört', 'Pantolon', 'Ayakkabı', 'Gömlek', 'Çanta', 'Aksesuar'],
-                        datasets: [{
-                            data: [35, 25, 15, 12, 8, 5],
-                            backgroundColor: [
-                                '#3498db',
-                                '#2ecc71',
-                                '#e74c3c',
-                                '#f39c12',
-                                '#9b59b6',
-                                '#1abc9c'
-                            ],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            }
-                        }
-                    }
-                });
-            }
-
-            // İstatistiklerin animasyonu
-            function animateCounter(elementId, targetValue) {
-                const element = document.getElementById(elementId);
-                if (!element) return; // Öğenin varlığını kontrol et
-                const duration = 1500;
-                let startTime = null;
-                const startValue = 0;
-
-                function step(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    const progress = Math.min((timestamp - startTime) / duration, 1);
-                    const currentValue = Math.floor(progress * (targetValue - startValue) + startValue);
-
-                    element.innerText = currentValue.toLocaleString();
-
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    }
+                if (searchValue) {
+                    Swal.fire({
+                        title: 'Ürün Arama',
+                        text: `"${searchValue}" barkodlu ürün aranıyor...`,
+                        icon: 'info',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Uyarı',
+                        text: 'Lütfen bir barkod numarası girin',
+                        icon: 'warning',
+                        confirmButtonText: 'Tamam'
+                    });
                 }
-
-                window.requestAnimationFrame(step);
-            }
-
-            // Sayaçları başlat
-            animateCounter('totalProducts', 1425);
-            animateCounter('monthlyTransactions', 368);
-            animateCounter('lowStock', 7);
-            animateCounter('pendingOrders', 12);
+            });
         });
     </script>
 
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <?php
+// Çıktıyı sonlandır
 echo $OUTPUT->footer();
 ?>
