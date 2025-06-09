@@ -247,10 +247,26 @@ class="btn btn-info">
     </div>' :
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
-                                        <!-- Kategori -->
-                                        <td class="align-middle">
-                                            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
-                                        </td>
+                                      <!-- Kategori -->
+<td class="kategori-cell align-middle">
+    <?php if (!empty($kategori_adi)): ?>
+        <div class="badge rounded-pill bg-warning-subtle text-warning border px-3 py-2 fw-normal d-flex align-items-center">
+            <i class="fas fa-tag me-1"></i>
+            <?php echo htmlspecialchars($kategori_adi); ?>
+        </div>
+    <?php else: ?>
+        <span class="text-muted fst-italic">Kategorisiz</span>
+    <?php endif; ?>
+</td>
+
+<style>
+.kategori-cell .badge {
+    background-color: #fffbe6 !important;
+    color: #b8860b !important;
+    border: 1px solid #ffe58f !important;
+    font-size: 1rem;
+}
+</style>
                                         <!-- Raf -->
                                         <td class="raf-cell align-middle">
                                             ' . (!empty($urun->raf) ?
