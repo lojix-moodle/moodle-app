@@ -57,10 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $raf = optional_param('raf', '', PARAM_TEXT);
     $bolum = optional_param('bolum', '', PARAM_TEXT);
+    $barkod = optional_param('barkod', '', PARAM_TEXT); // Barkod değerini al
 
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
-
+    $ana_urun->barkod = $barkod; // Barkodu ana ürüne ekle
     try {
         $depo_kontrol = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
         $kategori_kontrol = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $ana_urun->kategoriid], '*', MUST_EXIST);
@@ -945,10 +946,14 @@ echo $OUTPUT->header();
             // Barkodu oluştur ve görüntüle
             generateBtn.addEventListener('click', generateBarcode);
 
+            // Barkod işlemleri kısmında generateBarcode fonksiyonunu değiştirin
             function generateBarcode() {
                 const barkodValue = barkodInput.value.trim();
                 if (barkodValue) {
                     try {
+                        // Barkod SVG'sini temizle ve yeniden oluştur
+                        barcodeSvg.innerHTML = '';
+
                         // Barkod SVG'sini oluştur
                         JsBarcode(barcodeSvg, barkodValue, {
                             format: "CODE128",
@@ -957,8 +962,12 @@ echo $OUTPUT->header();
                             height: 100,
                             displayValue: true
                         });
+
                         // Yazdır butonunu etkinleştir
                         printBarcodeBtn.disabled = false;
+
+                        // Başarılı olduğunu konsola yaz
+                        console.log("Barkod başarıyla oluşturuldu:", barkodValue);
                     } catch (e) {
                         console.error("Barkod oluşturma hatası:", e);
                         alert("Geçersiz barkod değeri! Lütfen doğru bir değer girin.");
@@ -1007,6 +1016,26 @@ echo $OUTPUT->header();
                 }
             });
         });
+    </script>
+
+    <!-- JsBarcode kütüphanesini doğrudan CDN üzerinden yükleyin -->
+    <script>
+        // Kütüphane yükleme kontrolü
+        if (typeof JsBarcode === 'undefined') {
+            console.error("JsBarcode kütüphanesi yüklenemedi! Yükleniyor...");
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js";
+            script.onload = function() {
+                console.log("JsBarcode kütüphanesi başarıyla yüklendi!");
+                // Sayfa yüklendikten sonra otomatik olarak generateBarcode fonksiyonunu çalıştır
+                if (document.getElementById('barkod').value) {
+                    generateBarcode();
+                }
+            };
+            document.head.appendChild(script);
+        } else {
+            console.log("JsBarcode kütüphanesi zaten yüklü.");
+        }
     </script>
 
     <!-- JSBarcode kütüphanesi -->
