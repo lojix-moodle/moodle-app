@@ -170,6 +170,9 @@ class="btn btn-info">
                                 <select id="kategoriFiltre" class="form-select">
                                     <option value="">Tüm Kategoriler</option>';
 
+
+
+
         foreach ($tum_kategoriler as $kategori) {
             $html .= '<option value="' . htmlspecialchars($kategori->name) . '">' . htmlspecialchars($kategori->name) . '</option>';
         }
@@ -240,11 +243,13 @@ class="btn btn-info">
         <i class="fas fa-barcode text-primary me-2"></i>
         <div class="barcode-display p-2 border rounded bg-light">
             <strong class="text-dark">' . htmlspecialchars($urun->barkod) . '</strong>
-            <span class="barcode-scan-icon ms-2" data-bs-toggle="tooltip" title="Barkodu Tara">
-                <i class="fas fa-qrcode text-success"></i>
-            </span>
-        </div>
+           <!-- Barkod tara ikonu -->
+<span class="barcode-scan-icon ms-2" id="scan-barcode-btn" data-bs-toggle="tooltip" title="Barkodu Tara">
+    <i class="fas fa-qrcode text-success"></i>
+</span>
+<div id="barcode-scanner" style="display:none;"></div>
     </div>' :
+
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
                                         <!-- Kategori -->
@@ -309,6 +314,8 @@ class="btn btn-info">
                                     </tr>';
             }
         }
+
+
 
         $html .= '
                                 </tbody>
@@ -398,6 +405,39 @@ class="btn btn-info">
 
                     </div>';
         }
+
+        $html .= '
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var scanBtn = document.getElementById("scan-barcode-btn");
+    var scannerDiv = document.getElementById("barcode-scanner");
+    var urunArama = document.getElementById("urunArama");
+    var html5QrCode;
+    if (scanBtn && scannerDiv && urunArama) {
+        scanBtn.addEventListener("click", function() {
+            scannerDiv.style.display = "block";
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("barcode-scanner");
+            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                function(decodedText) {
+                    urunArama.value = decodedText;
+                    html5QrCode.stop();
+                    scannerDiv.style.display = "none";
+                },
+                function(errorMessage) {
+                    // Hata mesajı gösterme (isteğe bağlı)
+                }
+            );
+        });
+    }
+});
+</script>
+';
+
 
         $html .= '
                 </div>
