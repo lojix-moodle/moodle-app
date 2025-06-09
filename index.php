@@ -119,12 +119,53 @@ echo $OUTPUT->header();
         font-weight: 600;
     }
 
+    /* Hızlı erişim paneli için CSS */
+    .quick-access-panel {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        position: relative;
+    }
 
+    .quick-access-tabs {
+        display: flex;
+        border-bottom: 1px solid #eee;
+        padding: 0 15px;
+    }
+
+    .quick-access-tab {
+        padding: 15px 20px;
+        font-weight: 500;
+        color: #777;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .quick-access-tab.active {
+        color: #2a5298;
+        border-bottom-color: #2a5298;
+    }
 
     .quick-access-tab i {
         margin-right: 8px;
     }
 
+    .quick-access-content {
+        padding: 20px;
+    }
+
+    .search-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .search-item {
+        flex: 1;
+        min-width: 200px;
+    }
 
     .search-item label {
         display: block;
@@ -133,132 +174,38 @@ echo $OUTPUT->header();
         color: #555;
     }
 
-
-
-    /* Sistem Bilgilendirme Paneli için CSS */
-    .info-panel {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-        overflow: hidden;
-    }
-
-    .info-header {
-        background: linear-gradient(90deg, #2c3e50, #3498db);
-        color: white;
-        padding: 15px 25px;
-        font-weight: 500;
-    }
-
-    .info-header h4 {
-        margin: 0;
-        font-size: 1.25rem;
+    .search-actions {
         display: flex;
-        align-items: center;
-    }
-
-    .info-content {
-        padding: 25px;
-    }
-
-    .info-description {
-        font-size: 1rem;
-        line-height: 1.6;
-        color: #444;
-        margin-bottom: 20px;
-    }
-
-    .features-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
+        justify-content: flex-end;
         margin-top: 20px;
-    }
-
-    .feature-item {
-        display: flex;
-        align-items: center;
         gap: 10px;
     }
 
-    .feature-item i {
-        color: #2ecc71;
-        font-size: 1.1rem;
-    }
-
-    .system-stats {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-    }
-
-    .stat-circle {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3498db, #8e44ad);
+    .btn-search {
+        background: #2a5298;
         color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
 
-    .stat-icon {
-        font-size: 1.5rem;
-        margin-bottom: 5px;
+    .btn-reset {
+        background: #f1f2f6;
+        color: #444;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
 
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.8rem;
-        opacity: 0.9;
-        margin-top: 5px;
-    }
-
-    .version-info {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 10px;
-        width: 100%;
-    }
-
-    .version-label {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-bottom: 5px;
-    }
-
-    .version-number {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #2c3e50;
-    }
-
-    .update-date {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-top: 5px;
-    }
-
-    @media (max-width: 768px) {
-        .features-list {
-            grid-template-columns: 1fr;
-        }
-
-        .system-stats {
-            margin-top: 20px;
-        }
+    .btn-search:hover {
+        background: #1e3c72;
+        transform: translateY(-2px);
     }
 
     .card {
@@ -387,6 +334,261 @@ echo $OUTPUT->header();
         height: 300px;
         width: 100%;
     }
+
+    /* Kurumsal Bilgilendirme Paneli için CSS */
+    .enterprise-info-panel {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2.5rem;
+        overflow: hidden;
+        border: 1px solid #eaecef;
+    }
+
+    .enterprise-info-header {
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        color: white;
+        padding: 18px 25px;
+        font-weight: 600;
+    }
+
+    .enterprise-info-header h4 {
+        margin: 0;
+        font-size: 1.3rem;
+        letter-spacing: 0.3px;
+    }
+
+    .enterprise-info-content {
+        padding: 30px;
+    }
+
+    .enterprise-subtitle {
+        color: #192e59;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+        letter-spacing: -0.3px;
+    }
+
+    .enterprise-text {
+        color: #505c75;
+        line-height: 1.7;
+        font-size: 1rem;
+        margin-bottom: 25px;
+    }
+
+    /* Özellikler bölümü tasarımı */
+    .enterprise-features {
+        margin-top: 25px;
+    }
+
+    .feature-row {
+        display: flex;
+        gap: 25px;
+        margin-bottom: 20px;
+    }
+
+    .feature-box {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+    }
+
+    .feature-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .feature-details {
+        flex: 1;
+    }
+
+    .feature-details h6 {
+        margin: 0 0 5px;
+        color: #192e59;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .feature-details p {
+        margin: 0;
+        color: #505c75;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    /* Sağ taraf - Metrikler */
+    .enterprise-metrics {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    /* Sertifikalar */
+    .enterprise-certification {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .cert-badges {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .cert-badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+        min-width: 100px;
+    }
+
+    .cert-badge i {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .cert-badge.iso i {
+        color: #192e59;
+    }
+
+    .cert-badge.gdpr i {
+        color: #2d5286;
+    }
+
+    .cert-badge span {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #505c75;
+    }
+
+    .cert-description {
+        font-size: 0.85rem;
+        color: #505c75;
+    }
+
+    /* Performans çemberi */
+    .enterprise-performance {
+        display: flex;
+        justify-content: center;
+        padding: 15px 0;
+    }
+
+    .perf-circle {
+        text-align: center;
+    }
+
+    .circular-chart {
+        display: block;
+        max-width: 150px;
+        max-height: 150px;
+        margin: 0 auto;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: #eaeef5;
+        stroke-width: 2.8;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 2.8;
+        stroke-linecap: round;
+        stroke: #2d5286;
+        animation: progress 1.5s ease-out forwards;
+    }
+
+    @keyframes progress {
+        0% { stroke-dasharray: 0 100; }
+    }
+
+    .percentage {
+        fill: #2d5286;
+        font-size: 0.5em;
+        text-anchor: middle;
+        font-weight: bold;
+    }
+
+    .perf-label {
+        font-size: 0.9rem;
+        color: #505c75;
+        margin-top: 10px;
+    }
+
+    /* Versiyon bilgileri */
+    .enterprise-version {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .version-details {
+        text-align: center;
+    }
+
+    .version-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 15px;
+        margin-bottom: 8px;
+    }
+
+    .version-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #192e59;
+        margin-bottom: 8px;
+    }
+
+    .version-info {
+        font-size: 0.8rem;
+        color: #505c75;
+        margin-bottom: 10px;
+    }
+
+    .support-info {
+        font-size: 0.85rem;
+        color: #2d5286;
+        font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+        .feature-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .enterprise-metrics {
+            margin-top: 30px;
+        }
+    }
+
 </style>
 
     <!-- Yeni Başlık Bölümü -->
@@ -428,49 +630,101 @@ echo $OUTPUT->header();
 
     <!-- Sistem Hakkında Bilgilendirme Paneli -->
     <div class="container">
-        <div class="info-panel">
-            <div class="info-header">
-                <h4><i class="fas fa-info-circle me-2"></i>Depo Yönetim Sistemi Hakkında</h4>
+        <div class="enterprise-info-panel">
+            <div class="enterprise-info-header">
+                <h4><i class="fas fa-shield-alt me-2"></i>Kurumsal Depo Yönetim Platformu</h4>
             </div>
-            <div class="info-content">
-                <div class="row">
-                    <div class="col-md-8">
-                        <p class="info-description">
-                            Depo Yönetim Sistemimiz, işletmenizin envanter ve stok operasyonlarını
-                            uçtan uca yönetmenizi sağlayan entegre bir çözümdür. Sistem içerisinde
-                            ürün giriş-çıkışlarını takip edebilir, stok seviyelerini anlık izleyebilir
-                            ve detaylı raporlar oluşturabilirsiniz.
+            <div class="enterprise-info-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 enterprise-description">
+                        <h5 class="enterprise-subtitle">İşletmeniz İçin Özelleştirilmiş Entegre Çözüm</h5>
+                        <p class="enterprise-text">
+                            Depo Yönetim Platformumuz, kurumsal düzeyde envanter optimizasyonu ve tedarik zinciri
+                            yönetimi sunan kapsamlı bir çözümdür. ISO 27001 sertifikalı altyapımız ile verileriniz
+                            güvenle korunurken, yapay zeka destekli analitik araçlarımız ile stok ve
+                            operasyonel verimliliğinizi maksimize edebilirsiniz.
                         </p>
 
-                        <div class="features-list">
-                            <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Gerçek zamanlı stok takibi ve envanter yönetimi</span>
+                        <div class="enterprise-features">
+                            <div class="feature-row">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
+                                    <div class="feature-details">
+                                        <h6>Gerçek Zamanlı İzleme</h6>
+                                        <p>Anlık stok bildirimleri ve otomatik raporlama sistemleri</p>
+                                    </div>
+                                </div>
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="fas fa-cubes"></i></div>
+                                    <div class="feature-details">
+                                        <h6>Akıllı Envanter Yönetimi</h6>
+                                        <p>Tahmine dayalı stok planlaması ve optimizasyon algoritmaları</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Barkod bazlı ürün izleme ve takip sistemi</span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Detaylı raporlama ve analiz araçları</span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Kritik stok seviyesi uyarıları ve bildirimler</span>
+                            <div class="feature-row">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                                    <div class="feature-details">
+                                        <h6>Gelişmiş Analitik</h6>
+                                        <p>Öngörüsel analiz ve özelleştirilebilir KPI takip sistemleri</p>
+                                    </div>
+                                </div>
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                                    <div class="feature-details">
+                                        <h6>Kurumsal Güvenlik</h6>
+                                        <p>Çok katmanlı erişim kontrolü ve veri şifreleme protokolleri</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center system-stats">
-                        <div class="stat-circle">
-                            <div class="stat-icon"><i class="fas fa-bolt"></i></div>
-                            <div class="stat-value">%98</div>
-                            <div class="stat-label">Operasyon Verimliliği</div>
-                        </div>
-                        <div class="version-info">
-                            <div class="version-label">Sistem Versiyonu</div>
-                            <div class="version-number">v4.2.1</div>
-                            <div class="update-date">Son Güncelleme: 11.05.2023</div>
+                    <div class="col-lg-4">
+                        <div class="enterprise-metrics">
+                            <div class="enterprise-certification">
+                                <div class="cert-badges">
+                                    <div class="cert-badge iso">
+                                        <i class="fas fa-certificate"></i>
+                                        <span>ISO 27001</span>
+                                    </div>
+                                    <div class="cert-badge gdpr">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>KVKK Uyumlu</span>
+                                    </div>
+                                </div>
+                                <div class="cert-description">
+                                    Uluslararası güvenlik standartlarına uygun altyapı
+                                </div>
+                            </div>
+
+                            <div class="enterprise-performance">
+                                <div class="perf-circle">
+                                    <svg viewBox="0 0 36 36" class="circular-chart">
+                                        <path class="circle-bg" d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                        <path class="circle" stroke-dasharray="98, 100" d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                        <text x="18" y="21" class="percentage">98%</text>
+                                    </svg>
+                                    <div class="perf-label">Operasyonel Verimlilik</div>
+                                </div>
+                            </div>
+
+                            <div class="enterprise-version">
+                                <div class="version-details">
+                                    <div class="version-badge">Enterprise Edition</div>
+                                    <div class="version-number">v5.2.3 LTS</div>
+                                    <div class="version-info">
+                                        <span><i class="fas fa-clock"></i> Son Güncelleme: 15 Haziran 2023</span>
+                                    </div>
+                                    <div class="support-info">
+                                        <i class="fas fa-headset"></i> 7/24 Kurumsal Destek
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
