@@ -253,7 +253,7 @@ class="btn btn-info">
 <td class="align-middle">
     <div class="kategori-badge">
         <i class="fas fa-tag kategori-icon"></i>
-        <span class="kategori-text"><?php echo htmlspecialchars($kategori_adi); ?></span>
+        <span class="kategori-text"><?php echo htmlspecialchars($kategoriid); ?></span>
     </div>
 </td>
                                         <!-- Raf -->
