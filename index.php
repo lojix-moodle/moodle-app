@@ -32,64 +32,182 @@ echo $OUTPUT->header();
         background-color: #f5f7fa;
     }
 
-    .header-container {
-        background: linear-gradient(90deg, var(--primary-color) 0%, #1a2a3a 100%);
+    /* Yeni başlık tasarımı için CSS */
+    .dashboard-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 2rem 0;
         color: white;
-        padding: 1.5rem 0;
-        border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         margin-bottom: 2rem;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
     }
 
-    .header-logo {
-        display: flex;
-        align-items: center;
-        gap: 15px;
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30%;
+        height: 100%;
+        background: url('https://cdn.pixabay.com/photo/2018/03/10/12/00/teamwork-3213924_1280.png') no-repeat;
+        background-size: cover;
+        background-position: left center;
+        opacity: 0.1;
     }
 
-    .header-logo i {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 12px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    .header-content {
+        position: relative;
+        z-index: 2;
     }
 
     .header-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
         margin: 0;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        font-size: 1.8rem;
-    }
-
-    .header-subtitle {
-        margin-top: 5px;
-        font-size: 0.95rem;
-        opacity: 0.8;
-        font-weight: 300;
-        letter-spacing: 0.3px;
-        max-width: 90%;
-    }
-
-    .header-stats {
-        display: flex;
-        margin-top: 15px;
-        gap: 20px;
-    }
-
-    .header-stat {
-        background: rgba(255, 255, 255, 0.07);
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 0.8rem;
         display: flex;
         align-items: center;
     }
 
-    .header-stat i {
-        margin-right: 5px;
-        font-size: 0.8rem;
+    .header-title i {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 12px;
+        border-radius: 12px;
+        margin-right: 15px;
+        font-size: 1.8rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .header-subtitle {
+        font-size: 1rem;
+        opacity: 0.8;
+        max-width: 650px;
+        margin-top: 8px;
+        margin-left: 55px;
+    }
+
+    .dashboard-metrics {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .metric-item {
+        flex: 1;
+        min-width: 150px;
+        padding: 10px 15px;
+        text-align: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .metric-item:last-child {
+        border-right: none;
+    }
+
+    .metric-title {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        margin-bottom: 5px;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    /* Hızlı erişim paneli için CSS */
+    .quick-access-panel {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .quick-access-tabs {
+        display: flex;
+        border-bottom: 1px solid #eee;
+        padding: 0 15px;
+    }
+
+    .quick-access-tab {
+        padding: 15px 20px;
+        font-weight: 500;
+        color: #777;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .quick-access-tab.active {
+        color: #2a5298;
+        border-bottom-color: #2a5298;
+    }
+
+    .quick-access-tab i {
+        margin-right: 8px;
+    }
+
+    .quick-access-content {
+        padding: 20px;
+    }
+
+    .search-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .search-item {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-item label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .search-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+        gap: 10px;
+    }
+
+    .btn-search {
+        background: #2a5298;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reset {
+        background: #f1f2f6;
+        color: #444;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+        background: #1e3c72;
+        transform: translateY(-2px);
+    }
+
     .card {
         border-radius: 10px;
         border: none;
@@ -218,51 +336,82 @@ echo $OUTPUT->header();
     }
 </style>
 
-    <!-- Ana Başlık Bölümü -->
-    <div class="header-container">
+    <!-- Yeni Başlık Bölümü -->
+    <div class="dashboard-header">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="header-logo">
-                        <i class="fas fa-warehouse"></i>
-                        <div>
-                            <h1 class="header-title">Depo Yönetimi Sistemi</h1>
-                            <p class="header-subtitle">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
-                        </div>
+            <div class="header-content">
+                <h1 class="header-title">
+                    <i class="fas fa-warehouse"></i>
+                    Depo Yönetimi Sistemi
+                </h1>
+                <p class="header-subtitle">Stok takibi, envanter yönetimi ve depo operasyonları için entegre çözüm platformu</p>
+
+                <div class="dashboard-metrics">
+                    <div class="metric-item">
+                        <div class="metric-title">TOPLAM ÜRÜN</div>
+                        <div class="metric-value">1,425</div>
                     </div>
-                    <div class="header-stats">
-                        <div class="header-stat"><i class="fas fa-box"></i> 1,425 Ürün</div>
-                        <div class="header-stat"><i class="fas fa-exchange-alt"></i> 368 İşlem</div>
-                        <div class="header-stat"><i class="fas fa-warehouse"></i> 4 Depo</div>
+                    <div class="metric-item">
+                        <div class="metric-title">AKTİF DEPO</div>
+                        <div class="metric-value">4</div>
                     </div>
-                </div>
-                <div class="col-md-4 text-end">
-                    <!-- İstatistik özeti veya başka bir öğe eklenebilir -->
+                    <div class="metric-item">
+                        <div class="metric-title">AYLIK İŞLEM</div>
+                        <div class="metric-value">368</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-title">KRİTİK STOK</div>
+                        <div class="metric-value">7</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-title">BEKLEYEN SİPARİŞ</div>
+                        <div class="metric-value">12</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-<div class="container">
-    <!-- Barkod Tarayıcı -->
-    <div class="barcode-scanner">
-        <div class="row align-items-center">
-            <div class="col-md-2 text-center">
-                <i class="fas fa-barcode fa-3x text-secondary"></i>
+    <!-- Barkod Yerine Hızlı Erişim Paneli -->
+    <div class="container">
+        <div class="quick-access-panel">
+            <div class="quick-access-tabs">
+                <div class="quick-access-tab active"><i class="fas fa-search"></i>Hızlı Arama</div>
+                <div class="quick-access-tab"><i class="fas fa-bolt"></i>Son İşlemler</div>
+                <div class="quick-access-tab"><i class="fas fa-exclamation-circle"></i>Kritik Stoklar</div>
             </div>
-            <div class="col-md-8">
-                <h5 class="mb-3">Hızlı Ürün Arama</h5>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="barcodeInput" placeholder="Barkod numarasını girin veya taratın">
-                    <!-- Arama butonu kaldırıldı -->
+            <div class="quick-access-content">
+                <div class="search-items">
+                    <div class="search-item">
+                        <label>Ürün Adı veya Kodu</label>
+                        <input type="text" class="form-control" placeholder="Aramak için yazın...">
+                    </div>
+                    <div class="search-item">
+                        <label>Kategori</label>
+                        <select class="form-control">
+                            <option value="">Tüm Kategoriler</option>
+                            <option value="tekstil">Tekstil</option>
+                            <option value="ayakkabi">Ayakkabı</option>
+                            <option value="aksesuar">Aksesuar</option>
+                            <option value="elektronik">Elektronik</option>
+                        </select>
+                    </div>
+                    <div class="search-item">
+                        <label>Depo</label>
+                        <select class="form-control">
+                            <option value="">Tüm Depolar</option>
+                            <option value="a-depo">A Deposu</option>
+                            <option value="b-depo">B Deposu</option>
+                            <option value="c-depo">C Deposu</option>
+                            <option value="d-depo">D Deposu</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-actions">
+                    <button class="btn-reset"><i class="fas fa-times"></i> Temizle</button>
+                    <button class="btn-search"><i class="fas fa-search"></i> Ara</button>
                 </div>
             </div>
-            <div class="col-md-2 text-center">
-                <!-- Barkod oluştur butonu kaldırıldı -->
-            </div>
-        </div>
-        <div id="barcode-result" class="mt-3 text-center" style="display: none;">
-            <svg id="barcodeSvg"></svg>
         </div>
     </div>
 
