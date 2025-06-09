@@ -917,6 +917,156 @@ echo $OUTPUT->header();
         }
     }
 
+    /* Performans Göstergeleri CSS */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    }
+
+    .performance-dashboard .card-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .performance-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .metric-box {
+        background-color: #f8fafc;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .metric-title {
+        font-size: 0.9rem;
+        color: #505c75;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .metric-title i {
+        margin-right: 8px;
+        width: 18px;
+    }
+
+    .metric-value {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .trend {
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .trend.up {
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+    }
+
+    .trend.down {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+
+    /* Teknoloji Vitrini CSS */
+    .tech-showcase .card-header {
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+    }
+
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 1px;
+        background-color: #edf2f7;
+    }
+
+    .tech-item {
+        background-color: white;
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover {
+        background-color: #f8fafc;
+    }
+
+    .tech-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #2d5286 0%, #4481d6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.6rem;
+        box-shadow: 0 4px 10px rgba(45, 82, 134, 0.3);
+    }
+
+    .tech-content {
+        flex: 1;
+    }
+
+    .tech-content h5 {
+        color: #192e59;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .tech-content p {
+        color: #505c75;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .tech-info {
+        display: flex;
+        gap: 15px;
+        font-size: 0.8rem;
+    }
+
+    .implementation {
+        color: #192e59;
+        font-weight: 600;
+    }
+
+    .roi {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+        .tech-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 
 </style>
 
@@ -1465,249 +1615,339 @@ echo $OUTPUT->header();
             });
         </script>
 
-        <!-- İlk Kart: Yaklaşan Siparişler -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
-                <div>
-                    <span class="badge bg-primary me-2">3 Geciken</span>
-                    <!-- Tüm Siparişler butonu kaldırıldı -->
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Sipariş Kodu</th>
-                        <th>Tedarikçi</th>
-                        <th>Tarih</th>
-                        <th>Durum</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><strong>SP-32145</strong></td>
-                        <td>ABC Tekstil Ltd.</td>
-                        <td>20.07.2023</td>
-                        <td><span class="badge bg-primary">Yolda</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>SP-32157</strong></td>
-                        <td>Mega Ayakkabı A.Ş.</td>
-                        <td>18.07.2023</td>
-                        <td><span class="badge bg-warning">Gecikiyor</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>SP-32162</strong></td>
-                        <td>Trend Aksesuar</td>
-                        <td>22.07.2023</td>
-                        <td><span class="badge bg-success">Hazırlanıyor</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>SP-32169</strong></td>
-                        <td>Star Konfeksiyon</td>
-                        <td>15.07.2023</td>
-                        <td><span class="badge bg-danger">Beklemede</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer bg-light text-end">
-                <!-- Yeni Sipariş Oluştur butonu kaldırıldı -->
+    <!-- Tedarik Zinciri Performans Göstergeleri -->
+    <div class="card mb-4 performance-dashboard">
+        <div class="card-header d-flex justify-content-between align-items-center bg-gradient-primary text-white">
+            <span><i class="fas fa-tachometer-alt me-2"></i>Tedarik Zinciri Performans Göstergeleri</span>
+            <div>
+                <button class="btn btn-sm btn-light" id="quarterly-view">Çeyrek Dönem</button>
+                <button class="btn btn-sm btn-outline-light ms-2" id="yearly-view">Yıllık</button>
             </div>
         </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="chart-container" style="height: 320px;">
+                        <canvas id="supplyChainChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="performance-metrics">
+                        <div class="metric-box">
+                            <div class="metric-title">
+                                <i class="fas fa-dollar-sign"></i> Stok Taşıma Maliyeti
+                            </div>
+                            <div class="metric-value">
+                                13.8%
+                                <span class="trend down"><i class="fas fa-arrow-down"></i> 2.4%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 76%"></div>
+                            </div>
+                        </div>
 
-        <!-- İkinci Kart: Lokasyon Haritası -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-map-marked-alt me-2"></i>Depo Lokasyon Haritası</span>
-                <!-- Tam Görünüm butonu kaldırıldı -->
-            </div>
-            <div class="card-body p-3">
-                <div class="row text-center mb-3">
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="p-3 border rounded" style="background-color: rgba(231, 76, 60, 0.1);">
-                            <h6>A Bölgesi</h6>
-                            <div class="mb-2 fs-4">92%</div>
-                            <small class="text-danger">Dolu</small>
+                        <div class="metric-box">
+                            <div class="metric-title">
+                                <i class="fas fa-truck"></i> Zamanında Teslimat
+                            </div>
+                            <div class="metric-value">
+                                94.5%
+                                <span class="trend up"><i class="fas fa-arrow-up"></i> 1.7%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 94%"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="p-3 border rounded" style="background-color: rgba(243, 156, 18, 0.1);">
-                            <h6>B Bölgesi</h6>
-                            <div class="mb-2 fs-4">78%</div>
-                            <small class="text-warning">Yoğun</small>
+
+                        <div class="metric-box">
+                            <div class="metric-title">
+                                <i class="fas fa-check-double"></i> Sipariş Doğruluk Oranı
+                            </div>
+                            <div class="metric-value">
+                                99.3%
+                                <span class="trend up"><i class="fas fa-arrow-up"></i> 0.5%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 99%"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="p-3 border rounded" style="background-color: rgba(46, 204, 113, 0.1);">
-                            <h6>C Bölgesi</h6>
-                            <div class="mb-2 fs-4">45%</div>
-                            <small class="text-success">Normal</small>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="p-3 border rounded" style="background-color: rgba(52, 152, 219, 0.1);">
-                            <h6>D Bölgesi</h6>
-                            <div class="mb-2 fs-4">23%</div>
-                            <small class="text-primary">Müsait</small>
+
+                        <div class="metric-box">
+                            <div class="metric-title">
+                                <i class="fas fa-exchange-alt"></i> Stok Devir Hızı
+                            </div>
+                            <div class="metric-value">
+                                6.2
+                                <span class="trend up"><i class="fas fa-arrow-up"></i> 0.8</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 82%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <!-- En Kısa Rota ve Yerleşim Düzenle butonları kaldırıldı -->
-                </div>
-            </div>
-            <div class="card-footer bg-light text-center">
-                <small class="text-muted">Yerleşim planı son güncelleme: 16.07.2023</small>
             </div>
         </div>
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-sync-alt"></i> Son güncelleme: 25.07.2023</span>
+            <a href="#" class="link-primary">Detaylı Performans Raporu <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+    </div>
+
+    <!-- Akıllı Depo Yönetim Teknolojileri -->
+    <div class="card tech-showcase">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-microchip me-2"></i>Akıllı Depo Yönetim Teknolojileri</span>
+            <div class="badge bg-gradient-info text-white">Endüstri 4.0</div>
+        </div>
+        <div class="card-body p-0">
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>Otonom Robot Sistemleri</h5>
+                        <p>Lojistik süreçlerde %67'ye varan verimlilik artışı sağlayan akıllı robotik çözümler</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 75%</span>
+                            <span class="roi">ROI: 24 ay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>IoT Tabanlı Stok Yönetimi</h5>
+                        <p>Gerçek zamanlı stok takibi ve %99.8 envanter doğruluğuna ulaşan entegre sensör sistemleri</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 88%</span>
+                            <span class="roi">ROI: 18 ay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>Yapay Zeka & Öngörücü Analitik</h5>
+                        <p>Talep tahmin doğruluğunda %32 artış sağlayan makine öğrenimi algoritmaları</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 62%</span>
+                            <span class="roi">ROI: 36 ay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-vr-cardboard"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>AR/VR Destekli Operasyonlar</h5>
+                        <p>Eğitim süresini %45 kısaltan ve sipariş toplama hızını %30 artıran artırılmış gerçeklik sistemleri</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 45%</span>
+                            <span class="roi">ROI: 30 ay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-digital-tachograph"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>Dijital İkiz Teknolojisi</h5>
+                        <p>Depo tasarımı ve süreç optimizasyonunda %28 iyileştirme sağlayan simülasyon sistemi</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 39%</span>
+                            <span class="roi">ROI: 42 ay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="tech-content">
+                        <h5>Blockchain Tabanlı Tedarik Zinciri</h5>
+                        <p>İzlenebilirlik ve şeffaflıkta %100 artış, tedarik sürecinde %22 maliyet azaltımı</p>
+                        <div class="tech-info">
+                            <span class="implementation">Uygulama Seviyesi: 28%</span>
+                            <span class="roi">ROI: 48 ay</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light text-center">
+            <a href="#" class="btn btn-outline-primary btn-sm">Teknoloji Adaptasyon Planını Görüntüle</a>
+        </div>
+    </div>
     </div>
 </div>
 
 <!-- JavaScript Kodu -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Barkod işlemleri
-        const barcodeInput = document.getElementById('barcodeInput');
-        const barcodeResult = document.getElementById('barcode-result');
-        const barcodeSvg = document.getElementById('barcodeSvg');
+        // Tedarik Zinciri Performans Grafiği
+        const supplyChainCtx = document.getElementById('supplyChainChart').getContext('2d');
 
-        // Butonlar kaldırıldığı için bu referanslar ve event listener'lar kaldırıldı
-        // const searchBtn = document.getElementById('searchBtn');
-        // const generateBtn = document.getElementById('generateBarcode');
-
-        // Barkod arama butonunun olay dinleyicisi kaldırıldı
-
-        // Enter tuşu ile arama
-        barcodeInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const code = barcodeInput.value.trim();
-                if (code) {
-                    window.location.href = 'actions/barkod_ara.php?code=' + code;
+        const quarterlyData = {
+            labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz'],
+            datasets: [
+                {
+                    label: 'Stok Devir Hızı',
+                    data: [5.2, 5.4, 5.7, 5.9, 6.1, 6.0, 6.2],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Zamanında Teslimat (%)',
+                    data: [91.2, 92.0, 92.8, 93.5, 94.0, 94.3, 94.5],
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'percentage'
+                },
+                {
+                    label: 'Taşıma Maliyeti (%)',
+                    data: [16.8, 16.2, 15.9, 15.1, 14.5, 14.0, 13.8],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'percentage'
                 }
-            }
-        });
+            ]
+        };
 
-        // Barkod oluşturma fonksiyonu (buton kaldırıldığı için event listener kaldırıldı)
+        const yearlyData = {
+            labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+            datasets: [
+                {
+                    label: 'Stok Devir Hızı',
+                    data: [4.1, 4.4, 4.8, 5.3, 5.7, 6.2],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Zamanında Teslimat (%)',
+                    data: [86.5, 88.3, 89.7, 91.2, 93.0, 94.5],
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'percentage'
+                },
+                {
+                    label: 'Taşıma Maliyeti (%)',
+                    data: [21.2, 19.8, 18.2, 17.1, 15.6, 13.8],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'percentage'
+                }
+            ]
+        };
 
-        // Stok hareketleri grafiği
-        const stockCtx = document.getElementById('stockChart').getContext('2d');
-        const stockChart = new Chart(stockCtx, {
-            type: 'line',
-            data: {
-                labels: ['1 Haz', '5 Haz', '10 Haz', '15 Haz', '20 Haz', '25 Haz', '30 Haz'],
-                datasets: [
-                    {
-                        label: 'Giriş',
-                        data: [65, 78, 52, 91, 43, 58, 85],
-                        borderColor: '#27ae60',
-                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Çıkış',
-                        data: [42, 58, 65, 85, 38, 41, 36],
-                        borderColor: '#e74c3c',
-                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
-            }
-        });
-
-        // Kategori dağılımı grafiği
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-        const categoryChart = new Chart(categoryCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Tekstil', 'Ayakkabı', 'Aksesuar', 'Çanta', 'Elektronik'],
-                datasets: [{
-                    data: [42, 23, 15, 8, 12],
-                    backgroundColor: [
-                        '#3498db',
-                        '#e74c3c',
-                        '#2ecc71',
-                        '#f39c12',
-                        '#9b59b6'
-                    ],
-                    borderWidth: 0
-                }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 4,
+                    max: 7,
+                    title: {
+                        display: true,
+                        text: 'Stok Devir Hızı'
+                    },
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                percentage: {
+                    beginAtZero: false,
+                    position: 'right',
+                    min: 0,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Yüzde (%)'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
                     }
                 }
             }
+        };
+
+        let supplyChainChart = new Chart(supplyChainCtx, {
+            type: 'line',
+            data: quarterlyData,
+            options: chartOptions
         });
 
-        // İstatistik sayıları için animasyon
-        function animateNumbers() {
-            const elements = {
-                'totalProducts': 1425,
-                'monthlyTransactions': 368,
-                'lowStock': 7,
-                'pendingOrders': 12
-            };
+        // Çeyrek dönem ve yıllık görünüm butonları
+        document.getElementById('quarterly-view').addEventListener('click', function() {
+            this.classList.add('btn-light');
+            this.classList.remove('btn-outline-light');
+            document.getElementById('yearly-view').classList.add('btn-outline-light');
+            document.getElementById('yearly-view').classList.remove('btn-light');
 
-            for (const [id, targetValue] of Object.entries(elements)) {
-                const element = document.getElementById(id);
-                const duration = 1500;
-                const startTime = performance.now();
-                const startValue = 0;
+            supplyChainChart.data = quarterlyData;
+            supplyChainChart.update();
+        });
 
-                function updateNumber(currentTime) {
-                    const elapsedTime = currentTime - startTime;
-                    const progress = Math.min(elapsedTime / duration, 1);
-                    const currentValue = Math.floor(progress * (targetValue - startValue) + startValue);
+        document.getElementById('yearly-view').addEventListener('click', function() {
+            this.classList.add('btn-light');
+            this.classList.remove('btn-outline-light');
+            document.getElementById('quarterly-view').classList.add('btn-outline-light');
+            document.getElementById('quarterly-view').classList.remove('btn-light');
 
-                    element.textContent = currentValue.toLocaleString();
-
-                    if (progress < 1) {
-                        requestAnimationFrame(updateNumber);
-                    }
-                }
-
-                requestAnimationFrame(updateNumber);
-            }
-        }
-
-        // Sayfa yüklendiğinde istatistikleri animasyonla göster
-        animateNumbers();
-
-
+            supplyChainChart.data = yearlyData;
+            supplyChainChart.update();
+        });
     });
 </script>
 
