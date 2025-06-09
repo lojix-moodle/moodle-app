@@ -118,3 +118,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+// Tabloya modal HTML'ini ekle
+document.body.insertAdjacentHTML('beforeend', `
+<div class="modal fade" id="barcodeModal" tabindex="-1" aria-labelledby="barcodeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="barcodeModalLabel">Barkod Görüntüle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body text-center">
+        <svg id="popup-barcode-svg"></svg>
+        <div id="popup-barcode-value" class="mt-2 text-muted"></div>
+      </div>
+    </div>
+  </div>
+</div>
+`);
+
+// Barkod ikonlarına tıklama eventi ekle
+document.querySelectorAll('.barcode-scan-icon').forEach(function(icon) {
+    icon.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Barkod değerini bul
+        const barkod = this.closest('.barcode-display').querySelector('strong').textContent.trim();
+        // Modal içindeki SVG ve değer alanını bul
+        const svg = document.getElementById('popup-barcode-svg');
+        svg.innerHTML = '';
+        JsBarcode(svg, barkod, {
+            format: "CODE128",
+            lineColor: "#000",
+            width: 3,
+            height: 120,
+            displayValue: true
+        });
+        document.getElementById('popup-barcode-value').textContent = barkod;
+        // Bootstrap modalı aç
+        const modal = new bootstrap.Modal(document.getElementById('barcodeModal'));
+        modal.show();
+    });
+});

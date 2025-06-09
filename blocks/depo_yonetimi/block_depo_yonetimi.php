@@ -248,7 +248,7 @@ class="btn btn-info">
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
                                         <!-- Kategori -->
-                                        <td class="align-middle">
+                                      <td class="align-middle">
     <span class="badge rounded-pill px-3 py-2 fw-medium"
           style="background: linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%); color: #3730a3; border: 1px solid #a5b4fc;">
         <i class="fas fa-tag me-1"></i>
