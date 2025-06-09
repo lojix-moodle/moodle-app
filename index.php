@@ -1067,41 +1067,221 @@ echo $OUTPUT->header();
         }
     }
 
+    /* Animasyonlu Banner CSS */
+    .animated-banner {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 4rem 0;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .banner-content {
+        position: relative;
+        z-index: 10;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .animated-text-container {
+        max-width: 600px;
+    }
+
+    .text-animation {
+        height: 60px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .text-animation .text-line {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        display: block;
+        height: 100%;
+        animation: text-slide 8s infinite;
+        letter-spacing: -1px;
+        text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+
+    @keyframes text-slide {
+        0% { transform: translateY(0); }
+        25% { transform: translateY(-100%); }
+        50% { transform: translateY(-200%); }
+        75% { transform: translateY(-300%); }
+        100% { transform: translateY(0); }
+    }
+
+    .banner-subtitle {
+        font-size: 1.8rem;
+        font-weight: 400;
+        opacity: 0;
+        animation: fade-in 1s forwards 0.5s;
+    }
+
+    .banner-action {
+        margin-top: 20px;
+        opacity: 0;
+        animation: fade-in 1s forwards 1s;
+    }
+
+    .action-button {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.4);
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .action-button:hover {
+        background: white;
+        color: #1e3c72;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .banner-graphic {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .circle-animation {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.1;
+        background: white;
+    }
+
+    .c1 {
+        width: 300px;
+        height: 300px;
+        right: -50px;
+        top: -100px;
+        animation: pulse 8s infinite alternate;
+    }
+
+    .c2 {
+        width: 200px;
+        height: 200px;
+        right: 100px;
+        bottom: -50px;
+        animation: pulse 6s infinite alternate-reverse;
+    }
+
+    .c3 {
+        width: 150px;
+        height: 150px;
+        right: 250px;
+        top: 50px;
+        animation: pulse 10s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.1; }
+        50% { transform: scale(1.2); opacity: 0.2; }
+        100% { transform: scale(1); opacity: 0.1; }
+    }
+
+    .icon-float {
+        position: absolute;
+        color: rgba(255,255,255,0.3);
+        font-size: 2rem;
+    }
+
+    .icon-float:nth-child(4) {
+        right: 150px;
+        top: 50px;
+        font-size: 3rem;
+        animation: float 6s infinite ease-in-out;
+    }
+
+    .icon-float:nth-child(5) {
+        right: 300px;
+        bottom: 70px;
+        font-size: 2.5rem;
+        animation: float 8s infinite ease-in-out reverse;
+    }
+
+    .icon-float:nth-child(6) {
+        right: 100px;
+        top: 150px;
+        font-size: 2rem;
+        animation: float 10s infinite ease-in-out;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+        100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .banner-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .text-animation .text-line {
+            font-size: 2.5rem;
+        }
+
+        .banner-subtitle {
+            font-size: 1.4rem;
+        }
+
+        .c1, .c2, .c3 {
+            display: none;
+        }
+    }
+
 
 </style>
 
-    <!-- Yeni Başlık Bölümü -->
-    <div class="dashboard-header">
+    <!-- Animasyonlu Banner Bölümü -->
+    <div class="animated-banner">
         <div class="container">
-            <div class="header-content">
-                <h1 class="header-title">
-                    <i class="fas fa-warehouse"></i>
-                    Depo Yönetimi Sistemi
-                </h1>
-                <p class="header-subtitle">Stok takibi, envanter yönetimi ve depo operasyonları için entegre çözüm platformu</p>
-
-                <div class="dashboard-metrics">
-                    <div class="metric-item">
-                        <div class="metric-title">TOPLAM ÜRÜN</div>
-                        <div class="metric-value">1,425</div>
+            <div class="banner-content">
+                <div class="animated-text-container">
+                    <div class="text-animation">
+                        <span class="text-line">Verimli</span>
+                        <span class="text-line">Akıllı</span>
+                        <span class="text-line">Entegre</span>
+                        <span class="text-line">Güvenilir</span>
                     </div>
-                    <div class="metric-item">
-                        <div class="metric-title">AKTİF DEPO</div>
-                        <div class="metric-value">4</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-title">AYLIK İŞLEM</div>
-                        <div class="metric-value">368</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-title">KRİTİK STOK</div>
-                        <div class="metric-value">7</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-title">BEKLEYEN SİPARİŞ</div>
-                        <div class="metric-value">12</div>
-                    </div>
+                    <h2 class="banner-subtitle">Depo Yönetimi Çözümü</h2>
                 </div>
+
+                <div class="banner-action">
+                    <a href="#" class="action-button">
+                        <span>Keşfet</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="banner-graphic">
+                <div class="circle-animation c1"></div>
+                <div class="circle-animation c2"></div>
+                <div class="circle-animation c3"></div>
+                <i class="fas fa-box-open icon-float"></i>
+                <i class="fas fa-barcode icon-float"></i>
+                <i class="fas fa-chart-line icon-float"></i>
             </div>
         </div>
     </div>
