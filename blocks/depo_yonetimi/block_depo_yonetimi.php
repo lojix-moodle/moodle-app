@@ -532,32 +532,10 @@ class="btn btn-info">
         .border-dashed {
             border-style: dashed !important;
         }
-        .hover-shadow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-            transition: all 0.3s ease;
-        }
-        .avatar-xs {
-            width: 22px;
-            height: 22px;
-        }
-         .barcode-display {
-        font-family: "Courier New", monospace;
-        letter-spacing: 1px;
-        position: relative;
-    }
-    
-    .barcode-scan-icon {
-        opacity: 0.7;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .barcode-scan-icon:hover {
-        opacity: 1;
-        transform: scale(1.2);
-    }
-    .kategori-badge {
+        
+        
+        /* Kategori Badge Stillemesi */
+.kategori-badge {
     display: inline-flex;
     align-items: center;
     padding: 6px 12px;
@@ -586,6 +564,7 @@ class="btn btn-info">
     font-size: 0.85rem;
 }
 
+
 @media (max-width: 767.98px) {
             .kategori-badge {
                 padding: 4px 10px;
@@ -595,7 +574,32 @@ class="btn btn-info">
                 font-size: 0.8rem;
     }
 }
+        
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            transition: all 0.3s ease;
+        }
+        .avatar-xs {
+            width: 22px;
+            height: 22px;
+        }
+         .barcode-display {
+        font-family: "Courier New", monospace;
+        letter-spacing: 1px;
+        position: relative;
+    }
     
+    .barcode-scan-icon {
+        opacity: 0.7;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .barcode-scan-icon:hover {
+        opacity: 1;
+        transform: scale(1.2);
+    }
     
     @media print {
         .barcode-display {
@@ -604,7 +608,6 @@ class="btn btn-info">
             text-align: center;
         }
     }
-        
         
         
         </style>';
