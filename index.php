@@ -1870,7 +1870,7 @@ echo $OUTPUT->header();
         </div>
         <div class="card-footer bg-light d-flex justify-content-between align-items-center">
             <span><i class="fas fa-sync-alt"></i> Son güncelleme: 25.07.2023</span>
-            <a href="#" class="link-primary">Detaylı Performans Raporu <i class="fas fa-chevron-right ms-1"></i></a>
+            <a href="#" class="link-primary"> <i class="fas fa-chevron-right ms-1"></i></a>
         </div>
     </div>
 
@@ -1968,7 +1968,7 @@ echo $OUTPUT->header();
             </div>
         </div>
         <div class="card-footer bg-light text-center">
-            <a href="#" class="btn btn-outline-primary btn-sm">Teknoloji Adaptasyon Planını Görüntüle</a>
+            <a href="#" class="btn btn-outline-primary btn-sm"></a>
         </div>
     </div>
     </div>
