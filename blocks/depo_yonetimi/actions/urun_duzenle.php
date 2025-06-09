@@ -477,6 +477,9 @@ echo $OUTPUT->header();
                                             <input type="text" id="barkod" name="barkod" class="form-control"
                                                    value="<?php echo htmlspecialchars($urun->barkod ?? ''); ?>"
                                                    placeholder="Barkod değeri veya ürün kodu">
+                                            <button class="btn btn-outline-success" type="button" id="generate-barcode">
+                                                <i class="fas fa-random me-1"></i>Barkod Oluştur
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="mb-3 text-center">
@@ -490,7 +493,6 @@ echo $OUTPUT->header();
                                     </button>
                                 </div>
                             </div>
-
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
@@ -1076,6 +1078,68 @@ echo $OUTPUT->header();
                 document.getElementById('barcode-svg').innerHTML = '';
             }
         }
+
+        barcodeValue.addEventListener('input', generateBarcode);
+        if (barcodeValue.value.trim() !== '') {
+            generateBarcode();
+        }
+
+        printBtn.addEventListener('click', function() {
+            const printWindow = window.open('', '', 'height=500,width=800');
+            printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+            printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
+            printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const barcodeValue = document.getElementById('barkod');
+        const printBtn = document.getElementById('print-barcode');
+        const generateBtn = document.getElementById('generate-barcode');
+
+        function generateBarcode() {
+            if (barcodeValue.value.trim() !== '') {
+                try {
+                    JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
+                        format: "code128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Barkod oluşturulamadı: ' + e.message
+                    });
+                }
+            } else {
+                document.getElementById('barcode-svg').innerHTML = '';
+            }
+        }
+
+        // Rastgele barkod üret
+        generateBtn.addEventListener('click', function() {
+            // 13 haneli rastgele sayı üret
+            let randomBarcode = '';
+            for (let i = 0; i < 13; i++) {
+                randomBarcode += Math.floor(Math.random() * 10);
+            }
+            barcodeValue.value = randomBarcode;
+            generateBarcode();
+        });
 
         barcodeValue.addEventListener('input', generateBarcode);
         if (barcodeValue.value.trim() !== '') {
