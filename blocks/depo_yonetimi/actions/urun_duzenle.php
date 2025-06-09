@@ -9,6 +9,8 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $depoid = required_param('depoid', PARAM_INT);
 $urunid = required_param('urunid', PARAM_INT);
+$barkod = optional_param('barkod', '', PARAM_TEXT);
+
 //$min_stok_seviyesi = required_param('min_stok_seviyesi', PARAM_INT);
 
 
@@ -23,6 +25,7 @@ $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/jsbarcode@3.11.
 $context = context_system::instance();
 $is_admin = has_capability('block/depo_yonetimi:viewall', $context);
 $is_depo_user = has_capability('block/depo_yonetimi:viewown', $context);
+
 
 if (!$is_admin) {
 //    $user_depo = $DB->get_field('block_depo_yonetimi_kullanici_depo', 'depoid', ['userid' => $USER->id]);
@@ -459,28 +462,35 @@ echo $OUTPUT->header();
                                                 <option value="upc">UPC</option>
                                             </select>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="barcode-value" class="form-label">Barkod Değeri:</label>
-                                            <div class="input-group">
-                                                <input type="text" id="barcode-value" class="form-control" value="<?php echo htmlspecialchars($urun->barkod ?: ''); ?>" placeholder="Barkod değeri veya ürün kodu">
-                                                <button class="btn btn-primary" id="generate-barcode">Oluştur</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 text-center">
-                                        <div class="mb-3">
-                                            <label class="form-label">Önizleme:</label>
-                                            <div class="barcode-container p-3 border rounded bg-white">
-                                                <svg id="barcode-svg"></svg>
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-outline-primary" id="print-barcode">
-                                            <i class="fas fa-print me-2"></i>Yazdır
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
+                            <!-- Barkod Alanı -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="barkod" class="form-label">Barkod Değeri:</label>
+                                        <div class="input-group">
+                                            <input type="text" id="barkod" name="barkod" class="form-control"
+                                                   value="<?php echo htmlspecialchars($urun->barkod ?? ''); ?>"
+                                                   placeholder="Barkod değeri veya ürün kodu">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 text-center">
+                                        <label class="form-label">Önizleme:</label>
+                                        <div class="barcode-container p-3 border rounded bg-white">
+                                            <svg id="barcode-svg"></svg>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary" id="print-barcode" type="button">
+                                        <i class="fas fa-print me-2"></i>Yazdır
+                                    </button>
+                                </div>
+                            </div>
+
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
@@ -1039,6 +1049,55 @@ echo $OUTPUT->header();
             }, false);
         });
     })();
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const barcodeValue = document.getElementById('barkod');
+        const printBtn = document.getElementById('print-barcode');
+
+        function generateBarcode() {
+            if (barcodeValue.value.trim() !== '') {
+                try {
+                    JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
+                        format: "code128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Barkod oluşturulamadı: ' + e.message
+                    });
+                }
+            } else {
+                document.getElementById('barcode-svg').innerHTML = '';
+            }
+        }
+
+        barcodeValue.addEventListener('input', generateBarcode);
+        if (barcodeValue.value.trim() !== '') {
+            generateBarcode();
+        }
+
+        printBtn.addEventListener('click', function() {
+            const printWindow = window.open('', '', 'height=500,width=800');
+            printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+            printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
+            printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+    });
 </script>
 
 <!-- SweetAlert2 CDN -->
