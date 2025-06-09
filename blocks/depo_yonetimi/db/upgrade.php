@@ -42,5 +42,26 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2025060561, 'depo_yonetimi');
     }
 
+    function xmldb_block_depo_yonetimi_upgrade($oldversion) {
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        if ($oldversion < 2024050100) { // Versiyon numarasını uygun şekilde değiştirin
+            $table = new xmldb_table('block_depo_yonetimi_urunler');
+            $field = new xmldb_field('barkod', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'name');
+
+            // Alan yoksa ekle
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            upgrade_block_savepoint(true, 2024050100, 'depo_yonetimi');
+        }
+
+        return true;
+    }
+
+
+
     return true;
 }
