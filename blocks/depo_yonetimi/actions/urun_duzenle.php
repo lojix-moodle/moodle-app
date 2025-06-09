@@ -466,7 +466,6 @@ echo $OUTPUT->header();
                             </div>
                         </div>
                             <!-- Barkod Alanı -->
-                            <div class="card shadow-sm mb-4">
                                 <div class="card-header bg-white py-3">
                                     <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod</h5>
                                 </div>
@@ -492,7 +491,7 @@ echo $OUTPUT->header();
                                         <i class="fas fa-print me-2"></i>Yazdır
                                     </button>
                                 </div>
-                            </div>
+
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
