@@ -64,7 +64,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2025060561, 'depo_yonetimi');
     }
 
-    if ($oldversion < 2025060917) {
+    if ($oldversion < 2025060920) {
         // Ürünler tablosuna barkod alanı ekle
         $urunler_table = new xmldb_table('block_depo_yonetimi_urunler');
 
@@ -76,7 +76,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
 
         // Güncelleme noktasını kaydet
-        upgrade_block_savepoint(true, 2025060917, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2025060920, 'depo_yonetimi');
     }
 
     return true;
