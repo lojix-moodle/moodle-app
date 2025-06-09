@@ -1268,7 +1268,7 @@ echo $OUTPUT->header();
                 </div>
 
                 <div class="banner-action">
-                    <a href="#" class="action-button">
+                    <a href="<?php echo new moodle_url('/login/index.php'); ?>" class="action-button">
                         <span>Keşfet</span>
                         <i class="fas fa-chevron-right"></i>
                     </a>
