@@ -382,6 +382,7 @@ echo $OUTPUT->header();
     </div>
 </div>
 
+
 <div class="container-fluid py-4">
     <!-- Depo Bilgi Başlığı -->
     <div class="depo-info-bar mb-4">
@@ -406,7 +407,7 @@ echo $OUTPUT->header();
                 <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
 
                 <div class="row g-4">
-                    <!-- Sol Sütun - Ürün Bilgileri -->
+                    <!-- Sol Sütun - Tüm Ürün Bilgileri -->
                     <div class="col-lg-6 pe-lg-4">
                         <h4 class="section-title">Ürün Temel Bilgileri</h4>
 
@@ -445,107 +446,27 @@ echo $OUTPUT->header();
                             <div class="form-text">Depodaki ürünün adını girin</div>
                         </div>
 
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-white py-3">
-                                <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod Oluşturma</h5>
+                        <!-- Barkod Alanı -->
+                        <div class="mb-4">
+                            <label for="barkod" class="form-label"><i class="fas fa-qrcode me-2"></i>Barkod</label>
+                            <div class="input-group">
+                                <input type="text" id="barkod" name="barkod" class="form-control"
+                                       value="<?php echo htmlspecialchars($urun->barkod ?? ''); ?>"
+                                       placeholder="Barkod değeri veya ürün kodu">
+                                <button class="btn btn-outline-success" type="button" id="generate-barcode">
+                                    <i class="fas fa-random me-1"></i>Barkod Oluştur
+                                </button>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="barcode-type" class="form-label">Barkod Türü:</label>
-                                            <select id="barcode-type" class="form-select">
-                                                <option value="code128">Code 128</option>
-                                                <option value="code39">Code 39</option>
-                                                <option value="ean13">EAN-13</option>
-                                                <option value="ean8">EAN-8</option>
-                                                <option value="upc">UPC</option>
-                                            </select>
-                                        </div>
+                            <div class="mb-3 text-center">
+                                <label class="form-label">Önizleme:</label>
+                                <div class="barcode-container p-3 border rounded bg-white">
+                                    <svg id="barcode-svg"></svg>
                                 </div>
                             </div>
+                            <button class="btn btn-outline-primary" id="print-barcode" type="button">
+                                <i class="fas fa-print me-2"></i>Yazdır
+                            </button>
                         </div>
-                            <!-- Barkod Alanı -->
-                                <div class="card-header bg-white py-3">
-                                    <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i>Barkod</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="barkod" class="form-label">Barkod Değeri:</label>
-                                        <div class="input-group">
-                                            <input type="text" id="barkod" name="barkod" class="form-control"
-                                                   value="<?php echo htmlspecialchars($urun->barkod ?? ''); ?>"
-                                                   placeholder="Barkod değeri veya ürün kodu">
-                                            <button class="btn btn-outline-success" type="button" id="generate-barcode">
-                                                <i class="fas fa-random me-1"></i>Barkod Oluştur
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 text-center">
-                                        <label class="form-label">Önizleme:</label>
-                                        <div class="barcode-container p-3 border rounded bg-white">
-                                            <svg id="barcode-svg"></svg>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-outline-primary" id="print-barcode" type="button">
-                                        <i class="fas fa-print me-2"></i>Yazdır
-                                    </button>
-                                </div>
-
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const generateBtn = document.getElementById('generate-barcode');
-                                const printBtn = document.getElementById('print-barcode');
-                                const barcodeType = document.getElementById('barcode-type');
-                                const barcodeValue = document.getElementById('barcode-value');
-
-                                // Barkod oluştur
-                                generateBtn.addEventListener('click', function() {
-                                    if (barcodeValue.value.trim() !== '') {
-                                        try {
-                                            JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
-                                                format: barcodeType.value,
-                                                lineColor: "#000",
-                                                width: 2,
-                                                height: 100,
-                                                displayValue: true
-                                            });
-                                        } catch (e) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Hata!',
-                                                text: 'Barkod oluşturulamadı: ' + e.message
-                                            });
-                                        }
-                                    }
-                                });
-
-                                // Barkod yazdırma
-                                printBtn.addEventListener('click', function() {
-                                    const printWindow = window.open('', '', 'height=500,width=800');
-                                    printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
-                                    printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
-                                    printWindow.document.write('</head><body>');
-                                    printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
-                                    printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
-                                    printWindow.document.write('</body></html>');
-                                    printWindow.document.close();
-                                    printWindow.focus();
-
-                                    // Kısa gecikme sonrası yazdır
-                                    setTimeout(() => {
-                                        printWindow.print();
-                                        printWindow.close();
-                                    }, 500);
-                                });
-
-                                // Sayfa yüklendiğinde varsayılan barkod oluştur
-                                if (barcodeValue.value.trim() !== '') {
-                                    generateBtn.click();
-                                }
-                            });
-                        </script>
 
                         <!-- Minimum Stok Seviyesi -->
                         <div class="mb-4">
@@ -562,79 +483,73 @@ echo $OUTPUT->header();
                             <div class="form-text">Bu değer altına düşüldüğünde uyarı verilecektir</div>
                         </div>
 
-                        <!-- Renkler ve Boyutlar (Yan Yana) -->
-                        <div class="row mb-4">
-                            <!-- Renkler - Sol Kolon -->
-                            <div class="mb-4">
-                                <label for="colors" class="form-label">
-                                    <i class="fas fa-palette me-2 text-primary"></i>Renkler
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
-                                    <select multiple class="form-select" id="colors" name="colors[]" size="5">
-                                        <?php
-                                        $seciliRenkler = json_decode($urun->colors, true);
-                                        $tumRenkler = [
-                                            'beyaz' => 'Beyaz',
-                                            'mavi' => 'Mavi',
-                                            'siyah' => 'Siyah',
-                                            'bej' => 'Bej',
-                                            'gri' => 'Gri',
-                                            'lacivert' => 'Lacivert',
-                                            'kahverengi' => 'Kahverengi',
-                                            'pembe' => 'Pembe',
-                                            'mor' => 'Mor',
-                                            'haki' => 'Haki',
-                                            'vizon' => 'Vizon',
-                                            'sari' => 'Sarı',
-                                            'turuncu' => 'Turuncu',
-                                            'kirmizi' => 'Kırmızı',
-                                            'yesil' => 'Yeşil',
-                                            'bordo' => 'Bordo'
-                                        ];
-
-                                        foreach ($tumRenkler as $value => $label):
-                                            $selected = is_array($seciliRenkler) && in_array($value, $seciliRenkler) ? 'selected' : '';
-                                            ?>
-                                            <option value="<?php echo $value; ?>" <?php echo $selected; ?>><?php echo $label; ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="form-text small">
-                                    <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-                                </div>
+                        <!-- Renkler -->
+                        <div class="mb-4">
+                            <label for="colors" class="form-label">
+                                <i class="fas fa-palette me-2 text-primary"></i>Renkler
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-fill-drip"></i></span>
+                                <select multiple class="form-select" id="colors" name="colors[]" size="5">
+                                    <?php
+                                    $seciliRenkler = json_decode($urun->colors, true);
+                                    $tumRenkler = [
+                                        'beyaz' => 'Beyaz',
+                                        'mavi' => 'Mavi',
+                                        'siyah' => 'Siyah',
+                                        'bej' => 'Bej',
+                                        'gri' => 'Gri',
+                                        'lacivert' => 'Lacivert',
+                                        'kahverengi' => 'Kahverengi',
+                                        'pembe' => 'Pembe',
+                                        'mor' => 'Mor',
+                                        'haki' => 'Haki',
+                                        'vizon' => 'Vizon',
+                                        'sari' => 'Sarı',
+                                        'turuncu' => 'Turuncu',
+                                        'kirmizi' => 'Kırmızı',
+                                        'yesil' => 'Yeşil',
+                                        'bordo' => 'Bordo'
+                                    ];
+                                    foreach ($tumRenkler as $value => $label):
+                                        $selected = is_array($seciliRenkler) && in_array($value, $seciliRenkler) ? 'selected' : '';
+                                        ?>
+                                        <option value="<?php echo $value; ?>" <?php echo $selected; ?>><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
+                            <div class="form-text small">
+                                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
+                            </div>
+                        </div>
 
-                            <!-- Boyutlar - Sağ Kolon -->
-                            <div class="mb-4">
-                                <label for="sizes" class="form-label">
-                                    <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
-                                    <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
-                                        <?php
-                                        $seciliBoyutlar = json_decode($urun->sizes, true);
-                                        $tumBoyutlar = range(17, 45);
-
-                                        foreach ($tumBoyutlar as $boyut):
-                                            $selected = is_array($seciliBoyutlar) && in_array($boyut, $seciliBoyutlar) ? 'selected' : '';
-                                            ?>
-                                            <option value="<?php echo $boyut; ?>" <?php echo $selected; ?>><?php echo $boyut; ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="form-text small">
-                                    <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
-                                </div>
+                        <!-- Boyutlar -->
+                        <div class="mb-4">
+                            <label for="sizes" class="form-label">
+                                <i class="fas fa-ruler-combined me-2 text-primary"></i>Boyutlar
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-expand-arrows-alt"></i></span>
+                                <select multiple class="form-select" id="sizes" name="sizes[]" size="5">
+                                    <?php
+                                    $seciliBoyutlar = json_decode($urun->sizes, true);
+                                    $tumBoyutlar = range(17, 45);
+                                    foreach ($tumBoyutlar as $boyut):
+                                        $selected = is_array($seciliBoyutlar) && in_array($boyut, $seciliBoyutlar) ? 'selected' : '';
+                                        ?>
+                                        <option value="<?php echo $boyut; ?>" <?php echo $selected; ?>><?php echo $boyut; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-text small">
+                                <i class="fas fa-info-circle"></i> CTRL ile çoklu seçim yapabilirsiniz
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sağ Sütun - Varyasyonlar -->
+                    <!-- Sağ Sütun - Sadece Varyasyon Yönetimi -->
                     <div class="col-lg-6 ps-lg-4">
                         <h4 class="section-title">Varyasyon Yönetimi</h4>
-
                         <div class="alert alert-primary d-flex align-items-center mb-4">
                             <i class="fas fa-info-circle fs-5 me-3"></i>
                             <div>
@@ -642,7 +557,6 @@ echo $OUTPUT->header();
                                 Varyasyonlar, aynı ürünün farklı versiyonlarını yönetmenize olanak tanır.
                             </div>
                         </div>
-
                         <div class="card shadow-sm mb-4">
                             <div class="card-body">
                                 <div class="d-grid mb-3">
@@ -650,19 +564,16 @@ echo $OUTPUT->header();
                                         <i class="fas fa-cubes me-2"></i>Varyasyon Oluştur
                                     </button>
                                 </div>
-
                                 <div class="text-center text-muted">
                                     <small>Önce renk ve boyut seçimi yapmanız gerekiyor</small>
                                 </div>
                             </div>
                         </div>
-
                         <div id="varyasyonBolumu" class="mt-4 <?php echo (!empty($mevcut_varyasyonlar)) ? '' : 'd-none'; ?>">
                             <div class="alert alert-info d-flex <?php echo (!empty($mevcut_varyasyonlar)) ? 'd-none' : ''; ?>">
                                 <i class="fas fa-info-circle me-3 fs-5"></i>
                                 <div>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın</div>
                             </div>
-
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
@@ -676,11 +587,7 @@ echo $OUTPUT->header();
                                     </tbody>
                                 </table>
                             </div>
-
-                            <!-- Sayfalama Bilgisi -->
                             <div id="pageInfo" class="text-center text-muted mt-2"></div>
-
-                            <!-- Sayfalama Kontrolleri -->
                             <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
                                 <button id="prevPage" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-chevron-left me-1"></i> Önceki
@@ -1100,6 +1007,60 @@ echo $OUTPUT->header();
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const generateBtn = document.getElementById('generate-barcode');
+        const printBtn = document.getElementById('print-barcode');
+        const barcodeType = document.getElementById('barcode-type');
+        const barcodeValue = document.getElementById('barcode-value');
+
+        // Barkod oluştur
+        generateBtn.addEventListener('click', function() {
+            if (barcodeValue.value.trim() !== '') {
+                try {
+                    JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
+                        format: barcodeType.value,
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Barkod oluşturulamadı: ' + e.message
+                    });
+                }
+            }
+        });
+
+        // Barkod yazdırma
+        printBtn.addEventListener('click', function() {
+            const printWindow = window.open('', '', 'height=500,width=800');
+            printWindow.document.write('<html><head><title>Barkod Yazdır</title>');
+            printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
+            printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+
+            // Kısa gecikme sonrası yazdır
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+
+        // Sayfa yüklendiğinde varsayılan barkod oluştur
+        if (barcodeValue.value.trim() !== '') {
+            generateBtn.click();
+        }
+    });
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
