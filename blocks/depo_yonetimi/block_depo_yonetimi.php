@@ -101,20 +101,6 @@ class block_depo_yonetimi extends block_base {
             $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
             $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
-
-
-            $html .= '
-    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '" data-id="' . $urun->id . '">
-        <!-- ... diğer sütunlar ... -->
-        <td class="kategori-cell align-middle">';
-            if (!empty($kategori_adi) && $kategori_adi !== 'Kategorisiz') {
-                $html .= '<div class="badge rounded-pill bg-warning-subtle text-warning border px-3 py-2 fw-normal d-flex align-items-center">
-        <i class="fas fa-tag me-1"></i>' . htmlspecialchars($kategori_adi) . '
-    </div>';
-            } else {
-                $html .= '<span class="text-muted fst-italic">Kategorisiz</span>';
-            }
-
             if (!isset($kategorilere_gore_urunler[$kategori_adi])) {
                 $kategorilere_gore_urunler[$kategori_adi] = [];
             }
@@ -261,26 +247,14 @@ class="btn btn-info">
     </div>' :
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
-                                      <!-- Kategori -->
-<td class="kategori-cell align-middle">
-    <?php if (!empty($kategori_adi)): ?>
-        <div class="badge rounded-pill bg-warning-subtle text-warning border px-3 py-2 fw-normal d-flex align-items-center">
-            <i class="fas fa-tag me-1"></i>
-            <?php echo htmlspecialchars($kategori_adi); ?>
-        </div>
-    <?php else: ?>
-        <span class="text-muted fst-italic">Kategorisiz</span>
-    <?php endif; ?>
+                                        <!-- Kategori -->
+<td class="align-middle">
+    <span class="badge rounded-pill px-3 py-2 fw-medium"
+          style="background: linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%); color: #3730a3; border: 1px solid #a5b4fc;">
+        <i class="fas fa-tag me-1"></i>
+        <?php echo htmlspecialchars($kategori_adi); ?>
+    </span>
 </td>
-
-<style>
-.kategori-cell .badge {
-    background-color: #fffbe6 !important;
-    color: #b8860b !important;
-    border: 1px solid #ffe58f !important;
-    font-size: 1rem;
-}
-</style>
                                         <!-- Raf -->
                                         <td class="raf-cell align-middle">
                                             ' . (!empty($urun->raf) ?
