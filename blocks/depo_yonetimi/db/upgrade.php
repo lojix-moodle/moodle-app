@@ -5,7 +5,7 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025060617) {
+    if ($oldversion < 2025060561) {
         $table = new xmldb_table('block_depo_yonetimi_talepler');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
@@ -39,29 +39,8 @@ function xmldb_block_depo_yonetimi_upgrade($oldversion) {
 
 
         // Güncelleme noktasını kaydet
-        upgrade_block_savepoint(true, 2025060617, 'depo_yonetimi');
+        upgrade_block_savepoint(true, 2025060561, 'depo_yonetimi');
     }
-
-    function xmldb_block_depo_yonetimi_upgrade($oldversion) {
-        global $DB;
-        $dbman = $DB->get_manager();
-
-        if ($oldversion < 2025060617) { // Versiyon numarasını uygun şekilde değiştirin
-            $table = new xmldb_table('block_depo_yonetimi_urunler');
-            $field = new xmldb_field('barkod', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'name');
-
-            // Alan yoksa ekle
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-
-            upgrade_block_savepoint(true, 2025060617, 'depo_yonetimi');
-        }
-
-        return true;
-    }
-
-
 
     return true;
 }
