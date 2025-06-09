@@ -240,9 +240,9 @@ class="btn btn-info">
         <i class="fas fa-barcode text-primary me-2"></i>
         <div class="barcode-display p-2 border rounded bg-light">
             <strong class="text-dark">' . htmlspecialchars($urun->barkod) . '</strong>
-            <span class="barcode-scan-icon ms-2" data-bs-toggle="tooltip" title="Barkodu Tara">
-                <i class="fas fa-qrcode text-success"></i>
-            </span>
+            <button type="button" class="barcode-scan-icon btn btn-outline-success btn-sm ms-2" data-bs-toggle="tooltip" title="Barkodu Tara">
+    <i class="fas fa-qrcode"></i>
+</button>
         </div>
     </div>' :
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
