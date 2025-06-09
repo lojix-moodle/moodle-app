@@ -170,9 +170,6 @@ class="btn btn-info">
                                 <select id="kategoriFiltre" class="form-select">
                                     <option value="">Tüm Kategoriler</option>';
 
-
-
-
         foreach ($tum_kategoriler as $kategori) {
             $html .= '<option value="' . htmlspecialchars($kategori->name) . '">' . htmlspecialchars($kategori->name) . '</option>';
         }
@@ -243,17 +240,15 @@ class="btn btn-info">
         <i class="fas fa-barcode text-primary me-2"></i>
         <div class="barcode-display p-2 border rounded bg-light">
             <strong class="text-dark">' . htmlspecialchars($urun->barkod) . '</strong>
-           <!-- Barkod tara ikonu -->
-<span class="barcode-scan-icon ms-2" id="scan-barcode-btn" data-bs-toggle="tooltip" title="Barkodu Tara">
-    <i class="fas fa-qrcode text-success"></i>
-</span>
-<div id="barcode-scanner" style="display:none;"></div>
+            <span class="barcode-scan-icon ms-2" data-bs-toggle="tooltip" title="Barkodu Tara">
+                <i class="fas fa-qrcode text-success"></i>
+            </span>
+        </div>
     </div>' :
-
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
                                         <!-- Kategori -->
-                                      <td class="align-middle">
+                                        <td class="align-middle">
     <span class="badge rounded-pill px-3 py-2 fw-medium"
           style="background: linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%); color: #3730a3; border: 1px solid #a5b4fc;">
         <i class="fas fa-tag me-1"></i>
@@ -314,8 +309,6 @@ class="btn btn-info">
                                     </tr>';
             }
         }
-
-
 
         $html .= '
                                 </tbody>
@@ -406,9 +399,6 @@ class="btn btn-info">
                     </div>';
         }
 
-
-
-
         $html .= '
                 </div>
             </div>
@@ -482,39 +472,7 @@ class="btn btn-info">
                     </div>';
                 }
             }
-            $html .= '
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var scanBtn = document.getElementById("scan-barcode-btn");
-    var scannerDiv = document.getElementById("barcode-scanner");
-    var urunArama = document.getElementById("urunArama");
-    var html5QrCode;
-    if (scanBtn && scannerDiv && urunArama) {
-        scanBtn.addEventListener("click", function() {
-            scannerDiv.style.display = "block";
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("barcode-scanner");
-            }
-            html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                function(decodedText) {
-                    urunArama.value = decodedText;
-                    html5QrCode.stop();
-                    scannerDiv.style.display = "none";
-                },
-                function(errorMessage) {
-                    // Hata mesajı gösterme (isteğe bağlı)
-                }
-            );
-        });
-    }
-});
-</script>
-';
         }
-
         // Depo yetkilisi için
         else {
             $yetkili_depolar = $DB->get_records('block_depo_yonetimi_depolar', ['sorumluid' => $USER->id]);
@@ -588,8 +546,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         return $html;
     }
-
-
 
     public function applicable_formats() {
         return array('all' => true);
