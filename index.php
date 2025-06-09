@@ -687,27 +687,7 @@ echo $OUTPUT->header();
         // Sayfa yüklendiğinde istatistikleri animasyonla göster
         animateNumbers();
 
-        // Hızlı işlem butonları için olay dinleyicileri
-        const quickActions = document.querySelectorAll('.quick-action');
-        quickActions.forEach(action => {
-            action.addEventListener('click', function() {
-                const actionType = this.querySelector('h5').textContent;
-                switch(actionType) {
-                    case 'Yeni Ürün':
-                        window.location.href = 'blocks/depo_yonetimi/actions/urun_ekle.php';
-                        break;
-                    case 'Stok Girişi':
-                        window.location.href = 'blocks/depo_yonetimi/actions/stok_giris.php';
-                        break;
-                    case 'Stok Çıkışı':
-                        window.location.href = 'blocks/depo_yonetimi/actions/stok_cikis.php';
-                        break;
-                    case 'Raporlar':
-                        window.location.href = 'blocks/depo_yonetimi/actions/raporlar.php';
-                        break;
-                }
-            });
-        });
+
     });
 </script>
 
