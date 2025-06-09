@@ -1127,38 +1127,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <!-- Grafik ve Listeler -->
-    <div class="row">
-        <!-- Sol Taraf - Grafikler -->
-        <div class="col-md-7">
-            <!-- Stok Hareketleri Grafiği -->
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Son 30 Günlük Stok Hareketleri</span>
-                    <div class="dropdown">
-                        <!-- Filtre butonu kaldırıldı -->
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="stockChart"></canvas>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Kategori Dağılımı -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Ürün Kategorileri Dağılımı</span>
-                    <!-- Detay butonu kaldırıldı -->
-                </div>
-                <div class="card-body">
-                    <div class="chart-container" style="height: 250px;">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Ana İçerik Bölümü -->
         <div class="container mt-5">
