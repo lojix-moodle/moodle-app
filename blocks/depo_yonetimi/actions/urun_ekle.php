@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->raf = $raf;
     $ana_urun->bolum = $bolum;
     $ana_urun->barkod = $barkod; // Barkodu ana ürüne ekle
+
     try {
         $depo_kontrol = $DB->get_record('block_depo_yonetimi_depolar', ['id' => $depoid], '*', MUST_EXIST);
         $kategori_kontrol = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $ana_urun->kategoriid], '*', MUST_EXIST);

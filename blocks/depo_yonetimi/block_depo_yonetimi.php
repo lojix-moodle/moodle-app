@@ -233,11 +233,20 @@ class="btn btn-info">
                                             </div>
                                         </td>
                                         <!-- Barkod -->
-                                        <td class="align-middle">
-                                            ' . (!empty($urun->barkod) ?
-                        '<span class="badge bg-light text-dark border">' . htmlspecialchars($urun->barkod) . '</span>' :
-                        '<span class="text-muted fst-italic">Barkod yok</span>') . '
-                                        </td>
+                                        <!-- Barkod -->
+<td class="align-middle">
+    ' . (!empty($urun->barkod) ?
+                        '<div class="d-flex align-items-center">
+        <i class="fas fa-barcode text-primary me-2"></i>
+        <div class="barcode-display p-2 border rounded bg-light">
+            <strong class="text-dark">' . htmlspecialchars($urun->barkod) . '</strong>
+            <span class="barcode-scan-icon ms-2" data-bs-toggle="tooltip" title="Barkodu Tara">
+                <i class="fas fa-qrcode text-success"></i>
+            </span>
+        </div>
+    </div>' :
+                        '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
+</td>
                                         <!-- Kategori -->
                                         <td class="align-middle">
                                             <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
@@ -529,6 +538,31 @@ class="btn btn-info">
             width: 22px;
             height: 22px;
         }
+         .barcode-display {
+        font-family: "Courier New", monospace;
+        letter-spacing: 1px;
+        position: relative;
+    }
+    
+    .barcode-scan-icon {
+        opacity: 0.7;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .barcode-scan-icon:hover {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    
+    @media print {
+        .barcode-display {
+            border: 1px solid #ddd !important;
+            padding: 20px !important;
+            text-align: center;
+        }
+    }
+        
         </style>';
 
         return $html;
