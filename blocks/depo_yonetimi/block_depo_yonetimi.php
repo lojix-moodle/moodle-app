@@ -406,37 +406,7 @@ class="btn btn-info">
                     </div>';
         }
 
-        $html .= '
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var scanBtn = document.getElementById("scan-barcode-btn");
-    var scannerDiv = document.getElementById("barcode-scanner");
-    var urunArama = document.getElementById("urunArama");
-    var html5QrCode;
-    if (scanBtn && scannerDiv && urunArama) {
-        scanBtn.addEventListener("click", function() {
-            scannerDiv.style.display = "block";
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("barcode-scanner");
-            }
-            html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                function(decodedText) {
-                    urunArama.value = decodedText;
-                    html5QrCode.stop();
-                    scannerDiv.style.display = "none";
-                },
-                function(errorMessage) {
-                    // Hata mesajı gösterme (isteğe bağlı)
-                }
-            );
-        });
-    }
-});
-</script>
-';
+
 
 
         $html .= '
@@ -512,7 +482,39 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>';
                 }
             }
+            $html .= '
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var scanBtn = document.getElementById("scan-barcode-btn");
+    var scannerDiv = document.getElementById("barcode-scanner");
+    var urunArama = document.getElementById("urunArama");
+    var html5QrCode;
+    if (scanBtn && scannerDiv && urunArama) {
+        scanBtn.addEventListener("click", function() {
+            scannerDiv.style.display = "block";
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("barcode-scanner");
+            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                function(decodedText) {
+                    urunArama.value = decodedText;
+                    html5QrCode.stop();
+                    scannerDiv.style.display = "none";
+                },
+                function(errorMessage) {
+                    // Hata mesajı gösterme (isteğe bağlı)
+                }
+            );
+        });
+    }
+});
+</script>
+';
         }
+
         // Depo yetkilisi için
         else {
             $yetkili_depolar = $DB->get_records('block_depo_yonetimi_depolar', ['sorumluid' => $USER->id]);
@@ -586,6 +588,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         return $html;
     }
+
+
 
     public function applicable_formats() {
         return array('all' => true);
