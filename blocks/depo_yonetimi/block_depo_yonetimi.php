@@ -101,6 +101,20 @@ class block_depo_yonetimi extends block_base {
             $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
             $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
+
+
+            $html .= '
+    <tr data-kategori="' . htmlspecialchars($kategori_adi) . '" data-id="' . $urun->id . '">
+        <!-- ... diğer sütunlar ... -->
+        <td class="kategori-cell align-middle">';
+            if (!empty($kategori_adi) && $kategori_adi !== 'Kategorisiz') {
+                $html .= '<div class="badge rounded-pill bg-warning-subtle text-warning border px-3 py-2 fw-normal d-flex align-items-center">
+        <i class="fas fa-tag me-1"></i>' . htmlspecialchars($kategori_adi) . '
+    </div>';
+            } else {
+                $html .= '<span class="text-muted fst-italic">Kategorisiz</span>';
+            }
+
             if (!isset($kategorilere_gore_urunler[$kategori_adi])) {
                 $kategorilere_gore_urunler[$kategori_adi] = [];
             }
