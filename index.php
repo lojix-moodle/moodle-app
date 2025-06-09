@@ -119,53 +119,12 @@ echo $OUTPUT->header();
         font-weight: 600;
     }
 
-    /* Hızlı erişim paneli için CSS */
-    .quick-access-panel {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-        position: relative;
-    }
 
-    .quick-access-tabs {
-        display: flex;
-        border-bottom: 1px solid #eee;
-        padding: 0 15px;
-    }
-
-    .quick-access-tab {
-        padding: 15px 20px;
-        font-weight: 500;
-        color: #777;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        transition: all 0.3s ease;
-    }
-
-    .quick-access-tab.active {
-        color: #2a5298;
-        border-bottom-color: #2a5298;
-    }
 
     .quick-access-tab i {
         margin-right: 8px;
     }
 
-    .quick-access-content {
-        padding: 20px;
-    }
-
-    .search-items {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .search-item {
-        flex: 1;
-        min-width: 200px;
-    }
 
     .search-item label {
         display: block;
@@ -174,38 +133,132 @@ echo $OUTPUT->header();
         color: #555;
     }
 
-    .search-actions {
+
+
+    /* Sistem Bilgilendirme Paneli için CSS */
+    .info-panel {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .info-header {
+        background: linear-gradient(90deg, #2c3e50, #3498db);
+        color: white;
+        padding: 15px 25px;
+        font-weight: 500;
+    }
+
+    .info-header h4 {
+        margin: 0;
+        font-size: 1.25rem;
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .info-content {
+        padding: 25px;
+    }
+
+    .info-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #444;
+        margin-bottom: 20px;
+    }
+
+    .features-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
         margin-top: 20px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
         gap: 10px;
     }
 
-    .btn-search {
-        background: #2a5298;
+    .feature-item i {
+        color: #2ecc71;
+        font-size: 1.1rem;
+    }
+
+    .system-stats {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .stat-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3498db, #8e44ad);
         color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .btn-reset {
-        background: #f1f2f6;
-        color: #444;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    .stat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
     }
 
-    .btn-search:hover {
-        background: #1e3c72;
-        transform: translateY(-2px);
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+
+    .version-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+    }
+
+    .version-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .version-number {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .update-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .features-list {
+            grid-template-columns: 1fr;
+        }
+
+        .system-stats {
+            margin-top: 20px;
+        }
     }
 
     .card {
@@ -372,49 +425,58 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <!-- Barkod Yerine Hızlı Erişim Paneli -->
+
+    <!-- Sistem Hakkında Bilgilendirme Paneli -->
     <div class="container">
-        <div class="quick-access-panel">
-            <div class="quick-access-tabs">
-                <div class="quick-access-tab active"><i class="fas fa-search"></i>Hızlı Arama</div>
-                <div class="quick-access-tab"><i class="fas fa-bolt"></i>Son İşlemler</div>
-                <div class="quick-access-tab"><i class="fas fa-exclamation-circle"></i>Kritik Stoklar</div>
+        <div class="info-panel">
+            <div class="info-header">
+                <h4><i class="fas fa-info-circle me-2"></i>Depo Yönetim Sistemi Hakkında</h4>
             </div>
-            <div class="quick-access-content">
-                <div class="search-items">
-                    <div class="search-item">
-                        <label>Ürün Adı veya Kodu</label>
-                        <input type="text" class="form-control" placeholder="Aramak için yazın...">
+            <div class="info-content">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="info-description">
+                            Depo Yönetim Sistemimiz, işletmenizin envanter ve stok operasyonlarını
+                            uçtan uca yönetmenizi sağlayan entegre bir çözümdür. Sistem içerisinde
+                            ürün giriş-çıkışlarını takip edebilir, stok seviyelerini anlık izleyebilir
+                            ve detaylı raporlar oluşturabilirsiniz.
+                        </p>
+
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Gerçek zamanlı stok takibi ve envanter yönetimi</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Barkod bazlı ürün izleme ve takip sistemi</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Detaylı raporlama ve analiz araçları</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Kritik stok seviyesi uyarıları ve bildirimler</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="search-item">
-                        <label>Kategori</label>
-                        <select class="form-control">
-                            <option value="">Tüm Kategoriler</option>
-                            <option value="tekstil">Tekstil</option>
-                            <option value="ayakkabi">Ayakkabı</option>
-                            <option value="aksesuar">Aksesuar</option>
-                            <option value="elektronik">Elektronik</option>
-                        </select>
+                    <div class="col-md-4 text-center system-stats">
+                        <div class="stat-circle">
+                            <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="stat-value">%98</div>
+                            <div class="stat-label">Operasyon Verimliliği</div>
+                        </div>
+                        <div class="version-info">
+                            <div class="version-label">Sistem Versiyonu</div>
+                            <div class="version-number">v4.2.1</div>
+                            <div class="update-date">Son Güncelleme: 11.05.2023</div>
+                        </div>
                     </div>
-                    <div class="search-item">
-                        <label>Depo</label>
-                        <select class="form-control">
-                            <option value="">Tüm Depolar</option>
-                            <option value="a-depo">A Deposu</option>
-                            <option value="b-depo">B Deposu</option>
-                            <option value="c-depo">C Deposu</option>
-                            <option value="d-depo">D Deposu</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="search-actions">
-                    <button class="btn-reset"><i class="fas fa-times"></i> Temizle</button>
-                    <button class="btn-search"><i class="fas fa-search"></i> Ara</button>
                 </div>
             </div>
         </div>
     </div>
-
 
 
     <!-- İstatistik Kartları -->
