@@ -159,4 +159,8 @@ document.querySelectorAll('.barcode-scan-icon').forEach(function(icon) {
         const modal = new bootstrap.Modal(document.getElementById('barcodeModal'));
         modal.show();
     });
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 });
