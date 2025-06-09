@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = required_param('name', PARAM_TEXT);
     $kategoriid = required_param('kategoriid', PARAM_INT);
     $min_stok_seviyesi = optional_param('min_stok_seviyesi', 0, PARAM_INT);
+    $barkod = required_param('barkod', PARAM_TEXT);
 
     $colors = $_POST['colors'];
     $sizes = $_POST['sizes'];
