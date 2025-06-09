@@ -247,10 +247,13 @@ class="btn btn-info">
     </div>' :
                         '<span class="text-muted fst-italic"><i class="fas fa-exclamation-circle me-1"></i>Barkod yok</span>') . '
 </td>
-                                        <!-- Kategori -->
-                                        <td class="align-middle">
-                                            <span class="badge bg-light text-dark border">' . htmlspecialchars($kategori_adi) . '</span>
-                                        </td>
+                                       <!-- Kategori -->
+<td class="align-middle">
+    <div class="kategori-badge">
+        <i class="fas fa-tag kategori-icon"></i>
+        <span class="kategori-text"><?php echo htmlspecialchars($kategori_adi); ?></span>
+    </div>
+</td>
                                         <!-- Raf -->
                                         <td class="raf-cell align-middle">
                                             ' . (!empty($urun->raf) ?
@@ -554,6 +557,45 @@ class="btn btn-info">
         opacity: 1;
         transform: scale(1.2);
     }
+    .kategori-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: linear-gradient(to right, var(--primary-light, #eef2ff), var(--light, #f8f9fa));
+    border: 1px solid #e2e8f0;
+    transition: var(--transition);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.kategori-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary, #3e64ff);
+}
+
+.kategori-icon {
+    color: var(--primary, #3e64ff);
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+.kategori-text {
+    font-weight: 500;
+    color: #334155;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 767.98px) {
+            .kategori-badge {
+                padding: 4px 10px;
+    }
+    
+    .kategori-text {
+                font-size: 0.8rem;
+    }
+}
+    
     
     @media print {
         .barcode-display {
@@ -562,6 +604,8 @@ class="btn btn-info">
             text-align: center;
         }
     }
+        
+        
         
         </style>';
 
