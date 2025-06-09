@@ -17,6 +17,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Ürün Düzenle');
 $PAGE->set_heading('Ürün Düzenle');
 $PAGE->set_pagelayout('admin');
+$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'));
 
 // Yetki kontrolü
 $context = context_system::instance();
