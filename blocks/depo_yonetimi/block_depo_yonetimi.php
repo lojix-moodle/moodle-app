@@ -28,7 +28,10 @@ class block_depo_yonetimi extends block_base {
         global $PAGE;
         // Stil dosyasını dahil et
         $PAGE->requires->css(new moodle_url('/blocks/depo_yonetimi/styles.css'));
-
+// JsBarcode'u ekle
+        $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'));
+// Kendi script dosyanı ekle
+        $PAGE->requires->js(new moodle_url('/blocks/depo_yonetimi/js/script.js'));
         // Font Awesome'ı dahil et (eğer tema tarafından sağlanmıyorsa)
         $PAGE->requires->css(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'));
 
