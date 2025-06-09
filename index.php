@@ -178,7 +178,8 @@ echo $OUTPUT->header();
                     <p class="lead">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <!-- Butonlar kaldırıldı -->
+                    <button class="btn btn-light"><i class="fas fa-refresh me-2"></i>Yenile</button>
+                    <button class="btn btn-outline-light ms-2"><i class="fas fa-cog me-2"></i>Ayarlar</button>
                 </div>
             </div>
         </div>
@@ -195,11 +196,11 @@ echo $OUTPUT->header();
                     <h5 class="mb-3">Hızlı Ürün Arama</h5>
                     <div class="input-group">
                         <input type="text" class="form-control" id="barcodeInput" placeholder="Barkod numarasını girin veya taratın">
-                        <!-- Arama butonu kaldırıldı -->
+                        <button class="btn btn-primary" id="searchBtn" type="button"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-md-2 text-center">
-                    <!-- Barkod oluştur butonu kaldırıldı -->
+                    <button class="btn btn-outline-secondary" id="generateBarcode"><i class="fas fa-tag me-2"></i>Barkod Oluştur</button>
                 </div>
             </div>
             <div id="barcode-result" class="mt-3 text-center" style="display: none;">
@@ -282,7 +283,14 @@ echo $OUTPUT->header();
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Son 30 Günlük Stok Hareketleri</span>
                         <div class="dropdown">
-                            <!-- Filtre butonu kaldırıldı -->
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Filtre
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Son 7 Gün</a></li>
+                                <li><a class="dropdown-item" href="#">Son 30 Gün</a></li>
+                                <li><a class="dropdown-item" href="#">Son 90 Gün</a></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="card-body">
@@ -296,7 +304,7 @@ echo $OUTPUT->header();
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Ürün Kategorileri Dağılımı</span>
-                        <!-- Detay butonu kaldırıldı -->
+                        <button class="btn btn-sm btn-outline-secondary">Detay</button>
                     </div>
                     <div class="card-body">
                         <div class="chart-container" style="height: 250px;">
@@ -314,7 +322,7 @@ echo $OUTPUT->header();
                         <span><i class="fas fa-warehouse me-2"></i>Depo Kullanım İstatistiği</span>
                         <div>
                             <span class="badge bg-danger me-2">2 Kritik</span>
-                            <!-- Depo Detayı butonu kaldırıldı -->
+                            <button class="btn btn-sm btn-outline-primary">Depo Detayı</button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -355,7 +363,7 @@ echo $OUTPUT->header();
                             </div>
                         </div>
                         <div class="mt-3 text-center">
-                            <!-- Kapasite Planlaması butonu kaldırıldı -->
+                            <button class="btn btn-sm btn-outline-secondary">Kapasite Planlaması</button>
                         </div>
                     </div>
                 </div>
@@ -366,7 +374,7 @@ echo $OUTPUT->header();
                         <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
                         <div>
                             <span class="badge bg-danger me-2">5 Kritik</span>
-                            <!-- Tümünü Gör butonu kaldırıldı -->
+                            <button class="btn btn-sm btn-outline-primary">Tümünü Gör</button>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -389,7 +397,7 @@ echo $OUTPUT->header();
                                 </td>
                                 <td><span class="badge bg-danger">Kritik</span></td>
                                 <td><strong>2</strong> / 10</td>
-                                <td><!-- Sipariş butonu kaldırıldı --></td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
                             </tr>
                             <tr>
                                 <td>
@@ -400,7 +408,7 @@ echo $OUTPUT->header();
                                 </td>
                                 <td><span class="badge bg-danger">Kritik</span></td>
                                 <td><strong>3</strong> / 12</td>
-                                <td><!-- Sipariş butonu kaldırıldı --></td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
                             </tr>
                             <tr>
                                 <td>
@@ -411,7 +419,7 @@ echo $OUTPUT->header();
                                 </td>
                                 <td><span class="badge bg-warning">Uyarı</span></td>
                                 <td><strong>5</strong> / 8</td>
-                                <td><!-- Planla butonu kaldırıldı --></td>
+                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
                             </tr>
                             <tr>
                                 <td>
@@ -422,7 +430,7 @@ echo $OUTPUT->header();
                                 </td>
                                 <td><span class="badge bg-danger">Kritik</span></td>
                                 <td><strong>1</strong> / 8</td>
-                                <td><!-- Sipariş butonu kaldırıldı --></td>
+                                <td><button class="btn btn-sm btn-outline-danger py-0">Sipariş</button></td>
                             </tr>
                             <tr>
                                 <td>
@@ -433,7 +441,7 @@ echo $OUTPUT->header();
                                 </td>
                                 <td><span class="badge bg-warning">Uyarı</span></td>
                                 <td><strong>4</strong> / 6</td>
-                                <td><!-- Planla butonu kaldırıldı --></td>
+                                <td><button class="btn btn-sm btn-outline-warning py-0">Planla</button></td>
                             </tr>
                             </tbody>
                         </table>
@@ -450,7 +458,7 @@ echo $OUTPUT->header();
                     <span><i class="fas fa-truck-loading me-2"></i>Yaklaşan Teslimatlar</span>
                     <div>
                         <span class="badge bg-primary me-2">3 Geciken</span>
-                        <!-- Tüm Siparişler butonu kaldırıldı -->
+                        <button class="btn btn-sm btn-outline-primary">Tüm Siparişler</button>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -492,7 +500,7 @@ echo $OUTPUT->header();
                     </table>
                 </div>
                 <div class="card-footer bg-light text-end">
-                    <!-- Yeni Sipariş Oluştur butonu kaldırıldı -->
+                    <button class="btn btn-sm btn-outline-secondary">Yeni Sipariş Oluştur</button>
                 </div>
             </div>
 
@@ -500,7 +508,7 @@ echo $OUTPUT->header();
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-map-marked-alt me-2"></i>Depo Lokasyon Haritası</span>
-                    <!-- Tam Görünüm butonu kaldırıldı -->
+                    <button class="btn btn-sm btn-outline-primary">Tam Görünüm</button>
                 </div>
                 <div class="card-body p-3">
                     <div class="row text-center mb-3">
@@ -534,7 +542,12 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <!-- En Kısa Rota ve Yerleşim Düzenle butonları kaldırıldı -->
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-route me-1"></i>En Kısa Rota
+                        </button>
+                        <button class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-edit me-1"></i>Yerleşim Düzenle
+                        </button>
                     </div>
                 </div>
                 <div class="card-footer bg-light text-center">
@@ -549,14 +562,18 @@ echo $OUTPUT->header();
         document.addEventListener('DOMContentLoaded', function() {
             // Barkod işlemleri
             const barcodeInput = document.getElementById('barcodeInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const generateBtn = document.getElementById('generateBarcode');
             const barcodeResult = document.getElementById('barcode-result');
             const barcodeSvg = document.getElementById('barcodeSvg');
 
-            // Butonlar kaldırıldığı için bu referanslar ve event listener'lar kaldırıldı
-            // const searchBtn = document.getElementById('searchBtn');
-            // const generateBtn = document.getElementById('generateBarcode');
-
-            // Barkod arama butonunun olay dinleyicisi kaldırıldı
+            // Barkod arama butonu
+            searchBtn.addEventListener('click', function() {
+                const code = barcodeInput.value.trim();
+                if (code) {
+                    window.location.href = 'actions/barkod_ara.php?code=' + code;
+                }
+            });
 
             // Enter tuşu ile arama
             barcodeInput.addEventListener('keypress', function(e) {
@@ -568,7 +585,39 @@ echo $OUTPUT->header();
                 }
             });
 
-            // Barkod oluşturma fonksiyonu (buton kaldırıldığı için event listener kaldırıldı)
+            // Barkod oluşturma
+            generateBtn.addEventListener('click', function() {
+                const code = barcodeInput.value.trim();
+                if (code) {
+                    try {
+                        barcodeResult.style.display = 'block';
+                        JsBarcode(barcodeSvg, code, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 50,
+                            displayValue: true
+                        });
+                    } catch (e) {
+                        alert("Geçersiz barkod değeri!");
+                    }
+                } else {
+                    // Random barkod oluştur
+                    let randomBarcode = '';
+                    for (let i = 0; i < 12; i++) {
+                        randomBarcode += Math.floor(Math.random() * 10);
+                    }
+                    barcodeInput.value = randomBarcode;
+                    barcodeResult.style.display = 'block';
+                    JsBarcode(barcodeSvg, randomBarcode, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 50,
+                        displayValue: true
+                    });
+                }
+            });
 
             // Stok hareketleri grafiği
             const stockCtx = document.getElementById('stockChart').getContext('2d');
@@ -583,41 +632,26 @@ echo $OUTPUT->header();
                             borderColor: '#27ae60',
                             backgroundColor: 'rgba(39, 174, 96, 0.1)',
                             borderWidth: 2,
-                            tension: 0.4
+                            tension: 0.4,
+                            fill: true
                         },
                         {
                             label: 'Çıkış',
-                            data: [42, 58, 65, 85, 38, 41, 36],
+                            data: [28, 48, 40, 19, 36, 27, 50],
                             borderColor: '#e74c3c',
                             backgroundColor: 'rgba(231, 76, 60, 0.1)',
                             borderWidth: 2,
-                            tension: 0.4
+                            tension: 0.4,
+                            fill: true
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
@@ -628,15 +662,16 @@ echo $OUTPUT->header();
             const categoryChart = new Chart(categoryCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Tekstil', 'Ayakkabı', 'Aksesuar', 'Çanta', 'Elektronik'],
+                    labels: ['Tişört', 'Pantolon', 'Ayakkabı', 'Gömlek', 'Çanta', 'Aksesuar'],
                     datasets: [{
-                        data: [42, 23, 15, 8, 12],
+                        data: [35, 25, 15, 12, 8, 5],
                         backgroundColor: [
                             '#3498db',
-                            '#e74c3c',
                             '#2ecc71',
+                            '#e74c3c',
                             '#f39c12',
-                            '#9b59b6'
+                            '#9b59b6',
+                            '#1abc9c'
                         ],
                         borderWidth: 0
                     }]
@@ -646,67 +681,39 @@ echo $OUTPUT->header();
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'right',
+                            position: 'right'
                         }
                     }
                 }
             });
 
-            // İstatistik sayıları için animasyon
-            function animateNumbers() {
-                const elements = {
-                    'totalProducts': 1425,
-                    'monthlyTransactions': 368,
-                    'lowStock': 7,
-                    'pendingOrders': 12
-                };
+            // İstatistiklerin animasyonu
+            function animateCounter(elementId, targetValue) {
+                const element = document.getElementById(elementId);
+                const duration = 1500;
+                let startTime = null;
+                const startValue = 0;
 
-                for (const [id, targetValue] of Object.entries(elements)) {
-                    const element = document.getElementById(id);
-                    const duration = 1500;
-                    const startTime = performance.now();
-                    const startValue = 0;
+                function step(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    const currentValue = Math.floor(progress * (targetValue - startValue) + startValue);
 
-                    function updateNumber(currentTime) {
-                        const elapsedTime = currentTime - startTime;
-                        const progress = Math.min(elapsedTime / duration, 1);
-                        const currentValue = Math.floor(progress * (targetValue - startValue) + startValue);
+                    element.innerText = currentValue.toLocaleString();
 
-                        element.textContent = currentValue.toLocaleString();
-
-                        if (progress < 1) {
-                            requestAnimationFrame(updateNumber);
-                        }
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
                     }
-
-                    requestAnimationFrame(updateNumber);
                 }
+
+                window.requestAnimationFrame(step);
             }
 
-            // Sayfa yüklendiğinde istatistikleri animasyonla göster
-            animateNumbers();
-
-            // Hızlı işlem butonları için olay dinleyicileri
-            const quickActions = document.querySelectorAll('.quick-action');
-            quickActions.forEach(action => {
-                action.addEventListener('click', function() {
-                    const actionType = this.querySelector('h5').textContent;
-                    switch(actionType) {
-                        case 'Yeni Ürün':
-                            window.location.href = 'blocks/depo_yonetimi/actions/urun_ekle.php';
-                            break;
-                        case 'Stok Girişi':
-                            window.location.href = 'blocks/depo_yonetimi/actions/stok_giris.php';
-                            break;
-                        case 'Stok Çıkışı':
-                            window.location.href = 'blocks/depo_yonetimi/actions/stok_cikis.php';
-                            break;
-                        case 'Raporlar':
-                            window.location.href = 'blocks/depo_yonetimi/actions/raporlar.php';
-                            break;
-                    }
-                });
-            });
+            // Sayaçları başlat
+            animateCounter('totalProducts', 1425);
+            animateCounter('monthlyTransactions', 368);
+            animateCounter('lowStock', 7);
+            animateCounter('pendingOrders', 12);
         });
     </script>
 
