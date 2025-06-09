@@ -33,14 +33,63 @@ echo $OUTPUT->header();
     }
 
     .header-container {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(90deg, var(--primary-color) 0%, #1a2a3a 100%);
         color: white;
-        padding: 2rem 0;
-        border-radius: 0 0 20px 20px;
+        padding: 1.5rem 0;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     }
 
+    .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-logo i {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 12px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-title {
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        font-size: 1.8rem;
+    }
+
+    .header-subtitle {
+        margin-top: 5px;
+        font-size: 0.95rem;
+        opacity: 0.8;
+        font-weight: 300;
+        letter-spacing: 0.3px;
+        max-width: 90%;
+    }
+
+    .header-stats {
+        display: flex;
+        margin-top: 15px;
+        gap: 20px;
+    }
+
+    .header-stat {
+        background: rgba(255, 255, 255, 0.07);
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .header-stat i {
+        margin-right: 5px;
+        font-size: 0.8rem;
+    }
     .card {
         border-radius: 10px;
         border: none;
@@ -169,20 +218,30 @@ echo $OUTPUT->header();
     }
 </style>
 
-<!-- Ana Başlık Bölümü -->
-<div class="header-container">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1><i class="fas fa-warehouse me-3"></i>Depo Yönetimi Sistemi</h1>
-                <p class="lead">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
-            </div>
-            <div class="col-md-4 text-end">
-                <!-- Butonlar kaldırıldı -->
+    <!-- Ana Başlık Bölümü -->
+    <div class="header-container">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="header-logo">
+                        <i class="fas fa-warehouse"></i>
+                        <div>
+                            <h1 class="header-title">Depo Yönetimi Sistemi</h1>
+                            <p class="header-subtitle">Stok takibi, envanter yönetimi ve depo operasyonları için entegre platform</p>
+                        </div>
+                    </div>
+                    <div class="header-stats">
+                        <div class="header-stat"><i class="fas fa-box"></i> 1,425 Ürün</div>
+                        <div class="header-stat"><i class="fas fa-exchange-alt"></i> 368 İşlem</div>
+                        <div class="header-stat"><i class="fas fa-warehouse"></i> 4 Depo</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <!-- İstatistik özeti veya başka bir öğe eklenebilir -->
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 <div class="container">
     <!-- Barkod Tarayıcı -->
