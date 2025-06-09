@@ -589,6 +589,335 @@ echo $OUTPUT->header();
         }
     }
 
+
+    /* Yeni Profesyonel Kartlar için CSS */
+    .pro-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+    .pro-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .pro-card-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.4rem;
+        box-shadow: 0 4px 10px rgba(45, 82, 134, 0.3);
+    }
+
+    .header-content h4 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #192e59;
+    }
+
+    .header-content span {
+        font-size: 0.9rem;
+        color: #505c75;
+        display: block;
+        margin-top: 3px;
+    }
+
+    .pro-card-body {
+        padding: 25px;
+    }
+
+    .pro-card-footer {
+        padding: 15px 25px;
+        background-color: #f8fafc;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        font-size: 0.85rem;
+        color: #505c75;
+    }
+
+    /* Doküman Bölümü */
+    .document-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .doc-item {
+        display: flex;
+        padding: 15px;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .doc-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    .doc-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.2rem;
+    }
+
+    .doc-icon i.fa-file-pdf {
+        color: #e74c3c;
+    }
+
+    .doc-icon i.fa-file-alt {
+        color: #3498db;
+    }
+
+    .doc-icon i.fa-file-powerpoint {
+        color: #e67e22;
+    }
+
+    .doc-content h5 {
+        margin: 0 0 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .doc-content p {
+        margin: 0 0 8px;
+        font-size: 0.85rem;
+        color: #505c75;
+        line-height: 1.5;
+    }
+
+    .doc-meta {
+        display: flex;
+        gap: 15px;
+    }
+
+    .doc-meta span {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+        display: flex;
+        align-items: center;
+    }
+
+    .doc-meta span i {
+        margin-right: 5px;
+        font-size: 0.8rem;
+    }
+
+    /* Analitik Metrikler */
+    .kpi-metrics {
+        padding: 5px;
+    }
+
+    .analytics-widget {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        height: 100px;
+    }
+
+    .analytics-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #192e59 0%, #2d5286 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 15px;
+    }
+
+    .analytics-content h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .analytics-content span {
+        font-size: 0.8rem;
+        color: #7f8c8d;
+    }
+
+    .trend {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .trend-up {
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+    }
+
+    .trend-down {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+
+    /* Trend Grafiği */
+    .industry-trends .chart-container {
+        height: 210px;
+    }
+
+    .trend-highlights {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .trend-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .trend-name {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #505c75;
+    }
+
+    .trend-progress {
+        width: 100px;
+    }
+
+    .trend-value {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Entegrasyonlar */
+    .integration-systems {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .integration-category h5 {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .integration-platforms {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .integration-item {
+        display: flex;
+        align-items: center;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 12px;
+        width: calc(50% - 10px);
+        transition: all 0.2s ease;
+    }
+
+    .integration-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    .integration-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 12px;
+        font-size: 1.1rem;
+    }
+
+    .integration-icon.erp {
+        background: linear-gradient(135deg, #4834d4 0%, #686de0 100%);
+    }
+
+    .integration-icon.crm {
+        background: linear-gradient(135deg, #eb3b5a 0%, #fc5c65 100%);
+    }
+
+    .integration-icon.accounting {
+        background: linear-gradient(135deg, #20bf6b 0%, #26de81 100%);
+    }
+
+    .integration-icon.ecommerce {
+        background: linear-gradient(135deg, #0fb9b1 0%, #2bcbba 100%);
+    }
+
+    .integration-icon.marketplace {
+        background: linear-gradient(135deg, #f7b731 0%, #fed330 100%);
+    }
+
+    .integration-details h6 {
+        margin: 0 0 3px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .integration-status {
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .integration-status.connected {
+        color: #20bf6b;
+    }
+
+    .integration-status.pending {
+        color: #f7b731;
+    }
+
+    @media (max-width: 992px) {
+        .integration-item {
+            width: 100%;
+        }
+    }
+
+
 </style>
 
     <!-- Yeni Başlık Bölümü -->
@@ -831,143 +1160,341 @@ echo $OUTPUT->header();
             </div>
         </div>
 
-        <!-- Sağ Taraf - Analiz Kartları -->
-        <div class="col-md-5">
-            <!-- Depo Kullanım İstatistiği -->
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-warehouse me-2"></i>Depo Kullanım İstatistiği</span>
-                    <div>
-                        <span class="badge bg-danger me-2">2 Kritik</span>
-                        <!-- Depo Detayı butonu kaldırıldı -->
+        <!-- Ana İçerik Bölümü -->
+        <div class="container mt-5">
+            <div class="row">
+                <!-- Sol Taraf - Rehber ve Dokümanlar -->
+                <div class="col-lg-6">
+                    <!-- Depo Yönetimi Rehberi -->
+                    <div class="pro-card mb-4">
+                        <div class="pro-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="header-content">
+                                <h4>Depo Yönetimi Rehberi</h4>
+                                <span>Profesyonel operasyon yönetimi teknikleri</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body">
+                            <div class="document-section">
+                                <div class="doc-item">
+                                    <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                                    <div class="doc-content">
+                                        <h5>Stok Optimizasyon Stratejileri</h5>
+                                        <p>Envanter maliyetlerinizi düşürürken stok devir hızını artırmanın yolları</p>
+                                        <div class="doc-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> 15.03.2023</span>
+                                            <span><i class="fas fa-download"></i> 1.2 MB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="doc-item">
+                                    <div class="doc-icon"><i class="fas fa-file-alt"></i></div>
+                                    <div class="doc-content">
+                                        <h5>ABC Analizi Uygulama Kılavuzu</h5>
+                                        <p>Pareto prensibi ile stok önceliklendirme ve kaynakları verimli kullanma teknikleri</p>
+                                        <div class="doc-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> 28.05.2023</span>
+                                            <span><i class="fas fa-download"></i> 875 KB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="doc-item">
+                                    <div class="doc-icon"><i class="fas fa-file-powerpoint"></i></div>
+                                    <div class="doc-content">
+                                        <h5>JIT (Tam Zamanında) Tedarik Modeli</h5>
+                                        <p>Minimum stok ile çalışma ve tedarik zinciri optimizasyonu metodolojisi</p>
+                                        <div class="doc-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> 10.06.2023</span>
+                                            <span><i class="fas fa-download"></i> 2.4 MB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pro-card-footer">
+                            <div class="resource-count"><i class="fas fa-layer-group"></i> Toplam 14 doküman</div>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>A Deposu (Tekstil)</span>
-                            <span class="fw-bold">85%</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>B Deposu (Elektronik)</span>
-                            <span class="fw-bold">62%</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>C Deposu (Gıda)</span>
-                            <span class="fw-bold">41%</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>D Deposu (Mobilya)</span>
-                            <span class="fw-bold">78%</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <!-- Kapasite Planlaması butonu kaldırıldı -->
-                    </div>
-                </div>
-            </div>
 
-            <!-- Kritik Stok Bildirimleri -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-bell me-2"></i>Kritik Stok Bildirimleri</span>
-                    <div>
-                        <span class="badge bg-danger me-2">5 Kritik</span>
-                        <!-- Tümünü Gör butonu kaldırıldı -->
+                    <!-- Veri Analizi ve Raporlama -->
+                    <div class="pro-card mb-4">
+                        <div class="pro-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="header-content">
+                                <h4>Veri Analizi ve Raporlama</h4>
+                                <span>İş zekası araçları ve KPI takip sistemi</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body">
+                            <div class="kpi-metrics">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="analytics-widget">
+                                            <div class="analytics-icon"><i class="fas fa-sync"></i></div>
+                                            <div class="analytics-content">
+                                                <h3>5.8</h3>
+                                                <span>Stok Devir Hızı</span>
+                                            </div>
+                                            <div class="trend trend-up">+0.7</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="analytics-widget">
+                                            <div class="analytics-icon"><i class="fas fa-clock"></i></div>
+                                            <div class="analytics-content">
+                                                <h3>1.2</h3>
+                                                <span>Ortalama Bekleme (gün)</span>
+                                            </div>
+                                            <div class="trend trend-down">-0.3</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="analytics-widget">
+                                            <div class="analytics-icon"><i class="fas fa-bullseye"></i></div>
+                                            <div class="analytics-content">
+                                                <h3>96.8%</h3>
+                                                <span>Sipariş Karşılama Oranı</span>
+                                            </div>
+                                            <div class="trend trend-up">+1.2%</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="analytics-widget">
+                                            <div class="analytics-icon"><i class="fas fa-boxes"></i></div>
+                                            <div class="analytics-content">
+                                                <h3>99.5%</h3>
+                                                <span>Envanter Doğruluğu</span>
+                                            </div>
+                                            <div class="trend trend-up">+0.2%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pro-card-footer">
+                            <div class="resource-count"><i class="fas fa-chart-bar"></i> 7 adet özel rapor mevcut</div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th>Ürün</th>
-                            <th>Durum</th>
-                            <th>Stok</th>
-                            <th>İşlem</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stock-indicator stock-low me-2"></div>
-                                    <span>Beyaz Gömlek L Beden</span>
+
+                <!-- Sağ Taraf - Trendler ve Entegrasyonlar -->
+                <div class="col-lg-6">
+                    <!-- Sektörel Trendler ve İstatistikler -->
+                    <div class="pro-card mb-4">
+                        <div class="pro-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="header-content">
+                                <h4>Sektörel Trendler ve İstatistikler</h4>
+                                <span>Tedarik zinciri ve lojistik sektörü iç görüler</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body">
+                            <div class="industry-trends">
+                                <div class="chart-container">
+                                    <canvas id="trendChart"></canvas>
                                 </div>
-                            </td>
-                            <td><span class="badge bg-danger">Kritik</span></td>
-                            <td><strong>2</strong> / 10</td>
-                            <td><!-- Sipariş butonu kaldırıldı --></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stock-indicator stock-low me-2"></div>
-                                    <span>Spor Ayakkabı 42 No</span>
+                                <div class="trend-highlights mt-3">
+                                    <div class="trend-item">
+                                        <div class="trend-name">Otomatik Depolama Sistemleri</div>
+                                        <div class="trend-progress">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 68%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="trend-value">68%</div>
+                                    </div>
+                                    <div class="trend-item">
+                                        <div class="trend-name">Blockchain Teknolojisi</div>
+                                        <div class="trend-progress">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-info" role="progressbar" style="width: 42%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="trend-value">42%</div>
+                                    </div>
+                                    <div class="trend-item">
+                                        <div class="trend-name">Yapay Zeka & Makine Öğrenmesi</div>
+                                        <div class="trend-progress">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 87%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="trend-value">87%</div>
+                                    </div>
                                 </div>
-                            </td>
-                            <td><span class="badge bg-danger">Kritik</span></td>
-                            <td><strong>3</strong> / 12</td>
-                            <td><!-- Sipariş butonu kaldırıldı --></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stock-indicator stock-medium me-2"></div>
-                                    <span>Deri Cüzdan Kahve</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-footer">
+                            <div class="trend-source">Kaynak: Tedarik Zinciri Yönetimi Derneği (2023 Q2 Raporu)</div>
+                        </div>
+                    </div>
+
+                    <!-- Sistem Entegrasyonları -->
+                    <div class="pro-card">
+                        <div class="pro-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="header-content">
+                                <h4>Sistem Entegrasyonları</h4>
+                                <span>Bağlantılı veri ekosistemi</span>
+                            </div>
+                        </div>
+                        <div class="pro-card-body">
+                            <div class="integration-systems">
+                                <div class="integration-category">
+                                    <h5>Kurumsal Sistemler</h5>
+                                    <div class="integration-platforms">
+                                        <div class="integration-item">
+                                            <div class="integration-icon erp">
+                                                <i class="fas fa-cogs"></i>
+                                            </div>
+                                            <div class="integration-details">
+                                                <h6>ERP</h6>
+                                                <div class="integration-status connected">
+                                                    <i class="fas fa-check-circle"></i> Bağlı
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="integration-item">
+                                            <div class="integration-icon crm">
+                                                <i class="fas fa-user-friends"></i>
+                                            </div>
+                                            <div class="integration-details">
+                                                <h6>CRM</h6>
+                                                <div class="integration-status connected">
+                                                    <i class="fas fa-check-circle"></i> Bağlı
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="integration-item">
+                                            <div class="integration-icon accounting">
+                                                <i class="fas fa-calculator"></i>
+                                            </div>
+                                            <div class="integration-details">
+                                                <h6>Muhasebe</h6>
+                                                <div class="integration-status connected">
+                                                    <i class="fas fa-check-circle"></i> Bağlı
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </td>
-                            <td><span class="badge bg-warning">Uyarı</span></td>
-                            <td><strong>5</strong> / 8</td>
-                            <td><!-- Planla butonu kaldırıldı --></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stock-indicator stock-low me-2"></div>
-                                    <span>Yazlık Elbise M Beden</span>
+                                <div class="integration-category">
+                                    <h5>E-Ticaret & Pazaryerleri</h5>
+                                    <div class="integration-platforms">
+                                        <div class="integration-item">
+                                            <div class="integration-icon ecommerce">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </div>
+                                            <div class="integration-details">
+                                                <h6>E-Ticaret</h6>
+                                                <div class="integration-status connected">
+                                                    <i class="fas fa-check-circle"></i> Bağlı (3)
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="integration-item">
+                                            <div class="integration-icon marketplace">
+                                                <i class="fas fa-store"></i>
+                                            </div>
+                                            <div class="integration-details">
+                                                <h6>Pazaryeri</h6>
+                                                <div class="integration-status connected">
+                                                    <i class="fas fa-check-circle"></i> Bağlı (4)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </td>
-                            <td><span class="badge bg-danger">Kritik</span></td>
-                            <td><strong>1</strong> / 8</td>
-                            <td><!-- Sipariş butonu kaldırıldı --></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="stock-indicator stock-medium me-2"></div>
-                                    <span>Kış Montu XL Beden</span>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-warning">Uyarı</span></td>
-                            <td><strong>4</strong> / 6</td>
-                            <td><!-- Planla butonu kaldırıldı --></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card-footer text-center bg-light">
-                    <small class="text-muted">Son güncelleme: 17.07.2023 - 15:30</small>
+                            </div>
+                        </div>
+                        <div class="pro-card-footer">
+                            <div class="integration-count"><i class="fas fa-plug"></i> 9 aktif entegrasyon bağlantısı</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Ek JavaScript - Trend Grafiği için -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Sektörel Trendler Grafiği
+                const trendCtx = document.getElementById('trendChart').getContext('2d');
+                const trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                        datasets: [
+                            {
+                                label: 'Otomasyon Kullanımı',
+                                data: [24, 38, 45, 56, 65, 78],
+                                borderColor: '#2d5286',
+                                backgroundColor: 'rgba(45, 82, 134, 0.05)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Bulut Tabanlı Sistemler',
+                                data: [15, 29, 40, 59, 68, 82],
+                                borderColor: '#27ae60',
+                                backgroundColor: 'rgba(39, 174, 96, 0.05)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    drawBorder: false,
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
 
         <!-- İlk Kart: Yaklaşan Siparişler -->
         <div class="card mb-4">
