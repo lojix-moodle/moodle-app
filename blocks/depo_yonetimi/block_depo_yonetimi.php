@@ -24,6 +24,8 @@ class block_depo_yonetimi extends block_base {
         return $this->content;
     }
 
+
+
     private function page_add_assets() {
         global $PAGE;
         // Stil dosyasını dahil et
@@ -325,6 +327,48 @@ class="btn btn-info">
                 .stok-hareket-btn:hover .stok-hareket-icon {
                     color: white !important;
                 }
+                
+                /* Kategori Badge Stillemesi */
+    .kategori-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: linear-gradient(to right, var(--primary-light, #eef2ff), var(--light, #f8f9fa));
+        border: 1px solid #e2e8f0;
+        transition: var(--transition);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .kategori-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary, #3e64ff);
+    }
+
+    .kategori-icon {
+        color: var(--primary, #3e64ff);
+        font-size: 0.8rem;
+        margin-right: 5px;
+    }
+
+    .kategori-text {
+        font-weight: 500;
+        color: #334155;
+        font-size: 0.85rem;
+    }
+
+    /* Kategori badge\'ini mobil görünümde de düzgün göster */
+    @media (max-width: 767.98px) {
+        .kategori-badge {
+            padding: 4px 10px;
+        }
+        
+        .kategori-text {
+            font-size: 0.8rem;
+        }
+    }
+                
             </style>
 
             <script>
@@ -534,46 +578,7 @@ class="btn btn-info">
         }
         
         
-        /* Kategori Badge Stillemesi */
-.kategori-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: linear-gradient(to right, var(--primary-light, #eef2ff), var(--light, #f8f9fa));
-    border: 1px solid #e2e8f0;
-    transition: var(--transition);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.kategori-badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary, #3e64ff);
-}
-
-.kategori-icon {
-    color: var(--primary, #3e64ff);
-    font-size: 0.8rem;
-    margin-right: 5px;
-}
-
-.kategori-text {
-    font-weight: 500;
-    color: #334155;
-    font-size: 0.85rem;
-}
-
-
-@media (max-width: 767.98px) {
-            .kategori-badge {
-                padding: 4px 10px;
-    }
-    
-    .kategori-text {
-                font-size: 0.8rem;
-    }
-}
+        
         
         .hover-shadow:hover {
             transform: translateY(-5px);
