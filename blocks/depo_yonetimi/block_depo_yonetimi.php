@@ -538,31 +538,6 @@ class="btn btn-info">
             width: 22px;
             height: 22px;
         }
-         .barcode-display {
-        font-family: "Courier New", monospace;
-        letter-spacing: 1px;
-        position: relative;
-    }
-    
-    .barcode-scan-icon {
-        opacity: 0.7;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .barcode-scan-icon:hover {
-        opacity: 1;
-        transform: scale(1.2);
-    }
-    
-    @media print {
-        .barcode-display {
-            border: 1px solid #ddd !important;
-            padding: 20px !important;
-            text-align: center;
-        }
-    }
-        
         </style>';
 
         return $html;
