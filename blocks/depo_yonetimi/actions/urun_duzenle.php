@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $guncellenecekUrun->depoid = $depoid;
     $guncellenecekUrun->name = $name;
     $guncellenecekUrun->kategoriid = $kategoriid;
+    $guncellenecekUrun->barkod = $barkod; // <-- EKLEYİN
     $guncellenecekUrun->colors = json_encode($colors);
     $guncellenecekUrun->sizes = json_encode($sizes);
     $guncellenecekUrun->varyasyonlar = json_encode($varyasyonlar);
