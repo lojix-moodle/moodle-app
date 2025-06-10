@@ -688,76 +688,22 @@ echo $OUTPUT->header();
 
             // Rafları güncelleme fonksiyonu
             function updateRaflar(selectedRaf) {
-                const bolum = this.value;
+                const bolum = this.value.trim();
                 const editRafSelect = document.getElementById('edit_raf');
                 editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
 
                 if (bolum === "Outdoor / Trekking Ayakkabıları") {
-                    addRafOption(editRafSelect, "A1 Rafı");
-                    addRafOption(editRafSelect, "A2 Rafı");
-                    addRafOption(editRafSelect, "A3 Rafı");
-                    addRafOption(editRafSelect, "A4 Rafı");
-                    addRafOption(editRafSelect, "A5 Rafı");
-                    addRafOption(editRafSelect, "A6 Rafı");
-                    addRafOption(editRafSelect, "A7 Rafı");
-                    addRafOption(editRafSelect, "A8 Rafı");
-                    addRafOption(editRafSelect, "A9 Rafı");
-                    addRafOption(editRafSelect, "A10 Rafı");
-                } else if (bolum === "Botlar & Çizmeler") {
-                    addRafOption(editRafSelect, "B1 Rafı");
-                    addRafOption(editRafSelect, "B2 Rafı");
-                    addRafOption(editRafSelect, "B3 Rafı");
-                    addRafOption(editRafSelect, "B4 Rafı");
-                    addRafOption(editRafSelect, "B5 Rafı");
-                    addRafOption(editRafSelect, "B6 Rafı");
-                    addRafOption(editRafSelect, "B7 Rafı");
-                    addRafOption(editRafSelect, "B8 Rafı");
-                    addRafOption(editRafSelect, "B9 Rafı");
-                    addRafOption(editRafSelect, "B10 Rafı");
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `A${i} Rafı`);
+                } else if (bolum === "Bot & Çizmeler" || bolum === "Botlar & Çizmeler") {
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `B${i} Rafı`);
                 } else if (bolum === "Klasik Ayakkabılar") {
-                    addRafOption(editRafSelect, "C1 Rafı");
-                    addRafOption(editRafSelect, "C2 Rafı");
-                    addRafOption(editRafSelect, "C3 Rafı");
-                    addRafOption(editRafSelect, "C4 Rafı");
-                    addRafOption(editRafSelect, "C5 Rafı");
-                    addRafOption(editRafSelect, "C6 Rafı");
-                    addRafOption(editRafSelect, "C7 Rafı");
-                    addRafOption(editRafSelect, "C8 Rafı");
-                    addRafOption(editRafSelect, "C9 Rafı");
-                    addRafOption(editRafSelect, "C10 Rafı");
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `C${i} Rafı`);
                 } else if (bolum === "Sandalet & Terlik") {
-                    addRafOption(editRafSelect, "D1 Rafı");
-                    addRafOption(editRafSelect, "D2 Rafı");
-                    addRafOption(editRafSelect, "D3 Rafı");
-                    addRafOption(editRafSelect, "D4 Rafı");
-                    addRafOption(editRafSelect, "D5 Rafı");
-                    addRafOption(editRafSelect, "D6 Rafı");
-                    addRafOption(editRafSelect, "D7 Rafı");
-                    addRafOption(editRafSelect, "D8 Rafı");
-                    addRafOption(editRafSelect, "D9 Rafı");
-                    addRafOption(editRafSelect, "D10 Rafı");
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `D${i} Rafı`);
                 } else if (bolum === "Spor Ayakkabılar") {
-                    addRafOption(editRafSelect, "E1 Rafı");
-                    addRafOption(editRafSelect, "E2 Rafı");
-                    addRafOption(editRafSelect, "E3 Rafı");
-                    addRafOption(editRafSelect, "E4 Rafı");
-                    addRafOption(editRafSelect, "E5 Rafı");
-                    addRafOption(editRafSelect, "E6 Rafı");
-                    addRafOption(editRafSelect, "E7 Rafı");
-                    addRafOption(editRafSelect, "E8 Rafı");
-                    addRafOption(editRafSelect, "E9 Rafı");
-                    addRafOption(editRafSelect, "E10 Rafı");
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `E${i} Rafı`);
                 } else if (bolum) {
-                    addRafOption(editRafSelect, "F1 Rafı");
-                    addRafOption(editRafSelect, "F2 Rafı");
-                    addRafOption(editRafSelect, "F3 Rafı");
-                    addRafOption(editRafSelect, "F4 Rafı");
-                    addRafOption(editRafSelect, "F5 Rafı");
-                    addRafOption(editRafSelect, "F6 Rafı");
-                    addRafOption(editRafSelect, "F7 Rafı");
-                    addRafOption(editRafSelect, "F8 Rafı");
-                    addRafOption(editRafSelect, "F9 Rafı");
-                    addRafOption(editRafSelect, "F10 Rafı");
+                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `F${i} Rafı`);
                 }
 
                 // Mevcut rafı seçili yap
