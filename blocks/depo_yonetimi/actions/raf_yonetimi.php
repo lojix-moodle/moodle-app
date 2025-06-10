@@ -570,12 +570,14 @@ echo $OUTPUT->header();
                                         <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-end pe-4">
-                                    <a href="<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_duzenle.php', ['depoid' => $depoid, 'urunid' => $urun->id]); ?>"
-                                       class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3">
-                                        <i class="fa fa-edit me-1"></i> Düzenle
-                                    </a>
-                                </td>
+                                <a href="#"
+                                   class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn"
+                                   data-id="<?php echo $urun->id; ?>"
+                                   data-urunadi="<?php echo htmlspecialchars($urun->name); ?>"
+                                   data-bolum="<?php echo htmlspecialchars($urun->bolum); ?>"
+                                   data-raf="<?php echo htmlspecialchars($urun->raf); ?>">
+                                    <i class="fa fa-edit me-1"></i> Düzenle
+                                </a>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -647,6 +649,34 @@ echo $OUTPUT->header();
     <!-- Bootstrap Modal ve SweetAlert için gerekli JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const urunId = this.dataset.id;
+                const urunAdi = this.dataset.urunadi;
+                const bolum = this.dataset.bolum;
+                const raf = this.dataset.raf;
+
+                document.getElementById('edit_urun_id').value = urunId;
+                document.getElementById('edit_urun_adi').value = urunAdi;
+
+                // Bölüm seçimini ayarla
+                for(let i = 0; i < editBolumSelect.options.length; i++) {
+                    if(editBolumSelect.options[i].text === bolum) {
+                        editBolumSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                // Raf seçeneklerini güncelle ve seçimi ayarla
+                updateRaflar.call(editBolumSelect, raf);
+
+                if (editModal) {
+                    editModal.show();
+                }
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             // Bootstrap Modal nesnesini oluşturma
             let editModal;
