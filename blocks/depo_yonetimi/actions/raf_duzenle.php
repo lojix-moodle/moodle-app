@@ -209,15 +209,13 @@ echo $OUTPUT->header();
                                     <span class="input-group-text bg-white"><i class="bx bx-cabinet text-primary"></i></span>
                                     <select class="form-select" id="edit_bolum" name="bolum">
                                         <option value="">-- Bölüm Seçin --</option>
-                                        <option value="Tişört" <?php echo $urun->bolum === 'Tişört' ? 'selected' : ''; ?>>Tişört</option>
-                                        <option value="Pantolon" <?php echo $urun->bolum === 'Pantolon' ? 'selected' : ''; ?>>Pantolon</option>
-                                        <option value="Ayakkabı" <?php echo $urun->bolum === 'Ayakkabı' ? 'selected' : ''; ?>>Ayakkabı</option>
-                                        <option value="Gömlek" <?php echo $urun->bolum === 'Gömlek' ? 'selected' : ''; ?>>Gömlek</option>
-                                        <option value="Elbise" <?php echo $urun->bolum === 'Elbise' ? 'selected' : ''; ?>>Elbise</option>
-                                        <option value="Ceket" <?php echo $urun->bolum === 'Ceket' ? 'selected' : ''; ?>>Ceket</option>
-                                        <option value="Aksesuar" <?php echo $urun->bolum === 'Aksesuar' ? 'selected' : ''; ?>>Aksesuar</option>
-                                        <option value="Çanta" <?php echo $urun->bolum === 'Çanta' ? 'selected' : ''; ?>>Çanta</option>
-                                        <option value="İç Giyim" <?php echo $urun->bolum === 'İç Giyim' ? 'selected' : ''; ?>>İç Giyim</option>
+                                        <option value=" Spor Ayakkabılar">Spor Ayakkabılar</option>
+                                        <option value="Klasik Ayakkabılar">Klasik Ayakkabılar</option>
+                                        <option value="Günlük Ayakkabılar">Günlük Ayakkabılar</option>
+                                        <option value="Bot & Çizmeler">Bot & Çizmeler</option>
+                                        <option value="Sandalet & Terlik">Sandalet & Terlik</option>
+                                        <option value="Outdoor / Trekking Ayakkabıları">Outdoor / Trekking Ayakkabıları</option>
+
                                     </select>
                                 </div>
                             </div>
