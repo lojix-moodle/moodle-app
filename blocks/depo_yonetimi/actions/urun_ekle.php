@@ -424,15 +424,13 @@ echo $OUTPUT->header();
                                     <label for="bolum" class="form-label">Bölüm</label>
                                     <select class="form-select" id="bolum" name="bolum">
                                         <option value="">-- Bölüm Seçin --</option>
-                                        <option value="Tişört">Tişört</option>
-                                        <option value="Pantolon">Pantolon</option>
-                                        <option value="Ayakkabı">Ayakkabı</option>
-                                        <option value="Gömlek">Gömlek</option>
-                                        <option value="Elbise">Elbise</option>
-                                        <option value="Ceket">Ceket</option>
-                                        <option value="Aksesuar">Aksesuar</option>
-                                        <option value="Çanta">Çanta</option>
-                                        <option value="İç Giyim">İç Giyim</option>
+                                        <option value=" Spor Ayakkabılar">Tişört</option>
+                                        <option value="Klasik Ayakkabılar">Pantolon</option>
+                                        <option value="Günlük Ayakkabılar">Ayakkabı</option>
+                                        <option value="Bot & Çizmeler">Gömlek</option>
+                                        <option value="Sandalet & Terlik">Elbise</option>
+                                        <option value="Outdoor / Trekking Ayakkabıları">Ceket</option>
+
                                     </select>
                                 </div>
 
