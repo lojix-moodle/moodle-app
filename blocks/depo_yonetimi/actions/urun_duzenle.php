@@ -478,7 +478,7 @@ echo $OUTPUT->header();
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-level-down-alt"></i></span>
                                 <input type="number" class="form-control" id="min_stok_seviyesi" name="min_stok_seviyesi"
-                                       value="<?php echo htmlspecialchars($urun->min_stok_seviyesi); ?>"
+                                       value="<?php echo isset($urun->min_stok_seviyesi) ? (int)$urun->min_stok_seviyesi : 0; ?>"
                                        placeholder="Minimum stok miktarı" min="0" required>
                             </div>
                             <div class="invalid-feedback">Lütfen geçerli bir minimum stok seviyesi girin.</div>
