@@ -335,35 +335,42 @@ class="btn btn-info">
 
             <script>
             document.addEventListener("DOMContentLoaded", function() {
-                // Arama fonksiyonu
-                const searchInput = document.getElementById("urunArama");
-                const kategoriSelect = document.getElementById("kategoriFiltre");
-                const urunSatirlar = document.querySelectorAll("table.urun-tablosu tbody tr");
+    const searchInput = document.getElementById("urunArama");
+    const kategoriSelect = document.getElementById("kategoriFiltre");
+    const urunSatirlar = document.querySelectorAll("table.urun-tablosu tbody tr");
 
-                function filterTable() {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    const kategoriFiltre = kategoriSelect.value.toLowerCase();
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const kategoriFiltre = kategoriSelect.value.toLowerCase();
 
-                    urunSatirlar.forEach(satir => {
-                        const urunAdi = satir.querySelector("td:first-child strong").textContent.toLowerCase();
-                        const kategori = satir.getAttribute("data-kategori").toLowerCase();
+        urunSatirlar.forEach(satir => {
+            const urunAdi = satir.querySelector("td:first-child strong").textContent.toLowerCase();
+            // Barkod hücresini seç
+            const barkodCell = satir.querySelector("td:nth-child(2)");
+            let barkod = "";
+            if (barkodCell) {
+                const barkodStrong = barkodCell.querySelector("strong");
+                barkod = barkodStrong ? barkodStrong.textContent.toLowerCase() : "";
+            }
 
-                        const searchMatch = urunAdi.includes(searchTerm);
-                        const kategoriMatch = kategoriFiltre === "" || kategori === kategoriFiltre;
+            // Ürün adı veya barkod arama terimini içeriyorsa eşleşme olur
+            const searchMatch = urunAdi.includes(searchTerm) || barkod.includes(searchTerm);
+            const kategori = satir.getAttribute("data-kategori").toLowerCase();
+            const kategoriMatch = kategoriFiltre === "" || kategori === kategoriFiltre;
 
-                        satir.style.display = (searchMatch && kategoriMatch) ? "" : "none";
-                    });
-                }
+            satir.style.display = (searchMatch && kategoriMatch) ? "" : "none";
+        });
+    }
 
-                searchInput.addEventListener("input", filterTable);
-                kategoriSelect.addEventListener("change", filterTable);
+    searchInput.addEventListener("input", filterTable);
+    kategoriSelect.addEventListener("change", filterTable);
 
-                // Tooltip\'leri başlatmak için
+    // Tooltip\'leri başlatmak için
                 if (typeof bootstrap !== \'undefined\') {
                     const tooltipTriggerList = document.querySelectorAll(\'[data-bs-toggle="tooltip"]\');
                     [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
                 }
-            });
+});
             </script>';
 
         return $html;
