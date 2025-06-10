@@ -945,8 +945,7 @@ echo $OUTPUT->header();
             });
 
             // Barkodu oluştur ve görüntüle
-            generateBtn.addEventListener('click', generateBarcode);
-
+            generateBtn.addEventListener('click', window.generateBarcode);
             // Barkod işlemleri kısmında generateBarcode fonksiyonunu değiştirin
             function generateBarcode() {
                 const barkodValue = barkodInput.value.trim();
@@ -1021,6 +1020,28 @@ echo $OUTPUT->header();
 
     <!-- JsBarcode kütüphanesini doğrudan CDN üzerinden yükleyin -->
     <script>
+        window.generateBarcode = function() {
+            const barkodInput = document.getElementById('barkod');
+            const barcodeSvg = document.getElementById('barcode-svg');
+            const printBarcodeBtn = document.getElementById('print-barcode');
+            const barkodValue = barkodInput.value.trim();
+            if (barkodValue) {
+                try {
+                    barcodeSvg.innerHTML = '';
+                    JsBarcode(barcodeSvg, barkodValue, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                    printBarcodeBtn.disabled = false;
+                } catch (e) {
+                    alert("Geçersiz barkod değeri!");
+                }
+            }
+        };
+
         // Kütüphane yükleme kontrolü
         if (typeof JsBarcode === 'undefined') {
             console.error("JsBarcode kütüphanesi yüklenemedi! Yükleniyor...");
