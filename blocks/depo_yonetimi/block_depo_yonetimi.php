@@ -398,17 +398,18 @@ class="btn btn-info">
 
         if ($yetki === 'admin') {
             $html .= '
-                    <div class="dashboard-actions d-flex gap-2 flex-wrap">
-                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
-                           class="btn btn-primary rounded-pill d-flex align-items-center">
-                            <i class="fas fa-plus me-2"></i> Depo Ekle
-                        </a>
-                        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '"
-                           class="btn btn-outline-primary rounded-pill d-flex align-items-center">
-                            <i class="fas fa-tags me-2"></i> Kategoriler
-                        </a>
-
-                    </div>';
+    <div class="dashboard-actions d-flex gap-2 flex-wrap">
+        ' . ($yetki === 'admin' ? '
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_ekle.php') . '"
+           class="btn btn-primary rounded-pill d-flex align-items-center">
+            <i class="fas fa-plus me-2"></i> Depo Ekle
+        </a>
+        ' : '') . '
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/kategori_list.php') . '"
+           class="btn btn-outline-primary rounded-pill d-flex align-items-center">
+            <i class="fas fa-tags me-2"></i> Kategoriler
+        </a>
+    </div>';
         }
 
         $html .= '
