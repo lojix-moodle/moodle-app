@@ -646,37 +646,55 @@ echo $OUTPUT->header();
 
     <!-- Bootstrap Modal ve SweetAlert için gerekli JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Edit butonlarına tıklama olayını ekle
+            // Düzenle butonlarına tıklama olayını ekle
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const row = this.closest('tr');
                     const urunId = row.dataset.id;
                     const urunAdi = row.querySelector('td.ps-4 div.fw-medium').textContent.trim();
 
-                    // Badge'lerden bölüm ve raf bilgisini al
-                    const bolumCell = row.querySelector('.bolum-cell .badge');
-                    const rafCell = row.querySelector('.raf-cell .badge');
-                    const bolum = bolumCell ? bolumCell.textContent.trim() : '';
-                    const raf = rafCell ? rafCell.textContent.trim() : '';
+                    // Bölüm ve raf bilgilerini al
+                    const bolumCell = row.querySelector('.bolum-cell');
+                    const rafCell = row.querySelector('.raf-cell');
 
+                    // Bölüm bilgisini al (badge içinde veya italic text içinde)
+                    let bolum = '';
+                    if (bolumCell.querySelector('.badge')) {
+                        bolum = bolumCell.querySelector('.badge').textContent.trim().replace('', '').trim();
+                    } else if (bolumCell.querySelector('.text-muted')) {
+                        bolum = '';
+                    }
+
+                    // Raf bilgisini al (badge içinde veya italic text içinde)
+                    let raf = '';
+                    if (rafCell.querySelector('.badge')) {
+                        raf = rafCell.querySelector('.badge').textContent.trim().replace('', '').trim();
+                    } else if (rafCell.querySelector('.text-muted')) {
+                        raf = '';
+                    }
+
+                    // Modal alanlarını doldur
                     document.getElementById('edit_urun_id').value = urunId;
                     document.getElementById('edit_urun_adi').value = urunAdi;
 
                     // Bölüm select'inde mevcut bölümü seçili yap
                     const editBolumSelect = document.getElementById('edit_bolum');
-                    let bolumIndex = 0;
-                    for(let i = 0; i < editBolumSelect.options.length; i++) {
-                        if(editBolumSelect.options[i].text.trim() === bolum) {
-                            bolumIndex = i;
-                            break;
+                    if (bolum) {
+                        for(let i = 0; i < editBolumSelect.options.length; i++) {
+                            if(editBolumSelect.options[i].text === bolum) {
+                                editBolumSelect.selectedIndex = i;
+                                break;
+                            }
                         }
+                    } else {
+                        editBolumSelect.selectedIndex = 0; // "-- Bölüm Seçin --" seçeneği
                     }
-                    editBolumSelect.selectedIndex = bolumIndex;
 
                     // Raf seçeneklerini güncelle ve mevcut rafı seçili yap
-                    updateRaflar.call(editBolumSelect, raf);
+                    updateRaflar(editBolumSelect, raf);
 
                     // Modal'ı aç
                     if (typeof bootstrap !== 'undefined') {
@@ -686,15 +704,18 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Rafları güncelleme fonksiyonu
-            function updateRaflar(selectedRaf) {
-                const bolum = this.value.trim();
+            // Rafları güncelleme fonksiyonu (bölüm değiştiğinde)
+            function updateRaflar(bolumSelect, selectedRaf = '') {
+                const bolum = bolumSelect.value;
                 const editRafSelect = document.getElementById('edit_raf');
                 editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
 
+                if (!bolum) return;
+
+                // Bölüme göre raf seçeneklerini oluştur
                 if (bolum === "Outdoor / Trekking Ayakkabıları") {
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `A${i} Rafı`);
-                } else if (bolum === "Bot & Çizmeler" || bolum === "Botlar & Çizmeler") {
+                } else if (bolum === "Botlar & Çizmeler") {
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `B${i} Rafı`);
                 } else if (bolum === "Klasik Ayakkabılar") {
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `C${i} Rafı`);
@@ -702,14 +723,14 @@ echo $OUTPUT->header();
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `D${i} Rafı`);
                 } else if (bolum === "Spor Ayakkabılar") {
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `E${i} Rafı`);
-                } else if (bolum) {
+                } else {
                     for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `F${i} Rafı`);
                 }
 
-                // Mevcut rafı seçili yap
+                // Eğer önceden seçilmiş bir raf varsa onu seç
                 if (selectedRaf) {
                     for(let i = 0; i < editRafSelect.options.length; i++) {
-                        if(editRafSelect.options[i].text.trim() === selectedRaf) {
+                        if(editRafSelect.options[i].text === selectedRaf) {
                             editRafSelect.selectedIndex = i;
                             break;
                         }
@@ -717,7 +738,12 @@ echo $OUTPUT->header();
                 }
             }
 
-            // Raf select'e seçenek ekleme fonksiyonu
+            // Bölüm değiştiğinde rafları güncelle
+            document.getElementById('edit_bolum').addEventListener('change', function() {
+                updateRaflar(this);
+            });
+
+            // Raf seçeneği ekleme yardımcı fonksiyonu
             function addRafOption(select, value) {
                 const option = document.createElement("option");
                 option.value = value;
@@ -725,13 +751,51 @@ echo $OUTPUT->header();
                 select.appendChild(option);
             }
 
-            // Bölüm değiştiğinde rafları güncelle
-            const editBolumSelect = document.getElementById('edit_bolum');
-            if (editBolumSelect) {
-                editBolumSelect.addEventListener('change', function() {
-                    updateRaflar.call(this, '');
-                });
-            }
+            // Kaydet butonu işlevselliği
+            document.getElementById('save-changes').addEventListener('click', function() {
+                const formData = new FormData(document.getElementById('editForm'));
+                formData.append('action', 'update');
+                formData.append('depoid', <?php echo $depoid; ?>);
+
+                fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı!',
+                                text: data.message,
+                                confirmButtonColor: '#3e64ff'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: data.message || 'Bir hata oluştu.',
+                                confirmButtonColor: '#3e64ff'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Hata:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Bağlantı Hatası!',
+                            text: 'Sunucuyla bağlantı kurulamadı.',
+                            confirmButtonColor: '#3e64ff'
+                        });
+                    });
+            });
+
+            // Tabloyu yenile butonu
+            document.getElementById('refreshTable').addEventListener('click', function() {
+                location.reload();
+            });
         });
     </script>
 
