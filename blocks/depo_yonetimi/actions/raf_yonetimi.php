@@ -462,23 +462,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <!-- Modern Filtreler -->
-    <div class="card border-0 shadow-sm rounded-3 mb-5 animate__animated animate__fadeIn" style="animation-delay: 0.1s">
-        <div class="card-header bg-white p-3 border-bottom-0">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                <span class="p-2 rounded-circle bg-primary-subtle me-2">
-                    <i class="bx bx-filter text-primary"></i>
-                </span>
-                    <h5 class="fw-semibold mb-0">Ürün Filtreleri</h5>
-                    <span class="badge bg-primary rounded-pill ms-2 px-3 py-1" id="filterCount">0</span>
-                </div>
-                <button class="btn btn-sm btn-light rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
-                    <i class="bx bx-chevron-down me-1"></i>
-                    <span class="d-none d-sm-inline">Filtreler</span>
-                </button>
-            </div>
-        </div>
+
 
         <div class="card-body pt-0 pb-3 collapse show" id="filterCollapse">
             <form method="get" id="filterForm" class="row g-3">
