@@ -250,66 +250,86 @@ echo $OUTPUT->header();
 // Inline JavaScript daha güvenli bir şekilde eklemek için Moodle API'sini kullanıyoruz
 // JavaScript kısmında, sayfa yüklenirken mevcut bölüm ve rafı seçili getir:
 $js = "
-    document.addEventListener('DOMContentLoaded', function() {
-        const bolumSelect = document.getElementById('edit_bolum');
-        const rafSelect = document.getElementById('edit_raf');
-        const mevcutBolum = '".addslashes($urun->bolum)."';
-        const mevcutRaf = '".addslashes($urun->raf)."';
+   document.addEventListener('DOMContentLoaded', function() {
+    const bolumSelect = document.getElementById('edit_bolum');
+    const rafSelect = document.getElementById('edit_raf');
+    const mevcutBolum = '".addslashes(trim($urun->bolum))."';
+    const mevcutRaf = '".addslashes(trim($urun->raf))."';
 
-        // Sayfa yüklendiğinde mevcut bölüm ve rafı seçili getir
-        if (mevcutBolum) {
-            bolumSelect.value = mevcutBolum;
-        }
-        updateRaflar(mevcutBolum, mevcutRaf);
+    console.log('Mevcut bölüm:', mevcutBolum);
+    console.log('Mevcut raf:', mevcutRaf);
 
-        bolumSelect.addEventListener('change', function() {
-            updateRaflar(this.value, '');
-        });
-
-        function updateRaflar(bolum, selectedRaf) {
-            rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
-            if (bolum === 'Spor Ayakkabılar') {
-                for (let i = 1; i <= 10; i++) {
-                    addRafOption(rafSelect, 'E' + i + ' Rafı');
-                }
-            } else if (bolum === 'Klasik Ayakkabılar') {
-                for (let i = 1; i <= 5; i++) {
-                    addRafOption(rafSelect, 'K' + i + ' Rafı');
-                }
-            } else if (bolum === 'Günlük Ayakkabılar') {
-                for (let i = 1; i <= 5; i++) {
-                    addRafOption(rafSelect, 'G' + i + ' Rafı');
-                }
-            } else if (bolum === 'Bot & Çizmeler') {
-                for (let i = 1; i <= 5; i++) {
-                    addRafOption(rafSelect, 'B' + i + ' Rafı');
-                }
-            } else if (bolum === 'Sandalet & Terlik') {
-                for (let i = 1; i <= 3; i++) {
-                    addRafOption(rafSelect, 'S' + i + ' Rafı');
-                }
-            } else if (bolum === 'Outdoor / Trekking Ayakkabıları') {
-                for (let i = 1; i <= 3; i++) {
-                    addRafOption(rafSelect, 'O' + i + ' Rafı');
-                }
+    
+    if (mevcutBolum) {
+        // Bölüm seçiminde başında boşluk olabilir, kontrol et
+        for(let i = 0; i < bolumSelect.options.length; i++) {
+            if(bolumSelect.options[i].value.trim() === mevcutBolum.trim()) {
+                bolumSelect.selectedIndex = i;
+                break;
             }
-            // Mevcut rafı seçili yap
-            if (selectedRaf) {
+        }
+    }
+
+ 
+    updateRaflar(mevcutBolum, mevcutRaf);
+
+   
+    bolumSelect.addEventListener('change', function() {
+        updateRaflar(this.value, '');
+    });
+
+    function updateRaflar(bolum, selectedRaf) {
+        rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
+        
+        if (bolum.trim() === 'Spor Ayakkabılar') {
+            for (let i = 1; i <= 10; i++) {
+                addRafOption(rafSelect, 'E' + i + ' Rafı');
+            }
+        } else if (bolum.trim() === 'Klasik Ayakkabılar') {
+            for (let i = 1; i <= 5; i++) {
+                addRafOption(rafSelect, 'K' + i + ' Rafı');
+            }
+        } else if (bolum.trim() === 'Günlük Ayakkabılar') {
+            for (let i = 1; i <= 5; i++) {
+                addRafOption(rafSelect, 'G' + i + ' Rafı');
+            }
+        } else if (bolum.trim() === 'Bot & Çizmeler') {
+            for (let i = 1; i <= 5; i++) {
+                addRafOption(rafSelect, 'B' + i + ' Rafı');
+            }
+        } else if (bolum.trim() === 'Sandalet & Terlik') {
+            for (let i = 1; i <= 3; i++) {
+                addRafOption(rafSelect, 'S' + i + ' Rafı');
+            }
+        } else if (bolum.trim() === 'Outdoor / Trekking Ayakkabıları') {
+            for (let i = 1; i <= 3; i++) {
+                addRafOption(rafSelect, 'O' + i + ' Rafı');
+            }
+        }
+        
+        // Mevcut rafı seçili yap
+        if (selectedRaf && selectedRaf.trim() !== '') {
+            console.log('Raf seçiliyor:', selectedRaf);
+            setTimeout(() => {
                 for(let i = 0; i < rafSelect.options.length; i++) {
-                    if(rafSelect.options[i].value === selectedRaf) {
+                    if(rafSelect.options[i].value.trim() === selectedRaf.trim() || 
+                       rafSelect.options[i].text.trim() === selectedRaf.trim()) {
                         rafSelect.selectedIndex = i;
+                        console.log('Raf seçildi:', rafSelect.options[i].text);
                         break;
                     }
                 }
-            }
+            }, 100);
         }
-        function addRafOption(select, value) {
-            const option = document.createElement('option');
-            option.value = value;
-            option.text = value;
-            select.appendChild(option);
-        }
-    });
+    }
+    
+    function addRafOption(select, value) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.text = value;
+        select.appendChild(option);
+    }
+});
 ";
 $PAGE->requires->js_init_code($js);
 
