@@ -105,6 +105,8 @@ class block_depo_yonetimi extends block_base {
         foreach ($urunler as $urun) {
             $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
             $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
+            $stok_class = ($urun->adet <= $urun->min_stok_seviyesi) ? 'table-danger' : 'table-success';
+
 
             if (!isset($kategorilere_gore_urunler[$kategori_adi])) {
                 $kategorilere_gore_urunler[$kategori_adi] = [];
