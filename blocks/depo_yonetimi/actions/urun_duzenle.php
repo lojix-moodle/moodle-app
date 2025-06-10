@@ -76,12 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
 
-    $varyasyonlar = json_decode($urun->varyasyonlar, true);
-    $colors = json_decode($urun->colors, true);
-    $sizes = json_decode($urun->sizes, true);
-
-
-
     // Mevcut ürünün ID'sini koruyarak güncelleyelim
     $guncellenecekUrun = new stdClass();
     $guncellenecekUrun->id = $urunid; // Mevcut ürünün ID'sini koruyoruz
@@ -595,7 +589,16 @@ echo $OUTPUT->header();
                                     </tbody>
                                 </table>
                             </div>
-
+                            <div id="pageInfo" class="text-center text-muted mt-2"></div>
+                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
+                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-chevron-left me-1"></i> Önceki
+                                </button>
+                                <button id="nextPage" class="btn btn-sm btn-outline-primary">
+                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -614,61 +617,6 @@ echo $OUTPUT->header();
     </div>
 </div>
 
-
-<script>
-    window.existingVariants = <?php echo json_encode($varyasyonlar ?? []); ?>;
-    window.existingColors = <?php echo json_encode($colors ?? []); ?>;
-    window.existingSizes = <?php echo json_encode($sizes ?? []); ?>;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Eğer düzenleme modunda mevcut varyasyonlar varsa tabloyu doldur
-        if (window.existingVariants && Object.keys(window.existingVariants).length > 0) {
-            // Renk ve boyut select'lerini doldur
-            if (window.existingColors) {
-                const colorSelect = document.getElementById('colors');
-                Array.from(colorSelect.options).forEach(opt => {
-                    if (window.existingColors.includes(opt.value)) {
-                        opt.selected = true;
-                    }
-                });
-            }
-            if (window.existingSizes) {
-                const sizeSelect = document.getElementById('sizes');
-                Array.from(sizeSelect.options).forEach(opt => {
-                    if (window.existingSizes.includes(opt.value)) {
-                        opt.selected = true;
-                    }
-                });
-            }
-
-            // Varyasyon tablosunu oluştur
-            const varyasyonBolumu = document.getElementById('varyasyonBolumu');
-            const varyasyonTablo = document.getElementById('varyasyonTablo');
-            varyasyonBolumu.classList.remove('d-none');
-            varyasyonTablo.innerHTML = '';
-
-            Object.entries(window.existingVariants).forEach(([renk, boyutlar]) => {
-                Object.entries(boyutlar).forEach(([boyut, miktar]) => {
-                    const row = document.createElement('tr');
-                    const variantCell = document.createElement('td');
-                    variantCell.textContent = renk + ' / ' + boyut;
-                    const stockCell = document.createElement('td');
-                    const stockInput = document.createElement('input');
-                    stockInput.type = 'number';
-                    stockInput.name = `varyasyon[${renk}][${boyut}]`;
-                    stockInput.className = 'form-control form-control-sm';
-                    stockInput.min = 0;
-                    stockInput.value = miktar;
-                    stockInput.required = true;
-                    stockCell.appendChild(stockInput);
-                    row.appendChild(variantCell);
-                    row.appendChild(stockCell);
-                    varyasyonTablo.appendChild(row);
-                });
-            });
-        }
-    });
-</script>
 <script>
     (function () {
         'use strict';
@@ -779,21 +727,30 @@ echo $OUTPUT->header();
             currentPage = 1;
 
             // Varyasyonları sayfayla göster
-            displayAllVariants(); // Sadece bu fonksiyonu çağırın
-
+            displayVariantsByPage();
 
             // Sayfalama kontrollerini güncelle
             updatePaginationControls();
         });
 
         // Belirli bir sayfadaki varyasyonları göster
-        function displayAllVariants() {
+        function displayVariantsByPage() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, allVariants.length);
+            const pageVariants = allVariants.slice(startIndex, endIndex);
+
+            // Tabloyu temizle
             varyasyonTablo.innerHTML = '';
-            allVariants.forEach(variant => {
+
+            // Seçili sayfadaki varyasyonları ekle
+            pageVariants.forEach(variant => {
                 const row = document.createElement('tr');
+
+                // Renk + Boyut hücresi
                 const variantCell = document.createElement('td');
                 variantCell.className = 'd-flex align-items-center';
 
+                // Renk göstergesi
                 const colorBadge = document.createElement('span');
                 colorBadge.className = 'badge me-2';
                 colorBadge.style.backgroundColor = getColorHex(variant.color.value);
@@ -803,24 +760,70 @@ echo $OUTPUT->header();
                 variantCell.appendChild(colorBadge);
                 variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
 
+                // Stok miktarı hücresi
                 const stockCell = document.createElement('td');
                 const stockInput = document.createElement('input');
                 stockInput.type = 'number';
                 stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
                 stockInput.className = 'form-control form-control-sm';
                 stockInput.min = 0;
-                stockInput.value = 0;
+
+                // Mevcut varyasyon değerini kontrol et ve ata
+                stockInput.value = 0; // Varsayılan değer
+
+                // Mevcut varyasyon verisinden değeri al
+                if (mevcutVaryasyonlar &&
+                    mevcutVaryasyonlar[variant.color.value] &&
+                    mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
+                    stockInput.value = mevcutVaryasyonlar[variant.color.value][variant.size.value];
+                }
+
                 stockInput.required = true;
 
                 stockCell.appendChild(stockInput);
+
                 row.appendChild(variantCell);
                 row.appendChild(stockCell);
                 varyasyonTablo.appendChild(row);
             });
+
+            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${Math.ceil(allVariants.length / itemsPerPage)}`;
         }
 
+        // Sayfalama kontrollerini güncelle
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
 
+            // Önceki sayfa butonunu güncelle
+            prevPageBtn.disabled = currentPage <= 1;
 
+            // Sonraki sayfa butonunu güncelle
+            nextPageBtn.disabled = currentPage >= totalPages;
+
+            // Sayfa bilgisini güncelle
+            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
+        }
+
+        // Önceki sayfa butonuna tıklama
+        document.getElementById('prevPage').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayVariantsByPage();
+                updatePaginationControls();
+            }
+        });
+
+        // Sonraki sayfa butonuna tıklama
+        document.getElementById('nextPage').addEventListener('click', function() {
+            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayVariantsByPage();
+                updatePaginationControls();
+            }
+        });
 
         // Renk kodlarını al
         function getColorHex(colorName) {
