@@ -677,15 +677,22 @@ echo $OUTPUT->header();
 
         // Varyasyon oluşturma
         varyasyonOlusturBtn.addEventListener('click', function() {
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => ({
-                value: opt.value,
-                text: opt.textContent
-            }));
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => ({
-                value: opt.value,
-                text: opt.textContent
-            }));
+            // Seçilen renkler ve boyutları al
+            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
+                return {
+                    value: opt.value,
+                    text: opt.textContent
+                };
+            });
 
+            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
+                return {
+                    value: opt.value,
+                    text: opt.textContent
+                };
+            });
+
+            // Hiçbir seçim yapılmadıysa uyarı ver
             if (selectedColors.length === 0 || selectedSizes.length === 0) {
                 Swal.fire({
                     icon: 'warning',
@@ -697,21 +704,37 @@ echo $OUTPUT->header();
                 return;
             }
 
+            // Varyasyon bölümünü göster
             varyasyonBolumu.classList.remove('d-none');
+            // Uyarı mesajını gizle
             const uyariMesaji = varyasyonBolumu.querySelector('.alert-info');
-            if (uyariMesaji) uyariMesaji.classList.add('d-none');
+            if (uyariMesaji) {
+                uyariMesaji.classList.add('d-none');
+            }
 
+            // Tüm varyasyonları oluştur ve saklayalım
             allVariants = [];
             selectedColors.forEach(color => {
                 selectedSizes.forEach(size => {
-                    allVariants.push({ color, size });
+                    allVariants.push({
+                        color: color,
+                        size: size
+                    });
                 });
             });
 
-            displayAllVariants();
+            // Sayfalama değişkenlerini sıfırla
+            currentPage = 1;
+
+            // Varyasyonları sayfayla göster
+            displayAllVariants(); // Sadece bu fonksiyonu çağırın
+
+
+            // Sayfalama kontrollerini güncelle
+            updatePaginationControls();
         });
 
-// Tüm varyasyonları tek seferde göster
+        // Belirli bir sayfadaki varyasyonları göster
         function displayAllVariants() {
             varyasyonTablo.innerHTML = '';
             allVariants.forEach(variant => {
@@ -737,19 +760,47 @@ echo $OUTPUT->header();
                 stockInput.value = 0;
                 stockInput.required = true;
 
-                // Mevcut varyasyon değeri varsa ata
-                if (mevcutVaryasyonlar &&
-                    mevcutVaryasyonlar[variant.color.value] &&
-                    mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
-                    stockInput.value = mevcutVaryasyonlar[variant.color.value][variant.size.value];
-                }
-
                 stockCell.appendChild(stockInput);
                 row.appendChild(variantCell);
                 row.appendChild(stockCell);
                 varyasyonTablo.appendChild(row);
             });
         }
+
+        // Sayfalama kontrollerini güncelle
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+
+            // Önceki sayfa butonunu güncelle
+            prevPageBtn.disabled = currentPage <= 1;
+
+            // Sonraki sayfa butonunu güncelle
+            nextPageBtn.disabled = currentPage >= totalPages;
+
+            // Sayfa bilgisini güncelle
+            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
+        }
+
+        // Önceki sayfa butonuna tıklama
+        document.getElementById('prevPage').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayVariantsByPage();
+                updatePaginationControls();
+            }
+        });
+
+        // Sonraki sayfa butonuna tıklama
+        document.getElementById('nextPage').addEventListener('click', function() {
+            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayVariantsByPage();
+                updatePaginationControls();
+            }
+        });
 
         // Renk kodlarını al
         function getColorHex(colorName) {
