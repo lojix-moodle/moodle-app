@@ -1042,6 +1042,13 @@ echo $OUTPUT->header();
             }
         };
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-barcode');
+            if (generateBtn) {
+                generateBtn.addEventListener('click', window.generateBarcode);
+            }
+        });
+
         // Kütüphane yükleme kontrolü
         if (typeof JsBarcode === 'undefined') {
             console.error("JsBarcode kütüphanesi yüklenemedi! Yükleniyor...");
