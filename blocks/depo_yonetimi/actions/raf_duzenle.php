@@ -247,49 +247,18 @@ echo $OUTPUT->header();
     </div>
 
 <?php
-
-// Sayfa çıktısı
-echo $OUTPUT->header();
-
-// Mevcut değerleri al
-$current_bolum = !empty($urun->bolum) ? $urun->bolum : '';
-$current_raf = !empty($urun->raf) ? $urun->raf : '';
-?>
-
-    <!-- ... diğer HTML kodları ... -->
-
-    <select class="form-select" id="edit_bolum" name="bolum">
-        <option value="">-- Bölüm Seçin --</option>
-        <option value="Spor Ayakkabılar" <?php echo $current_bolum == 'Spor Ayakkabılar' ? 'selected' : ''; ?>>Spor Ayakkabılar</option>
-        <option value="Klasik Ayakkabılar" <?php echo $current_bolum == 'Klasik Ayakkabılar' ? 'selected' : ''; ?>>Klasik Ayakkabılar</option>
-        <option value="Günlük Ayakkabılar" <?php echo $current_bolum == 'Günlük Ayakkabılar' ? 'selected' : ''; ?>>Günlük Ayakkabılar</option>
-        <option value="Bot & Çizmeler" <?php echo $current_bolum == 'Bot & Çizmeler' ? 'selected' : ''; ?>>Bot & Çizmeler</option>
-        <option value="Sandalet & Terlik" <?php echo $current_bolum == 'Sandalet & Terlik' ? 'selected' : ''; ?>>Sandalet & Terlik</option>
-        <option value="Outdoor / Trekking Ayakkabıları" <?php echo $current_bolum == 'Outdoor / Trekking Ayakkabıları' ? 'selected' : ''; ?>>Outdoor / Trekking Ayakkabıları</option>
-    </select>
-
-    <!-- ... formun devamı ... -->
-
-<?php
-// JavaScript kodunu formdan sonra ekleyin
+// Inline JavaScript daha güvenli bir şekilde eklemek için Moodle API'sini kullanıyoruz
 $js = "
     document.addEventListener('DOMContentLoaded', function() {
         const bolumSelect = document.getElementById('edit_bolum');
         const rafSelect = document.getElementById('edit_raf');
-        
-        // Sayfa yüklendiğinde mevcut bölüm ve raf için seçimleri yap
-        const currentBolum = '" . addslashes($current_bolum) . "';
-        const currentRaf = '" . addslashes($current_raf) . "';
-        
-        if(currentBolum) {
-            // Bölüm seçiliyse, rafları yükle
-            updateRaflar(currentBolum, currentRaf);
-        }
 
+        // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
+updateRaflar(bolumSelect.value, '<?php echo addslashes($urun->raf); ?>');
         // Bölüm değiştiğinde rafları güncelle
-        bolumSelect.addEventListener('change', function() {
-            updateRaflar(this.value, '');
-        });
+       bolumSelect.addEventListener('change', function() {
+    updateRaflar(this.value, ''); // Seçili rafı sıfırla
+});
 
         // Rafları güncelleme fonksiyonu
         function updateRaflar(bolum, selectedRaf) {
@@ -308,7 +277,7 @@ $js = "
                 addRafOption(rafSelect, \"A8 Rafı\");
                 addRafOption(rafSelect, \"A9 Rafı\");
                 addRafOption(rafSelect, \"A10 Rafı\");
-            } else if (bolum === \"Bot & Çizmeler\") {
+            } else if (bolum === \"Botlar & Çizmeler\") {
                 addRafOption(rafSelect, \"B1 Rafı\");
                 addRafOption(rafSelect, \"B2 Rafı\");
                 addRafOption(rafSelect, \"B3 Rafı\");
@@ -339,9 +308,9 @@ $js = "
                 addRafOption(rafSelect, \"D6 Rafı\");
                 addRafOption(rafSelect, \"D7 Rafı\");
                 addRafOption(rafSelect, \"D8 Rafı\");
-                addRafOption(rafSelect, \"D9 Rafı\");
+                addRafOption(rafSelect, \"D9 Rafı\");a
                 addRafOption(rafSelect, \"D10 Rafı\");
-            } else if (bolum === \"Spor Ayakkabılar\") {
+            }else if (bolum === \"Spor Ayakkabılar\") {
                 addRafOption(rafSelect, \"E1 Rafı\");
                 addRafOption(rafSelect, \"E2 Rafı\");
                 addRafOption(rafSelect, \"E3 Rafı\");
@@ -350,16 +319,17 @@ $js = "
                 addRafOption(rafSelect, \"E6 Rafı\");
                 addRafOption(rafSelect, \"E7 Rafı\");
                 addRafOption(rafSelect, \"E8 Rafı\");
-                addRafOption(rafSelect, \"E9 Rafı\");
+                addRafOption(rafSelect, \"E9 Rafı\");a
                 addRafOption(rafSelect, \"E10 Rafı\");
-            } else if (bolum) {
+            } 
+            else if (bolum) {
                 // Diğer tüm bölümler için
                 addRafOption(rafSelect, \"F1 Rafı\");
                 addRafOption(rafSelect, \"F2 Rafı\");
                 addRafOption(rafSelect, \"F3 Rafı\");
                 addRafOption(rafSelect, \"F4 Rafı\");
                 addRafOption(rafSelect, \"F5 Rafı\");
-                addRafOption(rafSelect, \"F6 Rafı\");
+                addRafOption(rafSelect, \"F6 Rafı\");a
                 addRafOption(rafSelect, \"F7 Rafı\");
                 addRafOption(rafSelect, \"F8 Rafı\");
                 addRafOption(rafSelect, \"F9 Rafı\");
@@ -389,3 +359,4 @@ $js = "
 $PAGE->requires->js_init_code($js);
 
 echo $OUTPUT->footer();
+?>
