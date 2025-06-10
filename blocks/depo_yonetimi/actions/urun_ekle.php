@@ -945,8 +945,34 @@ echo $OUTPUT->header();
             });
 
             // Barkodu oluştur ve görüntüle
-            generateBtn.addEventListener('click', window.generateBarcode);
-            // Barkod işlemleri kısmında generateBarcode fonksiyonunu değiştirin
+            generateBtn.addEventListener('click', function() {
+                const barkodValue = barkodInput.value.trim();
+                if (!barkodValue) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Barkod Girilmedi',
+                        text: 'Lütfen önce bir barkod değeri girin.',
+                        confirmButtonColor: '#3e64ff'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Barkod Önizleme',
+                    html: '<svg id="swal-barcode-svg"></svg>',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        JsBarcode("#swal-barcode-svg", barkodValue, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 100,
+                            displayValue: true
+                        });
+                    }
+                });
+            });            // Barkod işlemleri kısmında generateBarcode fonksiyonunu değiştirin
             function generateBarcode() {
                 const barkodValue = barkodInput.value.trim();
                 if (barkodValue) {
