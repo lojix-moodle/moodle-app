@@ -633,9 +633,7 @@ echo $OUTPUT->header();
         const varyasyonBolumu = document.getElementById('varyasyonBolumu');
         const varyasyonTablo = document.getElementById('varyasyonTablo');
 
-        // Sayfalama değişkenleri
-        let currentPage = 1;
-        const itemsPerPage = 10;
+
         let allVariants = [];
 
         // Mevcut varyasyonları JSON'dan al
@@ -672,6 +670,7 @@ echo $OUTPUT->header();
                 // Varyasyonları göster
                 displayVariantsByPage();
                 updatePaginationControls();
+                displayAllVariants();
             }
         });
 
@@ -708,9 +707,8 @@ echo $OUTPUT->header();
             varyasyonBolumu.classList.remove('d-none');
             // Uyarı mesajını gizle
             const uyariMesaji = varyasyonBolumu.querySelector('.alert-info');
-            if (uyariMesaji) {
-                uyariMesaji.classList.add('d-none');
-            }
+            if (uyariMesaji) uyariMesaji.classList.add('d-none');
+            displayAllVariants();
 
             // Tüm varyasyonları oluştur ve saklayalım
             allVariants = [];
@@ -723,27 +721,17 @@ echo $OUTPUT->header();
                 });
             });
 
-            // Sayfalama değişkenlerini sıfırla
-            currentPage = 1;
 
-            // Varyasyonları sayfayla göster
-            displayVariantsByPage();
 
-            // Sayfalama kontrollerini güncelle
-            updatePaginationControls();
         });
 
-        // Belirli bir sayfadaki varyasyonları göster
-        function displayVariantsByPage() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, allVariants.length);
-            const pageVariants = allVariants.slice(startIndex, endIndex);
 
+        function displayAllVariants() {
             // Tabloyu temizle
             varyasyonTablo.innerHTML = '';
 
-            // Seçili sayfadaki varyasyonları ekle
-            pageVariants.forEach(variant => {
+            // Tüm varyasyonları ekle
+            allVariants.forEach(variant => {
                 const row = document.createElement('tr');
 
                 // Renk + Boyut hücresi
@@ -768,16 +756,13 @@ echo $OUTPUT->header();
                 stockInput.className = 'form-control form-control-sm';
                 stockInput.min = 0;
 
-                // Mevcut varyasyon değerini kontrol et ve ata
-                stockInput.value = 0; // Varsayılan değer
-
                 // Mevcut varyasyon verisinden değeri al
+                stockInput.value = 0;
                 if (mevcutVaryasyonlar &&
                     mevcutVaryasyonlar[variant.color.value] &&
                     mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
                     stockInput.value = mevcutVaryasyonlar[variant.color.value][variant.size.value];
                 }
-
                 stockInput.required = true;
 
                 stockCell.appendChild(stockInput);
@@ -786,44 +771,7 @@ echo $OUTPUT->header();
                 row.appendChild(stockCell);
                 varyasyonTablo.appendChild(row);
             });
-
-            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${Math.ceil(allVariants.length / itemsPerPage)}`;
         }
-
-        // Sayfalama kontrollerini güncelle
-        function updatePaginationControls() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-
-            // Önceki sayfa butonunu güncelle
-            prevPageBtn.disabled = currentPage <= 1;
-
-            // Sonraki sayfa butonunu güncelle
-            nextPageBtn.disabled = currentPage >= totalPages;
-
-            // Sayfa bilgisini güncelle
-            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
-        }
-
-        // Önceki sayfa butonuna tıklama
-        document.getElementById('prevPage').addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
-
-        // Sonraki sayfa butonuna tıklama
-        document.getElementById('nextPage').addEventListener('click', function() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
 
         // Renk kodlarını al
         function getColorHex(colorName) {
