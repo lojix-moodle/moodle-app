@@ -702,6 +702,54 @@ echo $OUTPUT->header();
                         editModal.show();
                     }
                 });
+
+
+                // Rafları güncelleme fonksiyonu
+                function updateRaflar(selectedRaf) {
+                    const bolum = this.value;
+                    const editRafSelect = document.getElementById('edit_raf');
+                    editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+                    // Bölüme göre rafları ekle (örnek)
+                    if (bolum === "Tişört" || bolum === "Gömlek") {
+                        addRafOption(editRafSelect, "A1 Rafı");
+                        addRafOption(editRafSelect, "A2 Rafı");
+                        addRafOption(editRafSelect, "A3 Rafı");
+                    } else if (bolum === "Pantolon") {
+                        addRafOption(editRafSelect, "B1 Rafı");
+                        addRafOption(editRafSelect, "B2 Rafı");
+                        addRafOption(editRafSelect, "B3 Rafı");
+                    } else if (bolum === "Ayakkabı") {
+                        addRafOption(editRafSelect, "C1 Rafı");
+                        addRafOption(editRafSelect, "C2 Rafı");
+                        addRafOption(editRafSelect, "C3 Rafı");
+                        addRafOption(editRafSelect, "C4 Rafı");
+                    } else if (bolum === "Aksesuar" || bolum === "Çanta") {
+                        addRafOption(editRafSelect, "D1 Rafı");
+                        addRafOption(editRafSelect, "D2 Rafı");
+                    } else if (bolum) {
+                        addRafOption(editRafSelect, "E1 Rafı");
+                        addRafOption(editRafSelect, "E2 Rafı");
+                        addRafOption(editRafSelect, "E3 Rafı");
+                    }
+
+                    // Mevcut rafı seçili yap
+                    if (selectedRaf) {
+                        for(let i = 0; i < editRafSelect.options.length; i++) {
+                            if(editRafSelect.options[i].text === selectedRaf) {
+                                editRafSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                function addRafOption(select, value) {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.text = value;
+                    select.appendChild(option);
+                }
             });
 
             // Bölüm değiştiğinde rafları güncelle
