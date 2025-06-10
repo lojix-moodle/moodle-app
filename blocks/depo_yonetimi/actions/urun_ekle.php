@@ -600,6 +600,21 @@ echo $OUTPUT->header();
         </div>
     </div>
 
+<?php
+$urunler = $DB->get_records('block_depo_yonetimi_urunler', ['depoid' => $depoid]);
+
+foreach ($urunler as $urun): ?>
+    <?php
+    $stok_class = ($urun->adet <= $urun->min_stok_seviyesi) ? 'table-danger' : 'table-success';
+    ?>
+    <tr class="<?php echo $stok_class; ?>">
+        <td><?php echo htmlspecialchars($urun->name); ?></td>
+        <td><?php echo $urun->adet; ?></td>
+        <td><?php echo $urun->min_stok_seviyesi; ?></td>
+        <!-- Diğer sütunlar -->
+    </tr>
+<?php endforeach; ?>
+
     <script>
         (function () {
             'use strict';
