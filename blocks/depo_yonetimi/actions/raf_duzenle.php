@@ -217,10 +217,6 @@ echo $OUTPUT->header();
                                         <option value="Outdoor / Trekking Ayakkabıları">Outdoor / Trekking Ayakkabıları</option>
 
                                     </select>
-                                    <select class="form-select" id="edit_raf" name="raf">
-                                        <option value="">-- Raf Seçin --</option>
-                                        <!-- Raflar JS ile doldurulacak ve mevcut raf seçili yapılacak -->
-                                    </select>
                                 </div>
                             </div>
 
@@ -254,66 +250,66 @@ echo $OUTPUT->header();
 // Inline JavaScript daha güvenli bir şekilde eklemek için Moodle API'sini kullanıyoruz
 // JavaScript kısmında, sayfa yüklenirken mevcut bölüm ve rafı seçili getir:
 $js = "
-document.addEventListener('DOMContentLoaded', function() {
-    const bolumSelect = document.getElementById('edit_bolum');
-    const rafSelect = document.getElementById('edit_raf');
-    const mevcutBolum = '".addslashes(trim($urun->bolum))."';
-    const mevcutRaf = '".addslashes(trim($urun->raf))."';
+    document.addEventListener('DOMContentLoaded', function() {
+        const bolumSelect = document.getElementById('edit_bolum');
+        const rafSelect = document.getElementById('edit_raf');
+        const mevcutBolum = '".addslashes($urun->bolum)."';
+        const mevcutRaf = '".addslashes($urun->raf)."';
 
-    // Sayfa yüklendiğinde mevcut bölüm ve rafı seçili getir
-    if (mevcutBolum) {
-        bolumSelect.value = mevcutBolum;
-    }
-    updateRaflar(mevcutBolum, mevcutRaf);
-
-    bolumSelect.addEventListener('change', function() {
-        updateRaflar(this.value, '');
-    });
-
-    function updateRaflar(bolum, selectedRaf) {
-        rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
-        if (bolum === 'Spor Ayakkabılar') {
-            for (let i = 1; i <= 10; i++) {
-                addRafOption(rafSelect, 'E' + i + ' Rafı');
-            }
-        } else if (bolum === 'Klasik Ayakkabılar') {
-            for (let i = 1; i <= 5; i++) {
-                addRafOption(rafSelect, 'K' + i + ' Rafı');
-            }
-        } else if (bolum === 'Günlük Ayakkabılar') {
-            for (let i = 1; i <= 5; i++) {
-                addRafOption(rafSelect, 'G' + i + ' Rafı');
-            }
-        } else if (bolum === 'Bot & Çizmeler') {
-            for (let i = 1; i <= 5; i++) {
-                addRafOption(rafSelect, 'B' + i + ' Rafı');
-            }
-        } else if (bolum === 'Sandalet & Terlik') {
-            for (let i = 1; i <= 3; i++) {
-                addRafOption(rafSelect, 'S' + i + ' Rafı');
-            }
-        } else if (bolum === 'Outdoor / Trekking Ayakkabıları') {
-            for (let i = 1; i <= 3; i++) {
-                addRafOption(rafSelect, 'O' + i + ' Rafı');
-            }
+        // Sayfa yüklendiğinde mevcut bölüm ve rafı seçili getir
+        if (mevcutBolum) {
+            bolumSelect.value = mevcutBolum;
         }
-        // Mevcut rafı seçili yap
-        if (selectedRaf) {
-            for(let i = 0; i < rafSelect.options.length; i++) {
-                if(rafSelect.options[i].value === selectedRaf) {
-                    rafSelect.selectedIndex = i;
-                    break;
+        updateRaflar(mevcutBolum, mevcutRaf);
+
+        bolumSelect.addEventListener('change', function() {
+            updateRaflar(this.value, '');
+        });
+
+        function updateRaflar(bolum, selectedRaf) {
+            rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
+            if (bolum === 'Spor Ayakkabılar') {
+                for (let i = 1; i <= 10; i++) {
+                    addRafOption(rafSelect, 'E' + i + ' Rafı');
+                }
+            } else if (bolum === 'Klasik Ayakkabılar') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'K' + i + ' Rafı');
+                }
+            } else if (bolum === 'Günlük Ayakkabılar') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'G' + i + ' Rafı');
+                }
+            } else if (bolum === 'Bot & Çizmeler') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'B' + i + ' Rafı');
+                }
+            } else if (bolum === 'Sandalet & Terlik') {
+                for (let i = 1; i <= 3; i++) {
+                    addRafOption(rafSelect, 'S' + i + ' Rafı');
+                }
+            } else if (bolum === 'Outdoor / Trekking Ayakkabıları') {
+                for (let i = 1; i <= 3; i++) {
+                    addRafOption(rafSelect, 'O' + i + ' Rafı');
+                }
+            }
+            // Mevcut rafı seçili yap
+            if (selectedRaf) {
+                for(let i = 0; i < rafSelect.options.length; i++) {
+                    if(rafSelect.options[i].value === selectedRaf) {
+                        rafSelect.selectedIndex = i;
+                        break;
+                    }
                 }
             }
         }
-    }
-    function addRafOption(select, value) {
-        const option = document.createElement('option');
-        option.value = value;
-        option.text = value;
-        select.appendChild(option);
-    }
-});
+        function addRafOption(select, value) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.text = value;
+            select.appendChild(option);
+        }
+    });
 ";
 $PAGE->requires->js_init_code($js);
 
