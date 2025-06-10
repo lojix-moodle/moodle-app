@@ -248,95 +248,29 @@ echo $OUTPUT->header();
 
 <?php
 // Inline JavaScript daha güvenli bir şekilde eklemek için Moodle API'sini kullanıyoruz
+// JavaScript kısmında, sayfa yüklenirken mevcut bölüm ve rafı seçili getir:
 $js = "
     document.addEventListener('DOMContentLoaded', function() {
         const bolumSelect = document.getElementById('edit_bolum');
         const rafSelect = document.getElementById('edit_raf');
+        // Mevcut değerleri PHP'den al
+        const mevcutBolum = '".addslashes($urun->bolum)."';
+        const mevcutRaf = '".addslashes($urun->raf)."';
 
-        // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
-updateRaflar(bolumSelect.value, '<?php echo addslashes($urun->raf); ?>');
-        // Bölüm değiştiğinde rafları güncelle
-       bolumSelect.addEventListener('change', function() {
-    updateRaflar(this.value, ''); // Seçili rafı sıfırla
-});
+        // Sayfa yüklendiğinde mevcut bölüm ve rafı seçili getir
+        if (mevcutBolum) {
+            bolumSelect.value = mevcutBolum;
+        }
+        updateRaflar(bolumSelect.value, mevcutRaf);
 
-        // Rafları güncelleme fonksiyonu
+        bolumSelect.addEventListener('change', function() {
+            updateRaflar(this.value, '');
+        });
+
         function updateRaflar(bolum, selectedRaf) {
-            // Raf seçimini temizle
             rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
-
-            // Bölüme göre rafları ayarla
-            if (bolum === \"Outdoor / Trekking Ayakkabıları\") {
-                addRafOption(rafSelect, \"A1 Rafı\");
-                addRafOption(rafSelect, \"A2 Rafı\");
-                addRafOption(rafSelect, \"A3 Rafı\");
-                addRafOption(rafSelect, \"A4 Rafı\");
-                addRafOption(rafSelect, \"A5 Rafı\");
-                addRafOption(rafSelect, \"A6 Rafı\");
-                addRafOption(rafSelect, \"A7 Rafı\");
-                addRafOption(rafSelect, \"A8 Rafı\");
-                addRafOption(rafSelect, \"A9 Rafı\");
-                addRafOption(rafSelect, \"A10 Rafı\");
-            } else if (bolum === \"Botlar & Çizmeler\") {
-                addRafOption(rafSelect, \"B1 Rafı\");
-                addRafOption(rafSelect, \"B2 Rafı\");
-                addRafOption(rafSelect, \"B3 Rafı\");
-                addRafOption(rafSelect, \"B4 Rafı\");
-                addRafOption(rafSelect, \"B5 Rafı\");
-                addRafOption(rafSelect, \"B6 Rafı\");
-                addRafOption(rafSelect, \"B7 Rafı\");
-                addRafOption(rafSelect, \"B8 Rafı\");
-                addRafOption(rafSelect, \"B9 Rafı\");
-                addRafOption(rafSelect, \"B10 Rafı\");
-            } else if (bolum === \"Klasik Ayakkabılar\") {
-                addRafOption(rafSelect, \"C1 Rafı\");
-                addRafOption(rafSelect, \"C2 Rafı\");
-                addRafOption(rafSelect, \"C3 Rafı\");
-                addRafOption(rafSelect, \"C4 Rafı\");
-                addRafOption(rafSelect, \"C5 Rafı\");
-                addRafOption(rafSelect, \"C6 Rafı\");
-                addRafOption(rafSelect, \"C7 Rafı\");
-                addRafOption(rafSelect, \"C8 Rafı\");
-                addRafOption(rafSelect, \"C9 Rafı\");
-                addRafOption(rafSelect, \"C10 Rafı\");
-            } else if (bolum === \"Sandalet & Terlik\") {
-                addRafOption(rafSelect, \"D1 Rafı\");
-                addRafOption(rafSelect, \"D2 Rafı\");
-                addRafOption(rafSelect, \"D3 Rafı\");
-                addRafOption(rafSelect, \"D4 Rafı\");
-                addRafOption(rafSelect, \"D5 Rafı\");
-                addRafOption(rafSelect, \"D6 Rafı\");
-                addRafOption(rafSelect, \"D7 Rafı\");
-                addRafOption(rafSelect, \"D8 Rafı\");
-                addRafOption(rafSelect, \"D9 Rafı\");a
-                addRafOption(rafSelect, \"D10 Rafı\");
-            }else if (bolum === \"Spor Ayakkabılar\") {
-                addRafOption(rafSelect, \"E1 Rafı\");
-                addRafOption(rafSelect, \"E2 Rafı\");
-                addRafOption(rafSelect, \"E3 Rafı\");
-                addRafOption(rafSelect, \"E4 Rafı\");
-                addRafOption(rafSelect, \"E5 Rafı\");
-                addRafOption(rafSelect, \"E6 Rafı\");
-                addRafOption(rafSelect, \"E7 Rafı\");
-                addRafOption(rafSelect, \"E8 Rafı\");
-                addRafOption(rafSelect, \"E9 Rafı\");a
-                addRafOption(rafSelect, \"E10 Rafı\");
-            } 
-            else if (bolum) {
-                // Diğer tüm bölümler için
-                addRafOption(rafSelect, \"F1 Rafı\");
-                addRafOption(rafSelect, \"F2 Rafı\");
-                addRafOption(rafSelect, \"F3 Rafı\");
-                addRafOption(rafSelect, \"F4 Rafı\");
-                addRafOption(rafSelect, \"F5 Rafı\");
-                addRafOption(rafSelect, \"F6 Rafı\");a
-                addRafOption(rafSelect, \"F7 Rafı\");
-                addRafOption(rafSelect, \"F8 Rafı\");
-                addRafOption(rafSelect, \"F9 Rafı\");
-                addRafOption(rafSelect, \"F10 Rafı\");
-            }
-
-            // Eğer önceden seçilmiş bir raf varsa onu seç
+            // ... (raf doldurma kodunuz aynı kalacak)
+            // Seçili rafı işaretle
             if (selectedRaf) {
                 for(let i = 0; i < rafSelect.options.length; i++) {
                     if(rafSelect.options[i].value === selectedRaf) {
@@ -346,8 +280,6 @@ updateRaflar(bolumSelect.value, '<?php echo addslashes($urun->raf); ?>');
                 }
             }
         }
-
-        // Raf seçeneği ekleme yardımcı fonksiyonu
         function addRafOption(select, value) {
             const option = document.createElement(\"option\");
             option.value = value;
