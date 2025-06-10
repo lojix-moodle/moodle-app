@@ -254,8 +254,7 @@ $js = "
         const bolumSelect = document.getElementById('edit_bolum');
         const rafSelect = document.getElementById('edit_raf');
         const mevcutBolum = '".addslashes($urun->bolum)."';
-        const mevcutRaf = '".addslashes($urun->raf)."';
-
+        const mevcutRaf = '<?php echo addslashes(trim($urun->raf)); ?>';
         // Sayfa yüklendiğinde mevcut bölüm ve rafı seçili getir
         if (mevcutBolum) {
             bolumSelect.value = mevcutBolum;
