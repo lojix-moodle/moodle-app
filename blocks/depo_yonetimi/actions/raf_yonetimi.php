@@ -74,8 +74,9 @@ if (!empty($filter_kategori)) {
 }
 
 if (!empty($search)) {
-    $sql_where .= " AND (" . $DB->sql_like('name', ':search', false) . " OR " . $DB->sql_like('barkod', ':search', false) . ")";
-    $params['search'] = '%' . $search . '%';
+    $sql_where .= " AND (" . $DB->sql_like('name', ':search1', false) . " OR " . $DB->sql_like('barkod', ':search2', false) . ")";
+    $params['search1'] = '%' . $search . '%';
+    $params['search2'] = '%' . $search . '%';
 }
 
 // Ürünleri getirrr
