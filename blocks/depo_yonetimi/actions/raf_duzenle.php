@@ -253,7 +253,6 @@ $js = "
     document.addEventListener('DOMContentLoaded', function() {
         const bolumSelect = document.getElementById('edit_bolum');
         const rafSelect = document.getElementById('edit_raf');
-        // Mevcut değerleri PHP'den al
         const mevcutBolum = '".addslashes($urun->bolum)."';
         const mevcutRaf = '".addslashes($urun->raf)."';
 
@@ -261,7 +260,7 @@ $js = "
         if (mevcutBolum) {
             bolumSelect.value = mevcutBolum;
         }
-        updateRaflar(bolumSelect.value, mevcutRaf);
+        updateRaflar(mevcutBolum, mevcutRaf);
 
         bolumSelect.addEventListener('change', function() {
             updateRaflar(this.value, '');
@@ -269,8 +268,32 @@ $js = "
 
         function updateRaflar(bolum, selectedRaf) {
             rafSelect.innerHTML = '<option value=\"\">-- Raf Seçin --</option>';
-            // ... (raf doldurma kodunuz aynı kalacak)
-            // Seçili rafı işaretle
+            if (bolum === 'Spor Ayakkabılar') {
+                for (let i = 1; i <= 10; i++) {
+                    addRafOption(rafSelect, 'E' + i + ' Rafı');
+                }
+            } else if (bolum === 'Klasik Ayakkabılar') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'K' + i + ' Rafı');
+                }
+            } else if (bolum === 'Günlük Ayakkabılar') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'G' + i + ' Rafı');
+                }
+            } else if (bolum === 'Bot & Çizmeler') {
+                for (let i = 1; i <= 5; i++) {
+                    addRafOption(rafSelect, 'B' + i + ' Rafı');
+                }
+            } else if (bolum === 'Sandalet & Terlik') {
+                for (let i = 1; i <= 3; i++) {
+                    addRafOption(rafSelect, 'S' + i + ' Rafı');
+                }
+            } else if (bolum === 'Outdoor / Trekking Ayakkabıları') {
+                for (let i = 1; i <= 3; i++) {
+                    addRafOption(rafSelect, 'O' + i + ' Rafı');
+                }
+            }
+            // Mevcut rafı seçili yap
             if (selectedRaf) {
                 for(let i = 0; i < rafSelect.options.length; i++) {
                     if(rafSelect.options[i].value === selectedRaf) {
@@ -281,7 +304,7 @@ $js = "
             }
         }
         function addRafOption(select, value) {
-            const option = document.createElement(\"option\");
+            const option = document.createElement('option');
             option.value = value;
             option.text = value;
             select.appendChild(option);
