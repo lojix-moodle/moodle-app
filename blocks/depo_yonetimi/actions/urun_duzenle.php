@@ -549,9 +549,10 @@ echo $OUTPUT->header();
                         </div>
                     </div>
 
-                    <!-- Sağ Sütun - Sadece Varyasyon Yönetimi -->
+                    <!-- Sağ Sütun - Varyasyonlar -->
                     <div class="col-lg-6 ps-lg-4">
                         <h4 class="section-title">Varyasyon Yönetimi</h4>
+
                         <div class="alert alert-primary d-flex align-items-center mb-4">
                             <i class="fas fa-info-circle fs-5 me-3"></i>
                             <div>
@@ -559,6 +560,7 @@ echo $OUTPUT->header();
                                 Varyasyonlar, aynı ürünün farklı versiyonlarını yönetmenize olanak tanır.
                             </div>
                         </div>
+
                         <div class="card shadow-sm mb-4">
                             <div class="card-body">
                                 <div class="d-grid mb-3">
@@ -566,16 +568,19 @@ echo $OUTPUT->header();
                                         <i class="fas fa-cubes me-2"></i>Varyasyon Oluştur
                                     </button>
                                 </div>
+
                                 <div class="text-center text-muted">
                                     <small>Önce renk ve boyut seçimi yapmanız gerekiyor</small>
                                 </div>
                             </div>
                         </div>
-                        <div id="varyasyonBolumu" class="mt-4 <?php echo (!empty($mevcut_varyasyonlar)) ? '' : 'd-none'; ?>">
-                            <div class="alert alert-info d-flex <?php echo (!empty($mevcut_varyasyonlar)) ? 'd-none' : ''; ?>">
+
+                        <div id="varyasyonBolumu" class="mt-4 d-none">
+                            <div class="alert alert-info d-flex">
                                 <i class="fas fa-info-circle me-3 fs-5"></i>
                                 <div>Lütfen önce renk ve boyut seçimi yapıp "Varyasyon Oluştur" butonuna tıklayın</div>
                             </div>
+
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
@@ -589,17 +594,7 @@ echo $OUTPUT->header();
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="pageInfo" class="text-center text-muted mt-2"></div>
-                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
-                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-chevron-left me-1"></i> Önceki
-                                </button>
-                                <button id="nextPage" class="btn btn-sm btn-outline-primary">
-                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>
-                                </button>
-                            </div>
                         </div>
-                    </div>
                 </div>
 
                 <!-- Form Butonları -->
