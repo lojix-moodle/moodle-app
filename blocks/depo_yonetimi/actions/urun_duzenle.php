@@ -628,7 +628,7 @@ echo $OUTPUT->header();
         let allVariants = [];
 
         // Mevcut varyasyonları JSON'dan al
-        const mevcutVaryasyonlar = <?php echo !empty($urun->varyasyonlar) ? $urun->varyasyonlar : '{}'; ?>;
+        const mevcutVaryasyonlar = <?php echo !empty($urun->varyasyonlar) ? json_encode(json_decode($urun->varyasyonlar, true)) : '{}'; ?>;
 
         // Sayfa yüklendiğinde mevcut varyasyonları göster
         document.addEventListener('DOMContentLoaded', function() {
@@ -713,39 +713,31 @@ echo $OUTPUT->header();
 
         // Tüm varyasyonları göster (sayfalama olmadan)
         function displayVariantsByPage() {
-            // Tabloyu temizle
             varyasyonTablo.innerHTML = '';
-
-            // Tüm varyasyonları göster
             allVariants.forEach(variant => {
                 const row = document.createElement('tr');
-
-                // Renk + Boyut hücresi
                 const variantCell = document.createElement('td');
                 variantCell.className = 'd-flex align-items-center';
-
-                // Renk göstergesi
                 const colorBadge = document.createElement('span');
                 colorBadge.className = 'badge me-2';
                 colorBadge.style.backgroundColor = getColorHex(variant.color.value);
                 colorBadge.style.color = getContrastColor(variant.color.value);
                 colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
-
                 variantCell.appendChild(colorBadge);
                 variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
-
-                // Stok miktarı hücresi
                 const stockCell = document.createElement('td');
                 const stockInput = document.createElement('input');
                 stockInput.type = 'number';
                 stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
                 stockInput.className = 'form-control form-control-sm';
                 stockInput.min = 0;
-                stockInput.value = 0;
+                // Mevcut miktarı ata
+                const miktar = (mevcutVaryasyonlar[variant.color.value] && mevcutVaryasyonlar[variant.color.value][variant.size.value])
+                    ? mevcutVaryasyonlar[variant.color.value][variant.size.value]
+                    : 0;
+                stockInput.value = miktar;
                 stockInput.required = true;
-
                 stockCell.appendChild(stockInput);
-
                 row.appendChild(variantCell);
                 row.appendChild(stockCell);
                 varyasyonTablo.appendChild(row);
