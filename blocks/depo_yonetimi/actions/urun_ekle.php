@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ana_urun->colors = json_encode($colors);
     $ana_urun->sizes = json_encode($sizes);
     $ana_urun->varyasyonlar = json_encode($varyasyonlar);
+    $ana_urun->min_stok_seviyesi = $min_stok_seviyesi;
 
     $raf = optional_param('raf', '', PARAM_TEXT);
     $bolum = optional_param('bolum', '', PARAM_TEXT);
