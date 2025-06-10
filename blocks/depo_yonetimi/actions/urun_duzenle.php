@@ -589,16 +589,7 @@ echo $OUTPUT->header();
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="pageInfo" class="text-center text-muted mt-2"></div>
-                            <div id="varyasyonPagination" class="d-flex justify-content-between align-items-center mt-3">
-                                <button id="prevPage" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-chevron-left me-1"></i> Önceki
-                                </button>
-                                <button id="nextPage" class="btn btn-sm btn-outline-primary">
-                                    Sonraki <i class="fas fa-chevron-right ms-1"></i>
-                                </button>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
@@ -767,40 +758,8 @@ echo $OUTPUT->header();
             });
         }
 
-        // Sayfalama kontrollerini güncelle
-        function updatePaginationControls() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
 
-            // Önceki sayfa butonunu güncelle
-            prevPageBtn.disabled = currentPage <= 1;
 
-            // Sonraki sayfa butonunu güncelle
-            nextPageBtn.disabled = currentPage >= totalPages;
-
-            // Sayfa bilgisini güncelle
-            document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
-        }
-
-        // Önceki sayfa butonuna tıklama
-        document.getElementById('prevPage').addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
-
-        // Sonraki sayfa butonuna tıklama
-        document.getElementById('nextPage').addEventListener('click', function() {
-            const totalPages = Math.ceil(allVariants.length / itemsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayVariantsByPage();
-                updatePaginationControls();
-            }
-        });
 
         // Renk kodlarını al
         function getColorHex(colorName) {
