@@ -103,24 +103,6 @@ class block_depo_yonetimi extends block_base {
         // Kategorilere göre ürünleri grupla
         $kategorilere_gore_urunler = [];
         foreach ($urunler as $urun) {
-            $min_stok = isset($urun->min_stok) ? (int)$urun->min_stok : 0;
-            $adet = (int)$urun->adet;
-
-            if ($adet <= 0) {
-                $badge_color = 'danger';
-                $icon = 'x';
-            } elseif ($adet <= $min_stok) {
-                $badge_color = 'danger';
-                $icon = 'error';
-            } elseif ($adet <= $min_stok + 5) {
-                $badge_color = 'warning';
-                $icon = 'error';
-            } else {
-                $badge_color = 'success';
-                $icon = 'check';
-            }
-
-
             $kategori = $DB->get_record('block_depo_yonetimi_kategoriler', ['id' => $urun->kategoriid]);
             $kategori_adi = $kategori ? $kategori->name : 'Kategorisiz';
 
@@ -296,10 +278,10 @@ class="btn btn-info">
                                         </td>
                                         <!-- Adet -->
                                         <td class="text-center align-middle">
-    <span class="badge bg-<?php echo $badge_color; ?> rounded-pill px-3 py-2 fw-medium">
-        <i class="bx bx-<?php echo $icon; ?> me-1"></i><?php echo $adet; ?> adet
-    </span>
-</td>
+                                            <span class="badge bg-' . ($urun->adet > 10 ? 'success' : ($urun->adet > 3 ? 'warning' : 'danger')) . ' rounded-pill px-3 py-2 fw-medium">
+                                                <i class="bx bx-' . ($urun->adet > 10 ? 'check' : ($urun->adet > 0 ? 'error' : 'x')) . ' me-1"></i>' . $urun->adet . ' adet
+                                            </span>
+                                        </td>
                                         <!-- İşlemler -->
                                         <td class="text-end pe-4 align-middle">
                                             <div class="btn-group">
