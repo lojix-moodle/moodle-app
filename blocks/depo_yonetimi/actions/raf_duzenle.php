@@ -256,12 +256,11 @@ $js = "
         const rafSelect = document.getElementById('edit_raf');
 
         // Sayfa yüklendiğinde mevcut bölüm için rafları yükle
-        updateRaflar(bolumSelect.value, '".addslashes($urun->raf)."');
-
+updateRaflar(bolumSelect.value, '<?php echo addslashes($urun->raf); ?>');
         // Bölüm değiştiğinde rafları güncelle
-        bolumSelect.addEventListener('change', function() {
-            updateRaflar(this.value);
-        });
+       bolumSelect.addEventListener('change', function() {
+    updateRaflar(this.value, ''); // Seçili rafı sıfırla
+});
 
         // Rafları güncelleme fonksiyonu
         function updateRaflar(bolum, selectedRaf) {
