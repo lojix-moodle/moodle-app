@@ -590,7 +590,6 @@ echo $OUTPUT->header();
                                 </table>
                             </div>
                         </div>
-                    </div>
                 </div>
 
                 <!-- Form Butonları -->
@@ -624,8 +623,10 @@ echo $OUTPUT->header();
         const varyasyonBolumu = document.getElementById('varyasyonBolumu');
         const varyasyonTablo = document.getElementById('varyasyonTablo');
 
+
         // Mevcut varyasyonları JSON'dan al
         const mevcutVaryasyonlar = <?php echo !empty($urun->varyasyonlar) ? $urun->varyasyonlar : '{}'; ?>;
+        let allVariants = [];
 
         // Sayfa yüklendiğinde mevcut varyasyonları göster
         document.addEventListener('DOMContentLoaded', function() {
@@ -644,29 +645,64 @@ echo $OUTPUT->header();
             });
 
             if (selectedColors.length > 0 && selectedSizes.length > 0) {
-                // Varyasyonları oluştur ve göster
-                createVariations(selectedColors, selectedSizes);
+                // Varyasyonları oluştur
+                allVariants = [];
+                selectedColors.forEach(color => {
+                    selectedSizes.forEach(size => {
+                        allVariants.push({
+                            color: color,
+                            size: size
+                        });
+                    });
+                });
+
             }
         });
 
-        // Varyasyon oluşturma
+        // Varyasyonları tabloya ekle
+        function displayAllVariants() {
+            varyasyonTablo.innerHTML = '';
+            allVariants.forEach(variant => {
+                const row = document.createElement('tr');
+                const variantCell = document.createElement('td');
+                variantCell.className = 'd-flex align-items-center';
+                const colorBadge = document.createElement('span');
+                colorBadge.className = 'badge me-2';
+                colorBadge.style.backgroundColor = getColorHex(variant.color.value);
+                colorBadge.style.color = getContrastColor(variant.color.value);
+                colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
+                variantCell.appendChild(colorBadge);
+                variantCell.appendChild(document.createTextNode(variant.color.text + ' / ' + variant.size.text));
+                const stockCell = document.createElement('td');
+                const stockInput = document.createElement('input');
+                stockInput.type = 'number';
+                stockInput.name = `varyasyon[${variant.color.value}][${variant.size.value}]`;
+                stockInput.className = 'form-control form-control-sm';
+                stockInput.min = 0;
+                stockInput.value = 0;
+                if (mevcutVaryasyonlar &&
+                    mevcutVaryasyonlar[variant.color.value] &&
+                    mevcutVaryasyonlar[variant.color.value][variant.size.value] !== undefined) {
+                    stockInput.value = mevcutVaryasyonlar[variant.color.value][variant.size.value];
+                }
+                stockInput.required = true;
+                stockCell.appendChild(stockInput);
+                row.appendChild(variantCell);
+                row.appendChild(stockCell);
+                varyasyonTablo.appendChild(row);
+            });
+        }
+
+// Varyasyon oluşturma
         varyasyonOlusturBtn.addEventListener('click', function() {
-            // Seçilen renkler ve boyutları al
-            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
-            });
-
-            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => {
-                return {
-                    value: opt.value,
-                    text: opt.textContent
-                };
-            });
-
-            // Hiçbir seçim yapılmadıysa uyarı ver
+            const selectedColors = Array.from(colorSelect.selectedOptions).map(opt => ({
+                value: opt.value,
+                text: opt.textContent
+            }));
+            const selectedSizes = Array.from(sizeSelect.selectedOptions).map(opt => ({
+                value: opt.value,
+                text: opt.textContent
+            }));
             if (selectedColors.length === 0 || selectedSizes.length === 0) {
                 Swal.fire({
                     icon: 'warning',
@@ -677,71 +713,19 @@ echo $OUTPUT->header();
                 });
                 return;
             }
-
-            // Varyasyon bölümünü göster
             varyasyonBolumu.classList.remove('d-none');
-            // Uyarı mesajını gizle
             const uyariMesaji = varyasyonBolumu.querySelector('.alert-info');
-            if (uyariMesaji) {
-                uyariMesaji.classList.add('d-none');
-            }
-
-            // Varyasyonları oluştur ve göster
-            createVariations(selectedColors, selectedSizes);
-        });
-
-        // Varyasyonları oluştur ve göster
-        function createVariations(selectedColors, selectedSizes) {
-            // Tabloyu temizle
-            varyasyonTablo.innerHTML = '';
-
-            // Tüm varyasyonları oluştur ve ekle
+            if (uyariMesaji) uyariMesaji.classList.add('d-none');
+            allVariants = [];
             selectedColors.forEach(color => {
                 selectedSizes.forEach(size => {
-                    const row = document.createElement('tr');
-
-                    // Renk + Boyut hücresi
-                    const variantCell = document.createElement('td');
-                    variantCell.className = 'd-flex align-items-center';
-
-                    // Renk göstergesi
-                    const colorBadge = document.createElement('span');
-                    colorBadge.className = 'badge me-2';
-                    colorBadge.style.backgroundColor = getColorHex(color.value);
-                    colorBadge.style.color = getContrastColor(color.value);
-                    colorBadge.innerHTML = '&nbsp;&nbsp;&nbsp;';
-
-                    variantCell.appendChild(colorBadge);
-                    variantCell.appendChild(document.createTextNode(color.text + ' / ' + size.text));
-
-                    // Stok miktarı hücresi
-                    const stockCell = document.createElement('td');
-                    const stockInput = document.createElement('input');
-                    stockInput.type = 'number';
-                    stockInput.name = `varyasyon[${color.value}][${size.value}]`;
-                    stockInput.className = 'form-control form-control-sm';
-                    stockInput.min = 0;
-
-                    // Mevcut varyasyon değerini kontrol et ve ata
-                    stockInput.value = 0; // Varsayılan değer
-
-                    // Mevcut varyasyon verisinden değeri al
-                    if (mevcutVaryasyonlar &&
-                        mevcutVaryasyonlar[color.value] &&
-                        mevcutVaryasyonlar[color.value][size.value] !== undefined) {
-                        stockInput.value = mevcutVaryasyonlar[color.value][size.value];
-                    }
-
-                    stockInput.required = true;
-
-                    stockCell.appendChild(stockInput);
-
-                    row.appendChild(variantCell);
-                    row.appendChild(stockCell);
-                    varyasyonTablo.appendChild(row);
+                    allVariants.push({ color, size });
                 });
             });
-        }
+            displayAllVariants();
+        });
+
+
 
         // Renk kodlarını al
         function getColorHex(colorName) {
@@ -852,53 +836,66 @@ echo $OUTPUT->header();
                         Swal.fire({
                             icon: 'question',
                             title: 'Onay',
-// ... önceki kodlar ...
-
-                            html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok girişi yapıldı.<br>Kaydetmek istiyor musunuz?</p>`,
+                            html: `<p>${validVariants} farklı varyasyon için toplam <strong>${varyasyonToplam}</strong> adet stok güncellemek üzeresiniz.</p>` +
+                                `<p>Devam etmek istiyor musunuz?</p>`,
                             showCancelButton: true,
-                            confirmButtonText: 'Evet, Kaydet',
-                            cancelButtonText: 'Vazgeç',
-                            confirmButtonColor: '#3e64ff'
+                            confirmButtonText: 'Evet, Güncelle',
+                            cancelButtonText: 'İptal',
+                            confirmButtonColor: '#3e64ff',
+                            cancelButtonColor: '#6c757d'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 loadingOverlay.style.display = 'flex';
+                                submitBtn.disabled = true;
                                 form.submit();
                             }
                         });
-                        return;
+                    } else {
+                        // Varyasyon yok, normal form gönderimi
+                        loadingOverlay.style.display = 'flex';
+                        submitBtn.disabled = true;
                     }
                 }
-                // Varyasyon yoksa direkt gönder
-                loadingOverlay.style.display = 'flex';
-            }
-            form.classList.add('was-validated');
-        }, false);
-    });
+
+                form.classList.add('was-validated');
+            }, false);
+        });
     })();
 
-    // Barkod oluşturma ve yazdırma işlemleri
+</script>
+
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const barcodeValue = document.getElementById('barkod');
         const printBtn = document.getElementById('print-barcode');
         const generateBtn = document.getElementById('generate-barcode');
-        const barcodeContainer = document.querySelector('.barcode-container');
 
         function generateBarcode() {
-            if (barcodeValue.value.trim() !== '' && typeof JsBarcode !== 'undefined') {
-                JsBarcode("#barcode", barcodeValue.value, {
-                    format: "CODE128",
-                    lineColor: "#000",
-                    width: 2,
-                    height: 60,
-                    displayValue: true
-                });
-                barcodeContainer.style.display = 'block';
+            if (barcodeValue.value.trim() !== '') {
+                try {
+                    JsBarcode("#barcode-svg", barcodeValue.value.trim(), {
+                        format: "code128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Barkod oluşturulamadı: ' + e.message
+                    });
+                }
             } else {
-                barcodeContainer.style.display = 'none';
+                document.getElementById('barcode-svg').innerHTML = '';
             }
         }
 
+        // Rastgele barkod üret
         generateBtn.addEventListener('click', function() {
+            // 13 haneli rastgele sayı üret
             let randomBarcode = '';
             for (let i = 0; i < 13; i++) {
                 randomBarcode += Math.floor(Math.random() * 10);
@@ -908,7 +905,6 @@ echo $OUTPUT->header();
         });
 
         barcodeValue.addEventListener('input', generateBarcode);
-
         if (barcodeValue.value.trim() !== '') {
             generateBarcode();
         }
@@ -919,7 +915,7 @@ echo $OUTPUT->header();
             printWindow.document.write('<style>body { font-family: Arial; text-align: center; } .barcode-container { margin: 20px; }</style>');
             printWindow.document.write('</head><body>');
             printWindow.document.write('<h4>Ürün: <?php echo htmlspecialchars($urun->name); ?></h4>');
-            printWindow.document.write('<div class="barcode-container">' + barcodeContainer.innerHTML + '</div>');
+            printWindow.document.write('<div class="barcode-container">' + document.querySelector('.barcode-container').innerHTML + '</div>');
             printWindow.document.write('</body></html>');
             printWindow.document.close();
             printWindow.focus();
@@ -931,6 +927,11 @@ echo $OUTPUT->header();
     });
 </script>
 
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <?php
 echo $OUTPUT->footer();
 ?>
+
