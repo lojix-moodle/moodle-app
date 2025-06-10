@@ -570,14 +570,16 @@ echo $OUTPUT->header();
                                         <span class="text-muted fst-italic">Belirtilmemiş</span>
                                     <?php endif; ?>
                                 </td>
-                                <a href="#"
-                                   class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn"
-                                   data-id="<?php echo $urun->id; ?>"
-                                   data-urunadi="<?php echo htmlspecialchars($urun->name); ?>"
-                                   data-bolum="<?php echo htmlspecialchars($urun->bolum); ?>"
-                                   data-raf="<?php echo htmlspecialchars($urun->raf); ?>">
-                                    <i class="fa fa-edit me-1"></i> Düzenle
-                                </a>
+                                <td class="text-end pe-4">
+                                    <a href="#"
+                                       class="btn btn-sm btn-outline-primary border-0 rounded-pill px-3 edit-btn"
+                                       data-id="<?php echo $urun->id; ?>"
+                                       data-urunadi="<?php echo htmlspecialchars($urun->name); ?>"
+                                       data-bolum="<?php echo htmlspecialchars($urun->bolum); ?>"
+                                       data-raf="<?php echo htmlspecialchars($urun->raf); ?>">
+                                        <i class="fa fa-edit me-1"></i> Düzenle
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
