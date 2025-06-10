@@ -646,85 +646,232 @@ echo $OUTPUT->header();
 
     <!-- Bootstrap Modal ve SweetAlert için gerekli JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Düzenle butonlarına tıklama olayını ekle
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr');
-                    const urunId = row.dataset.id;
-                    const urunAdi = row.querySelector('td.ps-4 div.fw-medium').textContent.trim();
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const urunId = row.dataset.id;
+                const urunAdi = row.querySelector('td.ps-4 div.fw-medium').textContent.trim();
 
-                    // Bölüm ve raf bilgilerini al
-                    const bolumCell = row.querySelector('.bolum-cell');
-                    const rafCell = row.querySelector('.raf-cell');
+                // Bölüm ve raf badge'lerinden metni al
+                const bolumCell = row.querySelector('.bolum-cell .badge');
+                const rafCell = row.querySelector('.raf-cell .badge');
+                const bolum = bolumCell ? bolumCell.textContent.trim() : '';
+                const raf = rafCell ? rafCell.textContent.trim() : '';
 
-                    // Bölüm bilgisini al (badge içinde veya italic text içinde)
-                    let bolum = '';
-                    if (bolumCell.querySelector('.badge')) {
-                        bolum = bolumCell.querySelector('.badge').textContent.trim().replace('', '').trim();
-                    } else if (bolumCell.querySelector('.text-muted')) {
-                        bolum = '';
+                document.getElementById('edit_urun_id').value = urunId;
+                document.getElementById('edit_urun_adi').value = urunAdi;
+
+                // Bölüm select'inde mevcut bölümü seçili yap
+                const editBolumSelect = document.getElementById('edit_bolum');
+                for(let i = 0; i < editBolumSelect.options.length; i++) {
+                    if(editBolumSelect.options[i].text === bolum) {
+                        editBolumSelect.selectedIndex = i;
+                        break;
                     }
+                }
 
-                    // Raf bilgisini al (badge içinde veya italic text içinde)
-                    let raf = '';
-                    if (rafCell.querySelector('.badge')) {
-                        raf = rafCell.querySelector('.badge').textContent.trim().replace('', '').trim();
-                    } else if (rafCell.querySelector('.text-muted')) {
-                        raf = '';
-                    }
+                // Raf seçeneklerini güncelle ve mevcut rafı seçili yap
+                updateRaflar.call(editBolumSelect, raf);
 
-                    // Modal alanlarını doldur
-                    document.getElementById('edit_urun_id').value = urunId;
-                    document.getElementById('edit_urun_adi').value = urunAdi;
-
-                    // Bölüm select'inde mevcut bölümü seçili yap
-                    const editBolumSelect = document.getElementById('edit_bolum');
-                    if (bolum) {
-                        for(let i = 0; i < editBolumSelect.options.length; i++) {
-                            if(editBolumSelect.options[i].text === bolum) {
-                                editBolumSelect.selectedIndex = i;
-                                break;
-                            }
-                        }
-                    } else {
-                        editBolumSelect.selectedIndex = 0; // "-- Bölüm Seçin --" seçeneği
-                    }
-
-                    // Raf seçeneklerini güncelle ve mevcut rafı seçili yap
-                    updateRaflar(editBolumSelect, raf);
-
-                    // Modal'ı aç
-                    if (typeof bootstrap !== 'undefined') {
-                        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                        editModal.show();
-                    }
-                });
+                // Modal'ı aç
+                if (typeof bootstrap !== 'undefined') {
+                    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                }
             });
+        });
 
-            // Rafları güncelleme fonksiyonu (bölüm değiştiğinde)
-            function updateRaflar(bolumSelect, selectedRaf = '') {
-                const bolum = bolumSelect.value;
-                const editRafSelect = document.getElementById('edit_raf');
+        // Rafları güncelleme fonksiyonu
+        function updateRaflar(selectedRaf) {
+            const bolum = this.value;
+            const editRafSelect = document.getElementById('edit_raf');
+            editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
+
+            if (bolum === "Outdoor / Trekking Ayakkabıları") {
+                addRafOption(editRafSelect, "A1 Rafı");
+                addRafOption(editRafSelect, "A2 Rafı");
+                addRafOption(editRafSelect, "A3 Rafı");
+                addRafOption(editRafSelect, "A4 Rafı");
+                addRafOption(editRafSelect, "A5 Rafı");
+                addRafOption(editRafSelect, "A6 Rafı");
+                addRafOption(editRafSelect, "A7 Rafı");
+                addRafOption(editRafSelect, "A8 Rafı");
+                addRafOption(editRafSelect, "A9 Rafı");
+                addRafOption(editRafSelect, "A10 Rafı");
+
+            } else if (bolum === "Botlar & Çizmeler") {
+                addRafOption(editRafSelect, "B1 Rafı");
+                addRafOption(editRafSelect, "B2 Rafı");
+                addRafOption(editRafSelect, "B3 Rafı");
+                addRafOption(editRafSelect, "B4 Rafı");
+                addRafOption(editRafSelect, "B5 Rafı");
+                addRafOption(editRafSelect, "B6 Rafı");
+                addRafOption(editRafSelect, "B7 Rafı");
+                addRafOption(editRafSelect, "B8 Rafı");
+                addRafOption(editRafSelect, "B9 Rafı");
+                addRafOption(editRafSelect, "B10 Rafı");
+
+            } else if (bolum === "Klasik Ayakkabılar") {
+                addRafOption(editRafSelect, "C1 Rafı");
+                addRafOption(editRafSelect, "C2 Rafı");
+                addRafOption(editRafSelect, "C3 Rafı");
+                addRafOption(editRafSelect, "C4 Rafı");
+                addRafOption(editRafSelect, "C5 Rafı");
+                addRafOption(editRafSelect, "C6 Rafı");
+                addRafOption(editRafSelect, "C7 Rafı");
+                addRafOption(editRafSelect, "C8 Rafı");
+                addRafOption(editRafSelect, "C9 Rafı");
+                addRafOption(editRafSelect, "C10 Rafı");
+            } else if (bolum === "Sandalet & Terlik") {
+                addRafOption(editRafSelect, "D1 Rafı");
+                addRafOption(editRafSelect, "D2 Rafı");
+                addRafOption(editRafSelect, "D3 Rafı");
+                addRafOption(editRafSelect, "D4 Rafı");
+                addRafOption(editRafSelect, "D5 Rafı");
+                addRafOption(editRafSelect, "D6 Rafı");
+                addRafOption(editRafSelect, "D7 Rafı");
+                addRafOption(editRafSelect, "D8 Rafı");
+                addRafOption(editRafSelect, "D9 Rafı");
+                addRafOption(editRafSelect, "D10 Rafı");
+            } else if (bolum === "Spor Ayakkabılar") {
+                addRafOption(editRafSelect, "E1 Rafı");
+                addRafOption(editRafSelect, "E2 Rafı");
+                addRafOption(editRafSelect, "E3 Rafı");
+                addRafOption(editRafSelect, "E4 Rafı");
+                addRafOption(editRafSelect, "E5 Rafı");
+                addRafOption(editRafSelect, "E6 Rafı");
+                addRafOption(editRafSelect, "E7 Rafı");
+                addRafOption(editRafSelect, "E8 Rafı");
+                addRafOption(editRafSelect, "E9 Rafı");
+                addRafOption(editRafSelect, "E10 Rafı");
+            }
+            else if (bolum) {
+                addRafOption(editRafSelect, "F1 Rafı");
+                addRafOption(editRafSelect, "F2 Rafı");
+                addRafOption(editRafSelect, "F3 Rafı");
+                addRafOption(editRafSelect, "F4 Rafı");
+                addRafOption(editRafSelect, "F5 Rafı");
+                addRafOption(editRafSelect, "F6 Rafı");
+                addRafOption(editRafSelect, "F7 Rafı");
+                addRafOption(editRafSelect, "F8 Rafı");
+                addRafOption(editRafSelect, "F9 Rafı");
+                addRafOption(editRafSelect, "F10 Rafı");
+            }
+
+
+            // Mevcut rafı seçili yap
+            if (selectedRaf) {
+                for(let i = 0; i < editRafSelect.options.length; i++) {
+                    if(editRafSelect.options[i].text === selectedRaf) {
+                        editRafSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        function addRafOption(select, value) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = value;
+            select.appendChild(option);
+        }
+
+        // Bölüm değiştiğinde rafları güncelle
+        document.getElementById('edit_bolum').addEventListener('change', updateRaflar);
+
+            // Bölüm değiştiğinde rafları güncelle
+            if (editBolumSelect) {
+                editBolumSelect.addEventListener("change", updateRaflar);
+            }
+
+            // Değişikliği kaydet butonu
+            if (saveChangesBtn) {
+                saveChangesBtn.addEventListener('click', function() {
+                    const formData = new FormData(editForm);
+                    formData.append('action', 'update');
+                    formData.append('depoid', <?php echo $depoid; ?>);
+
+                    // AJAX ile verileri gönder
+                    fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Başarılı!',
+                                        text: 'Raf bilgileri güncellendi.',
+                                        confirmButtonColor: '#3e64ff'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    alert('Başarılı! Raf bilgileri güncellendi.');
+                                    location.reload();
+                                }
+                            } else {
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Hata!',
+                                        text: data.message || 'Bir hata oluştu.',
+                                        confirmButtonColor: '#3e64ff'
+                                    });
+                                } else {
+                                    alert('Hata: ' + (data.message || 'Bir hata oluştu.'));
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Hata:', error);
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Bağlantı Hatası!',
+                                    text: 'Sunucuyla bağlantı kurulamadı.',
+                                    confirmButtonColor: '#3e64ff'
+                                });
+                            } else {
+                                alert('Bağlantı Hatası! Sunucuyla bağlantı kurulamadı.');
+                            }
+                        });
+                });
+            }
+
+            // Rafları güncelleme fonksiyonu
+            function updateRaflar(selectedRaf) {
+                const bolum = this.value;
+
+                // Raf seçimini temizle
                 editRafSelect.innerHTML = '<option value="">-- Raf Seçin --</option>';
 
-                if (!bolum) return;
-
-                // Bölüme göre raf seçeneklerini oluştur
-                if (bolum === "Outdoor / Trekking Ayakkabıları") {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `A${i} Rafı`);
-                } else if (bolum === "Botlar & Çizmeler") {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `B${i} Rafı`);
-                } else if (bolum === "Klasik Ayakkabılar") {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `C${i} Rafı`);
-                } else if (bolum === "Sandalet & Terlik") {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `D${i} Rafı`);
-                } else if (bolum === "Spor Ayakkabılar") {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `E${i} Rafı`);
-                } else {
-                    for (let i = 1; i <= 10; i++) addRafOption(editRafSelect, `F${i} Rafı`);
+                // Bölüme göre rafları ayarla
+                if (bolum === "Tişört" || bolum === "Gömlek") {
+                    addRafOption(editRafSelect, "A1 Rafı");
+                    addRafOption(editRafSelect, "A2 Rafı");
+                    addRafOption(editRafSelect, "A3 Rafı");
+                } else if (bolum === "Pantolon") {
+                    addRafOption(editRafSelect, "B1 Rafı");
+                    addRafOption(editRafSelect, "B2 Rafı");
+                    addRafOption(editRafSelect, "B3 Rafı");
+                } else if (bolum === "Ayakkabı") {
+                    addRafOption(editRafSelect, "C1 Rafı");
+                    addRafOption(editRafSelect, "C2 Rafı");
+                    addRafOption(editRafSelect, "C3 Rafı");
+                    addRafOption(editRafSelect, "C4 Rafı");
+                } else if (bolum === "Aksesuar" || bolum === "Çanta") {
+                    addRafOption(editRafSelect, "D1 Rafı");
+                    addRafOption(editRafSelect, "D2 Rafı");
+                } else if (bolum) {
+                    // Diğer tüm bölümler için
+                    addRafOption(editRafSelect, "E1 Rafı");
+                    addRafOption(editRafSelect, "E2 Rafı");
+                    addRafOption(editRafSelect, "E3 Rafı");
                 }
 
                 // Eğer önceden seçilmiş bir raf varsa onu seç
@@ -738,11 +885,6 @@ echo $OUTPUT->header();
                 }
             }
 
-            // Bölüm değiştiğinde rafları güncelle
-            document.getElementById('edit_bolum').addEventListener('change', function() {
-                updateRaflar(this);
-            });
-
             // Raf seçeneği ekleme yardımcı fonksiyonu
             function addRafOption(select, value) {
                 const option = document.createElement("option");
@@ -750,52 +892,6 @@ echo $OUTPUT->header();
                 option.text = value;
                 select.appendChild(option);
             }
-
-            // Kaydet butonu işlevselliği
-            document.getElementById('save-changes').addEventListener('click', function() {
-                const formData = new FormData(document.getElementById('editForm'));
-                formData.append('action', 'update');
-                formData.append('depoid', <?php echo $depoid; ?>);
-
-                fetch('<?php echo new moodle_url('/blocks/depo_yonetimi/actions/raf_yonetimi.php'); ?>', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Başarılı!',
-                                text: data.message,
-                                confirmButtonColor: '#3e64ff'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Hata!',
-                                text: data.message || 'Bir hata oluştu.',
-                                confirmButtonColor: '#3e64ff'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Hata:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Bağlantı Hatası!',
-                            text: 'Sunucuyla bağlantı kurulamadı.',
-                            confirmButtonColor: '#3e64ff'
-                        });
-                    });
-            });
-
-            // Tabloyu yenile butonu
-            document.getElementById('refreshTable').addEventListener('click', function() {
-                location.reload();
-            });
         });
     </script>
 
