@@ -76,6 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sizes = $_POST['sizes'];
     $varyasyonlar = $_POST['varyasyon'];
 
+    $varyasyonlar = json_decode($urun->varyasyonlar, true);
+    $colors = json_decode($urun->colors, true);
+    $sizes = json_decode($urun->sizes, true);
+
+
+
     // Mevcut ürünün ID'sini koruyarak güncelleyelim
     $guncellenecekUrun = new stdClass();
     $guncellenecekUrun->id = $urunid; // Mevcut ürünün ID'sini koruyoruz
@@ -608,6 +614,61 @@ echo $OUTPUT->header();
     </div>
 </div>
 
+
+<script>
+    window.existingVariants = <?php echo json_encode($varyasyonlar ?? []); ?>;
+    window.existingColors = <?php echo json_encode($colors ?? []); ?>;
+    window.existingSizes = <?php echo json_encode($sizes ?? []); ?>;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Eğer düzenleme modunda mevcut varyasyonlar varsa tabloyu doldur
+        if (window.existingVariants && Object.keys(window.existingVariants).length > 0) {
+            // Renk ve boyut select'lerini doldur
+            if (window.existingColors) {
+                const colorSelect = document.getElementById('colors');
+                Array.from(colorSelect.options).forEach(opt => {
+                    if (window.existingColors.includes(opt.value)) {
+                        opt.selected = true;
+                    }
+                });
+            }
+            if (window.existingSizes) {
+                const sizeSelect = document.getElementById('sizes');
+                Array.from(sizeSelect.options).forEach(opt => {
+                    if (window.existingSizes.includes(opt.value)) {
+                        opt.selected = true;
+                    }
+                });
+            }
+
+            // Varyasyon tablosunu oluştur
+            const varyasyonBolumu = document.getElementById('varyasyonBolumu');
+            const varyasyonTablo = document.getElementById('varyasyonTablo');
+            varyasyonBolumu.classList.remove('d-none');
+            varyasyonTablo.innerHTML = '';
+
+            Object.entries(window.existingVariants).forEach(([renk, boyutlar]) => {
+                Object.entries(boyutlar).forEach(([boyut, miktar]) => {
+                    const row = document.createElement('tr');
+                    const variantCell = document.createElement('td');
+                    variantCell.textContent = renk + ' / ' + boyut;
+                    const stockCell = document.createElement('td');
+                    const stockInput = document.createElement('input');
+                    stockInput.type = 'number';
+                    stockInput.name = `varyasyon[${renk}][${boyut}]`;
+                    stockInput.className = 'form-control form-control-sm';
+                    stockInput.min = 0;
+                    stockInput.value = miktar;
+                    stockInput.required = true;
+                    stockCell.appendChild(stockInput);
+                    row.appendChild(variantCell);
+                    row.appendChild(stockCell);
+                    varyasyonTablo.appendChild(row);
+                });
+            });
+        }
+    });
+</script>
 <script>
     (function () {
         'use strict';
