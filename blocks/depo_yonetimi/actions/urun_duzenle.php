@@ -924,6 +924,35 @@ echo $OUTPUT->header();
                 printWindow.close();
             }, 500);
         });
+
+        // Mevcut varyasyonlar varsa tabloyu doldur
+        if (Object.keys(mevcutVaryasyonlar).length > 0) {
+            allVariants = [];
+            for (const renk in mevcutVaryasyonlar) {
+                for (const boyut in mevcutVaryasyonlar[renk]) {
+                    allVariants.push({
+                        color: { value: renk, text: getColorLabel(renk) },
+                        size: { value: boyut, text: boyut }
+                    });
+                }
+            }
+            displayAllVariants();
+            varyasyonBolumu.classList.remove('d-none');
+            const uyariMesaji = varyasyonBolumu.querySelector('.alert-info');
+            if (uyariMesaji) uyariMesaji.classList.add('d-none');
+        }
+
+        // Yardımcı fonksiyon: Renk etiketini getir
+        function getColorLabel(value) {
+            const colorLabels = {
+                'kirmizi': 'Kırmızı', 'mavi': 'Mavi', 'siyah': 'Siyah', 'beyaz': 'Beyaz',
+                'yesil': 'Yeşil', 'sari': 'Sarı', 'turuncu': 'Turuncu', 'mor': 'Mor',
+                'pembe': 'Pembe', 'gri': 'Gri', 'bej': 'Bej', 'lacivert': 'Lacivert',
+                'kahverengi': 'Kahverengi', 'haki': 'Haki', 'vizon': 'Vizon', 'bordo': 'Bordo'
+            };
+            return colorLabels[value] || value;
+        }
+
     });
 </script>
 
