@@ -477,9 +477,9 @@ class="btn btn-info">
                                 <div class="card-footer bg-transparent border-top-light d-flex justify-content-between align-items-center py-3">
     <div>
         <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '"
-           class="btn btn-sm btn-outline-secondary rounded-pill me-2" title="Depoyu Düzenle" data-bs-toggle="tooltip">
-            <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Düzenle</span>
-        </a>
+   class="btn btn-sm btn-outline-info rounded-pill me-2" title="Depoyu Düzenle" data-bs-toggle="tooltip">
+    <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Düzenle</span>
+</a>
         <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]) . '"
            class="btn btn-sm btn-outline-danger rounded-pill" title="Depoyu Sil" data-bs-toggle="tooltip">
             <i class="fas fa-trash-alt me-1"></i><span class="d-none d-sm-inline">Sil</span>
