@@ -474,20 +474,19 @@ class="btn btn-info">
                                     </div>
                                     ' . $sorumlu_html . '
                                 </div>
-                                // Şu şekilde olmalı:
-<div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pt-0">
+                                <div class="card-footer bg-transparent border-top-light d-flex justify-content-between align-items-center py-3">
     <div>
-        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '" 
-           class="btn btn-sm btn-outline-secondary me-1" title="Depoyu Düzenle">
-            <i class="fas fa-edit"></i>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '"
+           class="btn btn-sm btn-outline-secondary rounded-pill me-2" title="Depoyu Düzenle" data-bs-toggle="tooltip">
+            <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Düzenle</span>
         </a>
-        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]) . '" 
-           class="btn btn-sm btn-outline-danger" title="Depoyu Sil">
-            <i class="fas fa-trash"></i>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]) . '"
+           class="btn btn-sm btn-outline-danger rounded-pill" title="Depoyu Sil" data-bs-toggle="tooltip">
+            <i class="fas fa-trash-alt me-1"></i><span class="d-none d-sm-inline">Sil</span>
         </a>
     </div>
-    <a href="' . $url->out() . '" class="btn btn-sm btn-outline-primary rounded-pill">
-        <i class="fas fa-arrow-right me-1"></i> Detaylar
+    <a href="' . $url->out() . '" class="btn btn-sm btn-primary rounded-pill">
+        <i class="fas fa-eye me-1"></i> Detaylar
     </a>
 </div>
                             </div>
@@ -565,6 +564,34 @@ class="btn btn-info">
             width: 22px;
             height: 22px;
         }
+        
+        .border-dashed {
+    border-style: dashed !important;
+}
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease;
+}
+.avatar-xs {
+    width: 22px;
+    height: 22px;
+}
+.border-top-light {
+    border-top: 1px solid rgba(0,0,0,.05) !important;
+}
+.card-footer .btn {
+    transition: all 0.3s ease;
+}
+.card-footer .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+.card-footer .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+        
         </style>';
 
         return $html;
