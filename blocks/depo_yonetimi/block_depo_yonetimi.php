@@ -474,11 +474,22 @@ class="btn btn-info">
                                     </div>
                                     ' . $sorumlu_html . '
                                 </div>
-                                <div class="card-footer bg-transparent border-0 text-end pt-0">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill">
-                                        <i class="fas fa-arrow-right me-1"></i> Detaylar
-                                    </button>
-                                </div>
+                                // Şu şekilde olmalı:
+<div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pt-0">
+    <div>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_duzenle.php', ['depoid' => $depo->id]) . '" 
+           class="btn btn-sm btn-outline-secondary me-1" title="Depoyu Düzenle">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="' . new moodle_url('/blocks/depo_yonetimi/actions/depo_sil.php', ['depoid' => $depo->id]) . '" 
+           class="btn btn-sm btn-outline-danger" title="Depoyu Sil">
+            <i class="fas fa-trash"></i>
+        </a>
+    </div>
+    <a href="' . $url->out() . '" class="btn btn-sm btn-outline-primary rounded-pill">
+        <i class="fas fa-arrow-right me-1"></i> Detaylar
+    </a>
+</div>
                             </div>
                         </a>
                     </div>';
